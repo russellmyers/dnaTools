@@ -113,6 +113,12 @@ function initialisePage() {
     processHTMLParams();
     setUpWorkerListeners();
 
+    document.getElementById('fileInput')
+        .addEventListener('change', readSingleFile, false);
+
+    document.getElementById('fileMotifInput')
+        .addEventListener('change', readSingleSequencesFile, false);
+
 //  document.getElementById('motifBrute').checked = true;
     motifRadClicked('motifBrute');
 
@@ -455,6 +461,42 @@ function readSingleFile(e) {
     reader.readAsText(file);
 }
 
+function readSingleSequencesFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+
+
+        var parts = contents.split(/\r\n|\r|\n/g);
+        parts = parts.filter(function(e) {
+            if (e.substring(0,1) === '>') {
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+
+        var joined = parts.join('\n');
+
+
+        document.getElementById('dnaStrings').value = joined;
+        motifsInput();
+    };
+    reader.readAsText(file);
+    //e.target.files[0] = '';
+   // document.getElementById('fileMotifInput').value = '';
+}
+
+
+function clearFileName(e) {
+    e.target.value = '';
+}
+
 
 function processHTMLParams()
 {
@@ -494,8 +536,7 @@ function displayContents(contents) {
     element.innerHTML = contents;
 }
 
-document.getElementById('fileInput')
-    .addEventListener('change', readSingleFile, false);
+
 
 
 
@@ -3031,7 +3072,7 @@ function randPressed(event) {
 
 function randMotifPressed(event) {
 
-    var numSequencesToGen = 4;
+    var numSequencesToGen = 10;
 
     var randN = document.getElementById('numMotifRand');
     var randNVal = parseInt(randN.value);

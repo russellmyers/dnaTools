@@ -296,13 +296,13 @@ input[type=number] {
 
 #mfkTools {
 
-    display:none;
+    display:block;
     height: 100px;
 }
 
 #motifTools {
 
-    display:block;
+    display:none;
     height: 100px;
 }
 

@@ -45,7 +45,7 @@
             <input type = "text" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
             <button type = "button" onclick="dnaInput(event)">Apply</button>
             <label for  fileInput>Load DNA :</label>
-            <input type = "file" name="fileInput" id = "fileInput">
+            <input type = "file" name="fileInput" onclick = "clearFileName(event)" id = "fileInput">
             <button type = "button" onclick="randPressed(event)" class="spacedBut">Random DNA</button>
             <input type = "number"  name = "numRand" id = "numRand"  min=1 max=1000000 value=50000>
             <!--span id = "dnaLengthText">DNA Sequence Len: </span>
@@ -94,7 +94,7 @@
                 <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
                 <button type = "button" onclick="sequencesInput(event)">Apply</button-->
                 <label for  filMotifeInput>Load Sequences :</label>
-                <input type = "file" name="fileMotifInput" id = "fileMotifInput">
+                <input type = "file" onclick = "clearFileName(event)" name="fileMotifInput" id = "fileMotifInput">
                 <button type = "button" onclick="randMotifPressed(event)" class="spacedBut">Random seq length</button>
                 <input type = "number"  name = "numMotifRand" id = "numMotifRand"  min=1 max=1000 value=20>
                 <!--span id = "dnaLengthText">DNA Sequence Len: </span>
