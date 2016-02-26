@@ -3023,6 +3023,29 @@ function randPressed(event) {
 }
 
 
+function randMotifPressed(event) {
+
+    var numSequencesToGen = 4;
+
+    var randN = document.getElementById('numMotifRand');
+    var randNVal = parseInt(randN.value);
+
+
+
+    var seqLines = '';
+
+    for (var i = 0;i < numSequencesToGen;++i) {
+        var dna = randomDNA(randNVal);
+        seqLines+=dna + '\n';
+    }
+
+    document.getElementById('dnaStrings').value = seqLines;
+    motifsInput();
+
+
+}
+
+
 function jumpToPressed() {
 
     var jumpToBase = parseInt(document.getElementById("jumpToBase").value) - 1;
