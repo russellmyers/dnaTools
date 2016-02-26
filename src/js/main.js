@@ -73,7 +73,7 @@ function testStuff() {
 
     var d2 = patternSequencesDist('CTCTGG',filtered);
 
-    var d2 = patternSequencesDist('aaa',
+    d2 = patternSequencesDist('aaa',
         [
             '',
             '',
@@ -86,7 +86,7 @@ function testStuff() {
             ''
         ],true);
 
-    var d2 = patternSequencesDist('aaa',
+    d2 = patternSequencesDist('aaa',
         [
             '',
             '',
@@ -122,6 +122,8 @@ function initialisePage() {
 function setUpWorkerListeners() {
     w.addEventListener('message', function(e) {
 
+        var resString, numKmer, numKmerVal, tot, dna, km;
+
         if (e.data.msgType === 'result') {
             console.log('Worker finished. Task: ' + e.data.task);
         }
@@ -143,7 +145,7 @@ function setUpWorkerListeners() {
                     //colourDNA(dnaMaster,null,document.getElementById("includeRevComplKS").checked);
 
                     if (document.getElementById('debugKS').checked) {
-                        var resString = '';
+                        resString = '';
 
                         var combined = mfk[0][0].concat(mfk[0][1]);
                         combined.sort();
@@ -176,7 +178,7 @@ function setUpWorkerListeners() {
                 case 'mostFrequentKmers':
 
                     mfk = e.data.indArray;
-                    var tot = 0;
+                    tot = 0;
                     if (mfk.length == 0) {
 
                     }
@@ -198,7 +200,7 @@ function setUpWorkerListeners() {
                      });
                      */
 
-                    var numKmer = document.getElementById('numKmers');
+                    numKmer = document.getElementById('numKmers');
                     numKmer.max = mfk.length;
                     if (mfk.length == 0) {
                         numKmer.min = 0;
@@ -210,8 +212,8 @@ function setUpWorkerListeners() {
                     }
 
 
-                    var numKmerVal = parseInt(numKmer.value);
-                    var dna = dnaMaster; // document.getElementById('dnaInput').value;
+                    numKmerVal = parseInt(numKmer.value);
+                    dna = dnaMaster; // document.getElementById('dnaInput').value;
 
                     if (mfk.length == 0) {
                         document.getElementById('kMerMostFreq').innerHTML = 'None';
@@ -219,7 +221,7 @@ function setUpWorkerListeners() {
 
                     }
                     else {
-                        var km = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
+                        km = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
                         // var km = dna.substring(mfk[numKmerVal - 1][0], mfk[numKmerVal - 1][0] + k);
                         document.getElementById('kMerMostFreq').innerHTML = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
                         document.getElementById('kMerRevCompl').innerHTML = reverseComplement(km);
@@ -230,7 +232,7 @@ function setUpWorkerListeners() {
                     colourDNA(dna, null, document.getElementById('includeRevComplMF').checked);
 
                     if (document.getElementById('debugMF').checked) {
-                        var resString = '';
+                        resString = '';
                         var debugRes = e.data.debugResult;
                          debugRes.forEach(function (el) {
                             resString += el;
@@ -251,7 +253,7 @@ function setUpWorkerListeners() {
 
                     mfk = e.data.indArray;
                     var clumps = e.data.clumps;
-                    var tot = 0;
+                    tot = 0;
                     if (mfk.length == 0) {
 
                     }
@@ -271,7 +273,7 @@ function setUpWorkerListeners() {
                         console.log('mfk entry: ' + m);
                     });
 
-                    var numKmer = document.getElementById('numKmers');
+                    numKmer = document.getElementById('numKmers');
                     numKmer.max = mfk.length;
                     if (mfk.length == 0) {
                         numKmer.min = 0;
@@ -283,8 +285,8 @@ function setUpWorkerListeners() {
                     }
 
 
-                    var numKmerVal = parseInt(numKmer.value);
-                    var dna = dnaMaster; //document.getElementById('dnaInput').value;
+                    numKmerVal = parseInt(numKmer.value);
+                    dna = dnaMaster; //document.getElementById('dnaInput').value;
 
                     if (mfk.length == 0) {
                         document.getElementById('kMerMostFreq').innerHTML = 'None';
@@ -293,7 +295,7 @@ function setUpWorkerListeners() {
 
                     }
                     else {
-                        var km = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
+                        km = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
                         // var km = dna.substring(mfk[numKmerVal - 1][0], mfk[numKmerVal - 1][0] + k);
                         document.getElementById('kMerMostFreq').innerHTML = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
                         document.getElementById('kMerRevCompl').innerHTML = reverseComplement(km);
@@ -1834,9 +1836,9 @@ function logoCanvas(motifs) {
     }
     charWidth *=2;
 
-    for (var c = 0;c < consensus.length; ++c) {
+    for (c = 0;c < consensus.length; ++c) {
         for (var r = 0;r < charHeightMatrix.length;++r) {
-            var size = charHeightMatrix[r][c][1] * 100;
+            size = charHeightMatrix[r][c][1] * 100;
             ctx.font = size + 'px Arial';
 
 
@@ -2559,6 +2561,7 @@ function colourDNAProgressNew(dna,mark,clumpsDetected,clumpSize) {
 
 
 }
+/*
 function colourDNAProgress(dna,mark,clumpsDetected) {
 
     var charsPerLine = 100;
@@ -2585,6 +2588,8 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
 
     var numKmer = document.getElementById('numKmers');
 
+    var s1,s2;
+
     chunks.forEach(function(chunk,chNum) {
 
         var totPosBegThisLine = chNum*charsPerLine;
@@ -2609,7 +2614,7 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
             }
 
             var clumpsFoundSecondHalf = false;
-            for (var ii = totPosBegThisLine + (charsPerLine / 2);ii < totPosBegNextLine;++ii) {
+            for (ii = totPosBegThisLine + (charsPerLine / 2);ii < totPosBegNextLine;++ii) {
                 if (clumpsDetected[ii]) {
                     clumpsFoundSecondHalf = true;
                     break;
@@ -2618,7 +2623,7 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
             }
 
 
-            var s1 = document.createElement('span');
+            s1 = document.createElement('span');
             if (clumpsFoundFirstHalf) {
                 s1.className += ' dnaCharHighlight';
             }
@@ -2626,7 +2631,7 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
             s1.textContent = chunk.substring(0,charsPerLine / 2);
             view.appendChild(s1);
 
-            var s2 = document.createElement('span');
+            s2 = document.createElement('span');
             if (clumpsFoundSecondHalf) {
                 s2.className += ' dnaCharHighlight';
             }
@@ -2638,12 +2643,12 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
         }
         else {
             var splitPoint = mark[0] - totPosBegThisLine;
-            var s1 = document.createElement('span');
+            s1 = document.createElement('span');
             s1.className += ' dnaChar';
             s1.textContent = chunk.substring(0,splitPoint);
             view.appendChild(s1);
 
-            var s2 = document.createElement('span');
+            s2 = document.createElement('span');
             s2.className += ' dnaChar';
             s2.textContent = chunk.substring(splitPoint,splitPoint+1);
             s2.className += ' dnaCharHighlight';
@@ -2659,7 +2664,7 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
         }
 
 
-
+*/
 
         /*
          for (var i = 0;i < chunk.length; ++i) {
@@ -2703,14 +2708,15 @@ function colourDNAProgress(dna,mark,clumpsDetected) {
          // console.log(d);
          }
          */
-
+        /*
         view.appendChild(document.createElement('br'));
 
 
-    });
+    })
 
 
 }
+*/
 
 
 //Events
