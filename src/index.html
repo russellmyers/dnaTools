@@ -262,10 +262,6 @@
                 <!--textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
                 <button type = "button" onclick="motifsInput(event)">Apply</button-->
 
-
-
-                </div>
-                <div class="midClump" id="midMotif">
                     <label for kMerLenMS  class="alignLab">k-mer Len</label>
                     <input type = "number" class="alignEl"  name = "kMerLenMS" onchange="kMerLenChanged(event)" id = "kMerLenMS" value = 6 min = 1 max = 100>
                     <label for maxMismatchMS id="maxMismatchLabMS" class="alignLab">Max Mismatches:</label>
@@ -277,19 +273,43 @@
                     <input type = "checkbox" class="alignEl"checked name = "laplaceMS" id = "laplaceMS">
                     <label for debugKS class="alignLab">Debug</label>
                     <input type = "checkbox" class="alignEl" name = "debugMS" id = "debugMS">
+
+                </div>
+                <div class="midClump" id="midMotif">
+                    <!--label for kMerLenMS  class="alignLab">k-mer Len</label>
+                    <input type = "number" class="alignEl"  name = "kMerLenMS" onchange="kMerLenChanged(event)" id = "kMerLenMS" value = 6 min = 1 max = 100>
+                    <label for maxMismatchMS id="maxMismatchLabMS" class="alignLab">Max Mismatches:</label>
+                    <input type = "number" class="alignEl" name = "maxMismatchMS"   id = "maxMismatchMS" value = 0 min = 0 max = 10>
+                    <label for numItersMS id="numItersLabMS" class="alignLab">Num Iterations:</label>
+                    <input type = "number" class = "sensibleNum alignEl" name = "numItersMS"   id = "numItersMS" value = 1 min = 1>
+
+                    <label for laplaceMS id="laplaceLabMS" class="alignLab">Laplace?</label>
+                    <input type = "checkbox" class="alignEl"checked name = "laplaceMS" id = "laplaceMS">
+                    <label for debugKS class="alignLab">Debug</label>
+                    <input type = "checkbox" class="alignEl" name = "debugMS" id = "debugMS"-->
+                    <input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
+                    <br>
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifBrute" value="motifBrute" checked>Brute
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifMedian" value="motifMedian" >Median String
+                    <br>
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy">Greedy Motif
+                    <br>
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">Random Motif
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler
                 </div>
                 <div class="rightClump" id="rightMotif">
-                    <input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
+                    <!--input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
                     <br>
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifBrute" value="motifBrute" checked>Brute
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifMedian" value="motifMedian" >Median String
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy">Greedy Motif
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">Random Motif
-                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler-->
+                    <button type = "button" class="fixedBut" onclick="runMotif(event)">Run</button>
+                    <button type = "button"  onclick="motifCompare(event)">Score Motifs</button>
                 </div>
 
-                     <button type = "button" class="fixedBut" onclick="runMotif(event)">Run</button>
-                <button type = "button"  onclick="motifCompare(event)">Score Motifs</button>
+
 
 
 
