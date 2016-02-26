@@ -1,0 +1,418 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <!--link rel="stylesheet" href="css/normalize.css"-->
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div id = "bannerDiv">
+            <div id = "leftBannerDiv">
+                <h2>
+                    <img style="margin-left: 20px" src = 'img/logo_cropped.png'>
+                    Genetics and Evolution - DNA Analysis Tools</h2>
+
+            </div>
+            <div id = "rightBannerDiv">
+            </div>
+        </div>
+
+        <div id = "rightTwo">DNA Stats</div>
+        <br>
+        <div id = "progressDiv">
+            <span id="currPosInDNA"></span>
+            <span id = "progress"></span>
+
+        </div>
+        <div id = "mfkTools">
+        <div id = "mfkInputTools">
+            <label for dnaInput>Enter DNA:</label>
+            <input type = "text" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
+            <button type = "button" onclick="dnaInput(event)">Apply</button>
+            <label for  fileInput>Load DNA :</label>
+            <input type = "file" name="fileInput" id = "fileInput">
+            <button type = "button" onclick="randPressed(event)" class="spacedBut">Random DNA</button>
+            <input type = "number"  name = "numRand" id = "numRand"  min=1 max=1000000 value=50000>
+            <!--span id = "dnaLengthText">DNA Sequence Len: </span>
+            <span id = "dnaLength"></span-->
+
+
+
+
+           <br>
+           <!--br-->
+           <label for numKmers style ="display:none">Equal Most frequent k-mer navigate</label>
+            <input type = "number" style="display:none" name = "numKmers" id = "numKmers" onchange="numKmerChanged(event)" min=1 max=5 value=1>
+            <!--BR-->
+
+
+
+
+        </div>
+
+        <div id = "stats">
+            Kmer: <span id = "kMerMostFreq"></span>
+            Rev Compl: <span id = "kMerRevCompl"></span>
+            Freq: <span id = "kMerOccurrences"></span>
+            Tot num Kmers: <span id = "kMerNumEqualMostFreq"></span>
+
+
+        </div>
+        <br>
+        <div id = "navDiv">
+            <button type = "button" onclick="pagePressed(-1000)" >|&lt</button>
+            <button type = "button" onclick="pagePressed(-1)">&lt</button>
+            <span id="currRangeDNA"></span>
+            <button type = "button" onclick="pagePressed(1)">&gt</button>
+            <button type = "button" onclick="pagePressed(1000)">&gt|</button>
+            <button type ="button" onclick="jumpToPressed()">Jump to:</button>
+            <input type = "number"  name = "jumpToBase" id = "jumpToBase"  min=0 value=0>
+
+        </div>
+
+        </div>
+        <div id = "motifTools">
+            <div id = "motifInputTools">
+                <textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
+                <button type = "button" id="motifsInput" onclick="motifsInput(event)">Apply</button>
+                <!--label for sequencesInput>Enter sequences:</label-->
+                <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
+                <button type = "button" onclick="sequencesInput(event)">Apply</button-->
+                <label for  filMotifeInput>Load Sequences :</label>
+                <input type = "file" name="fileMotifInput" id = "fileMotifInput">
+                <button type = "button" onclick="randMotifPressed(event)" class="spacedBut">Random sequences</button>
+                <input type = "number"  name = "numMotifRand" id = "numMotifRand"  min=1 max=1000 value=100>
+                <!--span id = "dnaLengthText">DNA Sequence Len: </span>
+                <span id = "dnaLength"></span-->
+
+            </div>
+        </div>
+
+         <div id="tabs">
+            <a href="#"  onclick="tab_click(0,tabClickDone);">Most Frequent k-mers</a>
+            <a href="#"  onclick="tab_click(1,tabClickDone);">LT Clumps</a>
+            <a href="#"  onclick="tab_click(2,tabClickDone);">Search for k-mer</a>
+            <a href="#" onclick="tab_click(3,tabClickDone);">Motifs</a>
+            <a href="#" onclick="tab_click(4,tabClickDone);">Misc</a>
+            <!--a href="#tabs" onclick="tab_click(2);">tab 3</a-->
+        </div>
+        <div id="tabDataPlusCanvas">
+        <div id="tabs_data">
+            <section class="tabFieldset">
+                <h3 id="tabFieldsetHead1">Most Frequent k-mers</h3>
+
+                <article id="art2">
+                    <div id = "leftFreq" class="leftClump">
+                        <label for kMerLenMF class="alignLab">k-mer Len</label>
+                        <input type = "number" class="alignEl" name = "kMerLenMF" onchange="kMerLenChanged(event)" id = "kMerLenMF" value = 6 min = 1 max = 100>
+                        <label for maxMismatchMF class="alignLab">Max Mismatches:</label>
+                        <input type = "number" class="alignEl" name = "maxMismatchMF"   id = "maxMismatchMF" value = 0 min = 0 max = 10>
+
+                        <label for includeRevComplMF class="alignLab">Include rev compls?</label>
+                        <input type = "checkbox" class="alignEl" name = "includeRevComplMF" id = "includeRevComplMF">
+                         <label for debugMF class="alignLab">Debug</label>
+                        <input type = "checkbox" class="alignEl" name = "debugMF" id = "debugMF">
+
+                    </div>
+                    <div id = "midFreq" class ="midClump">
+
+                        <input type="radio" name="most"  id ="mostMost" value="most" checked>Most Freq k-mers only
+                        <br>
+                        <input type="radio" name="most" id = "mostAll"  value="all">All k-mers w/
+                        <label for mfThresh>Threshold frequency(t)</label>
+
+                        <input type = "number" name = "mfThresh" id = "mfThresh" value = 2 min = 1 max = 50>
+
+                    </div>
+                    <div id="rightFreq" class="rightClump">
+                    <button type = "button" onclick="mostFrequentKmersBrute(event,1)">Brute Force</button>
+                    <button type = "button" onclick="mostFrequentKmersBrute(event,2)">Freq Array</button>
+                    <button type = "button" onclick="mostFrequentKmersBrute(event,4)">Object</button>
+                    <button type = "button" onclick="mostFrequentKmersBrute(event,3)">Sort</button>
+                    <button type = "button" onclick = "mostFrequentKmersTree()">Run Tree</button>
+                    <BR>
+                        </div>
+
+
+                    <br>
+                    <br>
+
+
+
+
+
+
+
+                </article>
+
+            </section>
+            <section class = "tabFieldset">
+                <h3 id="tabFieldsetHead2">LT Clumps</h3>
+
+                <article id = "art4">
+                  <div id = "leftClump" class = "leftClump">
+
+                    <label for kMerLenLT class = "alignLab">k-mer Len</label>
+                    <input type = "number" class = "alignEl" name = "kMerLenLT" onchange="kMerLenChanged(event)" id = "kMerLenLT" value = 6 min = 1 max = 100>
+
+
+
+                    <label for ltClumpThresh class="alignLab">Clump size(L)</label>
+                    <input type = "number" class = "alignEl" name = "ltClumpSize" id = "ltClumpSize" value = 500 min = 1 max = 10000>
+                    <label for ltClumpThresh class="alignLab">Threshold frequency(t)</label>
+                    <input type = "number" class="alignEl" name = "ltClumpThresh" id = "ltClumpThresh" value = 2 min = 1 max = 50>
+                    <label for maxMismatchLT class="alignLab">Max Mismatches:</label>
+                    <input type = "number" class="alignEl" name = "maxMismatchLT"   id = "maxMismatchLT" value = 0 min = 0 max = 10>
+                      <label for includeRevComplLT class="alignLab">Include rev compls?</label>
+
+                      <input type = "checkbox" class="alignEl" name = "includeRevComplLT" id = "includeRevComplLT">
+                  </div>
+                  <div id = "midClump" class="midClump">
+
+
+
+
+
+
+
+
+                      <label>Method:</label>
+                      <br>
+
+                    <input type="radio"  name="bruteOrTreeLT"  id ="bruteLT" value="bruteLT" checked>Brute
+
+                    <input type="radio"  name="bruteOrTreeLT" id = "treeLT"  value="treeLT">Tree
+
+                      <br>
+                      <br>
+
+
+                  </div>
+                    <div id = "rightClump" class="rightClump">
+                        <button class="alignBut" type = "button" onclick="runLTClump()">LT Clump</button>
+                        <br>
+                        <button class = "alignBut" type = "button" onclick="stopPressed(event)">Stop</button>
+
+
+                    </div>
+
+
+
+
+
+                </article>
+
+            </section>
+            <section class="tabFieldset">
+                <h3 id="tabFieldsetHead3">Search for k-mer</h3>
+
+                <article id="art5">
+                    <div class="leftClump" id="leftKmer">
+                        <label for kmer class="alignLab">k-mer:</label>
+                        <input type = "text" class="alignEl" name = "kmer"  onkeypress="return restrictToACGT(event)" id = "kmer" onchange="kmerChanged(event)">
+                        <label for maxMismatchKS class="alignLab">Max Mismatches:</label>
+                        <input type = "number" class="alignEl" name = "maxMismatchKS"   id = "maxMismatchKS" value = 0 min = 0 max = 10>
+                        <label for includeRevComplKS class="alignLab">Include rev compls?</label>
+                        <input type = "checkbox" class="alignEl" name = "includeRevComplKS" id = "includeRevComplKS">
+                        <label for debugKS class="alignLab">Debug</label>
+                        <input type = "checkbox" class="alignEl" name = "debugKS" id = "debugKS">
+
+
+                    </div>
+                    <div class="rightClump" id="rightKmer">
+                        <button type = "button" onclick="searchKmer(event)">Search for k-mer</button>
+                        <br>
+                        <button type = "button" onclick = "kMerRevComplPressed()">k-mer Rev Compl</button>
+                        <br>
+                        <label id="revComplKmerLabel">ACGTTG</label>
+
+                    </div>
+
+
+
+
+
+
+
+
+                </article>
+
+            </section>
+            <section class="tabFieldset">
+            <h3 id="tabFieldsetHead4">Motifs</h3>
+
+            <article id="art6">
+                <!--label for kmer>DNA strings:</label-->
+                <div class="leftClump">
+                <!--textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
+                <button type = "button" onclick="motifsInput(event)">Apply</button-->
+
+
+
+                </div>
+                <div class="midClump" id="midMotif">
+                    <label for kMerLenMS  class="alignLab">k-mer Len</label>
+                    <input type = "number" class="alignEl"  name = "kMerLenMS" onchange="kMerLenChanged(event)" id = "kMerLenMS" value = 6 min = 1 max = 100>
+                    <label for maxMismatchMS id="maxMismatchLabMS" class="alignLab">Max Mismatches:</label>
+                    <input type = "number" class="alignEl" name = "maxMismatchMS"   id = "maxMismatchMS" value = 0 min = 0 max = 10>
+                    <label for numItersMS id="numItersLabMS" class="alignLab">Num Iterations:</label>
+                    <input type = "number" class = "sensibleNum alignEl" name = "numItersMS"   id = "numItersMS" value = 1 min = 1>
+
+                    <label for laplaceMS id="laplaceLabMS" class="alignLab">Laplace?</label>
+                    <input type = "checkbox" class="alignEl"checked name = "laplaceMS" id = "laplaceMS">
+                    <label for debugKS class="alignLab">Debug</label>
+                    <input type = "checkbox" class="alignEl" name = "debugMS" id = "debugMS">
+                </div>
+                <div class="rightClump" id="rightMotif">
+                    <input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
+                    <br>
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifBrute" value="motifBrute" checked>Brute
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifMedian" value="motifMedian" >Median String
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy">Greedy Motif
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">Random Motif
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler
+                </div>
+
+                     <button type = "button" class="fixedBut" onclick="runMotif(event)">Run</button>
+                <button type = "button"  onclick="motifCompare(event)">Score Motifs</button>
+
+
+
+
+
+
+
+
+                    <!--button type = "button" class="fixedBut" onclick="motifSearch(event)">k d Motifs</button>
+                    <br>
+                    <button type = "button" class="fixedBut" onclick="bruteMotifSearch(event)">Brute</button>
+                    <button type = "button" class="fixedBut" onclick="medianString(event)">Median String</button>
+                    <button type = "button" class="fixedBut" onclick="greedyMotif(event)">Greedy Motif</button>
+                    <button type = "button" class="fixedBut" onclick = "randomMotif(event)">Random Motif</button>
+                    <button type = "button" class = "fixedBut" onclick = "gibbsSampler(event)">Gibbs Sampler</button-->
+
+
+
+
+
+
+
+
+
+
+
+            </article>
+
+        </section>
+            <section class="tabFieldset">
+                <h3 id="tabFieldsetHead5">Misc</h3>
+
+                <article id="art7">
+                    <!--label for kmer>DNA strings:</label-->
+                    <textarea name = "miscParam1" placeholder = "Enter  param 1" rows = "4" cols = "20"  id = "miscParam1" ></textarea>
+                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "4" cols = "20"  id = "miscParam2" ></textarea>
+                    <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "4" cols = "20"  id = "miscParam3" ></textarea>
+                    <div id = "miscRadioBox">
+                    <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Compl
+
+                    <input type="radio" name="miscRadio" id = "miscFunc2"  value="2">Profile Most Prob
+                    </div>
+
+                    <button type = "button" onclick="executeMisc(event)">Execute</button>
+                    <textarea name = "miscQuickResult" placeholder = "Result" rows = "4" cols = "8"  id = "miscQuickResult" ></textarea>
+
+
+
+
+
+
+                </article>
+
+            </section>
+            <!--fieldset class="tabFieldset"> It is pretty useful for the time related wage types such as OT, unpaid leave and so on.
+                SAP standard report, HQAPPWTR, has a similar function on this.
+                On selection screen, there is a section to allow user to specify whether to output number values.
+                The number values will only appear for wage types having value on number fields.
+            </fieldset>
+            <fieldset class="tabFieldset">we could configure the hire/termination by specifying action type and reason, it will be more convenient. The configuration file is used by program /EOP/GL10_PRO_RE_WTUPLOADER
+                Now, a work around solution is to get the date from infotype 41. But customer needs to do a duplicate work if the hire date is the same as the one in IT0000. Some customers </fieldset>
+            <fieldset class="tabFieldset"> contents of tab 3</fieldset-->
+
+        </div>
+        <canvas id = "skewCanvas">
+
+        </canvas>
+        </div>
+
+        <div id = "mainAreaDiv">
+
+            <div id="leftMainDiv">
+                <div id = "dnaviewer">
+                    <div id = "dnaView" onclick="clickInDNA(event)"></div>
+                </div>
+
+            </div>
+            <div id="rightMainDiv">
+
+                <!--div id = "rightTwo">DNA Stats</div-->
+               <div id = "debugDiv">
+                   <label id = "debugLab">Debug Info</label>
+                  <textarea id = "debugText"></textarea>
+               </div>
+
+                <div id = "rightOne">
+
+                    <span>k-mer Stats</span>
+
+
+
+
+                    <table id = "kMerResultsTab"></table>
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <div id = "moreDetailDiv">
+            <!--textarea id = "debugText"></textarea-->
+            <textArea id = "moreDetailText"></textArea>
+        </div>
+
+
+        <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/{{JQUERY_VERSION}}/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-{{JQUERY_VERSION}}.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script-->
+
+        <script src = "js/russGenLibs/GenUtilities.js"></script>
+        <script src="js/russGenLibs/GenAlg.js"></script>
+        <script src = "js/russGenLibs/BioUtilities.js"></script>
+        <script src="js/main.js"></script>
+
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>

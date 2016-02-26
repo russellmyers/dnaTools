@@ -1,0 +1,670 @@
+/*
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+html {
+    color: #222;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/*
+ * Remove text-shadow in selection highlight:
+ * https://twitter.com/miketaylr/status/12228805301
+ *
+ * These selection rule sets have to be separate.
+ * Customize the background color to match your design.
+ */
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+h3 {
+    padding: 0;
+
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ * https://github.com/h5bp/html5-boilerplate/issues/440
+ */
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+/*
+textarea {
+    resize: vertical;
+}
+*/
+
+/* ==========================================================================
+   Browser Upgrade Prompt
+   ========================================================================== */
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+body {
+    width: 1200px;
+    margin-left:auto;
+    margin-right: auto;
+
+}
+
+#bannerDiv {
+
+//background-color: brown;
+    height: 110px;
+    width: 100%;
+    font-size: 0;
+
+}
+
+#leftBannerDiv {
+    font-size: medium;
+    background-color:  #282304;  /*#8C2318; *//* antiquewhite;*/
+    color: white;
+    width: 60%;
+    height: 88%;
+    display: inline-block;
+    margin: 0;
+
+    padding: 0;
+    padding-top: 10px;
+    vertical-align: bottom;
+
+
+}
+
+#rightBannerDiv {
+
+    font-size: medium;
+    display: inline-block;
+    background-color: #a79c65;/* #F2C45A; *//*lightgreen;*/ /*aliceblue; */ /*aquamarine;*/
+    width: 40%;
+    height: 88%;
+    margin: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    vertical-align: bottom;
+
+}
+
+
+
+#moreDetailDiv {
+
+    background-color: #282304; /*#8C2318; *//* antiquewhite;*/
+    color: white;
+    width: 1200px;
+    height: 150px;
+    display: inline-block;
+    margin: 0;
+
+    padding: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+
+
+
+
+#debugDiv {
+    display: inline-block;
+    width: 35%;
+    height: 100%;
+    margin-left: 0;
+}
+
+#debugText {
+    display: inline-block;
+    background-color: transparent;
+    width: 100%;
+    height: 80%;
+}
+
+#moreDetailText {
+    display: inline-block;
+
+    width: 30%;
+    height: 100%;
+    margin-left: 15px;
+}
+
+#motifLogo {
+    display:inline-block;
+    width: 30%;
+    height: 100%;
+    background-color: white;
+    color: black;
+}
+
+input[type=number] {
+    text-align:right;
+}
+
+
+#dnaView {
+    word-wrap: break-word;
+    width: 100%
+
+    height: 100%;
+    padding:5px;
+
+
+}
+#dnaviewer {
+    background-color: beige;
+    width: 100%;
+    height: 100%;
+    overflow:auto;
+
+
+}
+
+.dnaChar {
+    font-family: monospace;
+    font-size: 16px;
+}
+.aChar {
+    color: blue;
+
+}
+
+.cChar {
+    color: red;
+}
+
+.gChar {
+    color: green;
+}
+
+.tChar {
+    color: gold;
+}
+
+.dnaClumpHighlight {
+    text-decoration: underline;
+}
+
+.dnaCharHighlight {
+    background-color: cyan;
+
+}
+
+
+
+#stats {
+    display: block; /*was none*/
+}
+
+
+#mainAreaDiv {
+    font-size: medium;
+    margin-top: 10px;
+
+    height: 550px;
+    width: 1200px;
+    background-color: purple;
+
+
+}
+
+
+#leftMainDiv {
+    background-color: green;
+    width: 55%;
+    height: 100%;
+    display: inline-block;
+    margin-right: 0;
+
+
+
+    /*
+
+    font-size: medium;
+    background-color: #75aeb5; */ //* #5E8C6A;*//*#75aeb5;*/
+    /*
+    width: 600px;
+    height: 500px;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: bottom;
+    */
+    /*overflow: scroll;*/
+    /*
+    position: relative;
+    */
+
+
+}
+
+#mfkTools {
+
+    display:none;
+    height: 100px;
+}
+
+#motifTools {
+
+    display:block;
+    height: 100px;
+}
+
+#motifsInput {
+    vertical-align: baseline;
+}
+
+
+#rightMainDiv {
+    border-radius: 5px;
+    font-size: medium;
+    background-color:  #e2d892;/*silver;*/
+    width: 44%;
+    height: 100%;
+    display:  inline-block; /*inline-block;*/
+    margin: 0;
+    padding: 0;
+    margin-left: 0px;
+    margin-top:0px;
+
+    vertical-align: top;
+    /*text-align: center;*/
+
+    padding-bottom: 10px;
+
+
+}
+
+
+#progressDiv {
+    clear: both;
+    float:right;
+}
+
+#rightOne {
+    border:ridge;
+    height: 90%;
+    width: 60%;
+    display: inline-block;
+    text-align: center;
+    vertical-align:top;
+    overflow:auto;
+}
+
+/*#rightTwo {
+    border:ridge;
+    height: 90%;
+    width: 35%;
+    display: inline-block;
+    text-align: center;
+    vertical-align:top;
+
+
+}*/
+#rightTwo {
+    border: ridge;
+    height: 100px;
+    width: 220px;
+    /*display: inline-block;*/
+    float: right;
+    text-align: center;
+    vertical-align: top;
+    overflow: scroll;
+}
+
+
+#kMerResultsTab {
+
+}
+
+
+
+#tabDataPlusCanvas {
+    background-color: blue;
+    /*vertical-align: top;*/
+    height: 144px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+
+
+}
+#skewCanvas {
+    margin: 0;
+    padding: 2px;
+    width: 19%; /*220px;*/
+    height: 140px;
+    background-color: purple;
+    display: inline-block;
+    vertical-align: top;
+
+
+
+}
+
+.leftClump {
+    display: inline-block;
+   /* background-color: red;*/
+    width: 25%;
+
+
+}
+
+.midClump {
+    padding-left: 10px;
+    padding-right: 10px;
+    display: inline-block;
+    vertical-align: top;
+   /* background-color: blue;*/
+    width: 20%;
+}
+
+.rightClump {
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+   /* background-color: purple;*/
+    width: 10%;
+}
+
+
+#leftKmer {
+    width: 35%;
+}
+#rightFreq {
+    width: 40%;
+    text-align: inherit;
+}
+
+#rightKmer {
+    width: 20%;
+}
+
+#midMotif {
+    width: 25%;
+}
+
+#rightMotif {
+    width: 30%;
+}
+
+.alignLab {
+    display: inline-block;
+     float: left;
+    clear: left;
+    width: 150px;
+    text-align: right;
+}
+.alignEl {
+    display: inline-block;
+    float: right;
+
+}
+
+
+.fixedBut {
+    width: 110px;
+}
+
+
+
+#miscRadioBox {
+    display: inline-block;
+    width: 300px;
+    height: 70px;
+    background-color: blue;
+    vertical-align: top;
+}
+
+.spacedBut {
+    margin-left: 30px;
+}
+
+#dnaLengthText {
+    margin-left: 50px;
+}
+
+.sensibleNum {
+    width: 60px;
+}
+
+/*tabs stuff*/
+#tabs {border-bottom:1px solid #ccc;height:42px; width: 100%; margin:10px 0 5px;padding-top:5px; background: white; /*#5f9ca3;*/ /*background:#fff;*/}
+#tabs a {float: left;margin-left:5px;border-radius:3px 3px 0 0;border:1px solid #eee;border-bottom-color:#ccc;color:#555;height:27px;line-height:32px;padding:0 12px;text-decoration:none;background-color: #ddd; } /*color #08c*/
+#tabs a:hover {background:#ddd;color:#09c;border-color:#ddd #ddd #ccc;} /*color #058 */
+#tabs a.active {background: #fff;color:#08c;border-color:#ccc #ccc #fff;} /*color #555*/
+#tabs a.active:hover {background:#fff;color:#08c;border-color:#ccc #ccc #fff;} /*color #555 */
+#tabs_data {clear: both; display: inline-block;  background-color:#75aeb5;padding: 2px; height:140px; width: 80% }
+/*#tabs_data fieldset {margin: 5px; height: 80px;display:none;border:1px solid;color:black; background-color: white; }
+#tabs_data fieldset div {font-size:13px;}*/
+/*#tabs_data section {margin: 5px; height: 80px;display:none;border:1px solid;color:black; background-color: white; }
+#tabs_data section div {font-size:13px;}*/
+
+
+
+
+
+
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Hide visually and from screen readers:
+ */
+
+.hidden {
+    display: none !important;
+}
+
+/*
+ * Hide only visually, but have it available for screen readers:
+ * http://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+ */
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/*
+ * Extends the .visuallyhidden class to allow the element
+ * to be focusable when navigated to via the keyboard:
+ * https://www.drupal.org/node/897638
+ */
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+/*
+ * Hide visually and from screen readers, but maintain layout
+ */
+
+.invisible {
+    visibility: hidden;
+}
+
+/*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    `contenteditable` attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+       (min-resolution: 1.25dppx),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid the additional HTTP request:
+   http://www.phpied.com/delay-loading-your-print-css/
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster:
+                                   http://www.sanbeiji.com/archives/953 */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links that are fragment identifiers,
+     * or use the `javascript:` pseudo protocol
+     */
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    /*
+     * Printing Tables:
+     * http://css-discuss.incutio.com/wiki/Printing_Tables
+     */
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
