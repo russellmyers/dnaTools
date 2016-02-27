@@ -372,7 +372,8 @@ function processReturnedMotif(e) {
 
     }
     else {
-        tot = mfMotif[0][0][0].length + mfMotif[0][0][1].length;
+       // tot = mfMotif[0][0][0].length + mfMotif[0][0][1].length;
+        tot = mfMotif[0].length;
     }
 
 
@@ -1558,6 +1559,17 @@ function motifCompare(e) {
         document.getElementById("debugText").value += '\nEntropy Matrix: '  +  entropyMatrixStr;
         document.getElementById("debugText").value += '\nProfile Matrix: '  +  profileMatrixStr;
 
+        var extraInfoAr = [];
+
+        mfMotif[0][0].forEach(function(el,i) {
+            var ind = el[0][0];
+            var km = dnaMasterStrings[i].substring(ind,ind+k);
+
+            extraInfoAr.push(km);
+        });
+
+        logoCanvas(extraInfoAr);
+
     }
 
     document.getElementById("moreDetailText").value = 'Consensus: ' + res[0];
@@ -2346,7 +2358,15 @@ function colourDNA(dna,mark,inclRevCompl) {
    /// console.log('colour end loop');
 
     //  if (mfk.length > 0) {
-    var hData = ['k-mers', 'Num found'];
+    var hData;
+    if (motifView)  {
+        hData = ['Consensus', 'Num found'];
+    }
+    else {
+        hData = ['k-mers', 'Num found'];
+    }
+
+
     var tData;
     if (motifView) {
         if (mfMotif.length == 0) {

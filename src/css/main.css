@@ -340,11 +340,14 @@ input[type=number] {
 #rightOne {
     border:ridge;
     height: 90%;
-    width: 60%;
+    width: 63%;
     display: inline-block;
     text-align: center;
     vertical-align:top;
     overflow:auto;
+
+
+
 }
 
 /*#rightTwo {
@@ -370,6 +373,7 @@ input[type=number] {
 
 
 #kMerResultsTab {
+
 
 }
 
