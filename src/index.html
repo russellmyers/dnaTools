@@ -344,17 +344,19 @@
 
                 <article id="art7">
                     <!--label for kmer>DNA strings:</label-->
-                    <textarea name = "miscParam1" placeholder = "Enter  param 1" rows = "4" cols = "20"  id = "miscParam1" ></textarea>
-                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "4" cols = "20"  id = "miscParam2" ></textarea>
-                    <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "4" cols = "20"  id = "miscParam3" ></textarea>
+                    <textarea name = "miscParam1" placeholder = "Enter  param 1" rows = "6" cols = "15"  id = "miscParam1" ></textarea>
+                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "15"  id = "miscParam2" ></textarea>
+                    <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "15"  id = "miscParam3" ></textarea>
                     <div id = "miscRadioBox">
                     <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Compl
 
                     <input type="radio" name="miscRadio" id = "miscFunc2"  value="2">Profile Most Prob
+                    <input type="radio" name="miscRadio" id = "miscFunc3"  value="3">create ham nodes
+                    <input type="radio" name="miscRadio" id = "miscFunc4"  value="4">create deBruijn nodes
                     </div>
 
                     <button type = "button" onclick="executeMisc(event)">Execute</button>
-                    <textarea name = "miscQuickResult" placeholder = "Result" rows = "4" cols = "8"  id = "miscQuickResult" ></textarea>
+                    <textarea name = "miscQuickResult" placeholder = "Result" rows = "6" cols = "20"  id = "miscQuickResult" ></textarea>
 
 
 
@@ -414,6 +416,9 @@
         <div id = "moreDetailDiv">
             <!--textarea id = "debugText"></textarea-->
             <textArea id = "moreDetailText"></textArea>
+            <canvas id = "moreCanvas">
+                hhh
+            </canvas>
         </div>
 
 

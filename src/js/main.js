@@ -1354,6 +1354,86 @@ function searchKmer(e) {
 }
 
 
+function NodePrinter(node,x,y,num) {
+    this.x = x;
+    this.y = y;
+    this.radius = 15;
+    this.node = node;
+
+    this.linearNum = num;
+    this.numForward = 1;
+    this.numBackward = 1;
+
+
+    var k = node.dna.length;
+
+    if (k <=3) {
+        this.font = '12pt Arial';
+    }
+    else if (deb.k <= 4) {
+        this.font = '10pt Arial';
+
+    }
+    else  if (deb.k <= 5) {
+        this.font = '8pt Arial';
+    }
+    else if (deb.k <= 6) {
+        this.font = '6pt Arial';
+    }
+    else {
+        this.font = '5pt Arial';
+    }
+
+
+    this.print = function(ctx) {
+        ctx.font = this.font;
+
+        ctx.moveTo(this.x + this.radius,this.y);
+
+        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        ctx.fillText(this.node.dna,this.x - 15,this.y+5);
+
+    };
+
+    this.join = function(ctx,endPNode,walkNum) {
+        var stX = this.x;
+        var stY = this.y - 15;
+        var endX = endPNode.x;
+        var endY = endPNode.y - 15;
+        var point1,point2;
+
+        if (this.linearNum > endPNode.linearNum) {
+            stY += this.radius * 2;
+            endY  += endPNode.radius * 2;
+            point1 = stY + (NodePrinter.pointInc * this.numBackward);
+            point2 = endY + (NodePrinter.pointInc * this.numBackward);
+            ++this.numBackward;
+        }
+        else {
+            point1 = stY - (NodePrinter.pointInc * this.numForward);
+            point2 = endY - (NodePrinter.pointInc * this.numForward);
+            ++this.numForward;
+        }
+
+        var col = walkNum % NodePrinter.walkColours.length;
+
+        ctx.strokeStyle = NodePrinter.walkColours[col];
+
+        ctx.moveTo(stX,stY);
+        ctx.bezierCurveTo(stX,point1,endX,point2,endX,endY);
+
+
+    };
+
+
+}
+NodePrinter.walkColours = ['black','blue','red','green','purple','orange'];
+NodePrinter.startY = 80;
+NodePrinter.startX = 20;
+NodePrinter.xInc = 45;
+NodePrinter.pointInc = 15;
+
+
 function executeMisc(e) {
     initialiseResults();
 
@@ -1399,6 +1479,137 @@ function executeMisc(e) {
             resEl.value = 'Best kmer: \n' + res[0] + '\nBest prob:\n' + res[1];
 
 
+            break;
+        case '3':
+            var k = parseInt(par2El.value);
+            par1El.value = cleanContents(par1El.value);
+            var dna = par1El.value;
+            var nodes = createHamNodes(dna,k);
+            var resArray = [];
+
+           // hamiltonCanvas(nodes);
+
+            for (var i = 0;i < parseInt(par3El.value);++i) {
+                resArray.push(hamPath(nodes));
+
+            }
+
+            resEl.value = 'results';
+            var eqCount = 0;
+            var neButSameLengthCount = 0;
+
+            resArray.forEach(function(el,i) {
+
+                hamiltonCanvas(nodes,el[2]);
+
+                if (dna === el[1]) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value+= ' Equal ' + i;
+                    ++eqCount;
+                }
+                else if (dna.length == el[1].length) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value+= ' Nope sl ' + i;
+                    ++neButSameLengthCount;
+                }
+                else if (el[1] === '') {
+                    resEl.value+= ' \n' + 'First not found';
+                }
+
+            });
+            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
+                resEl.value+= ' \n' + 'None found';
+            }
+            //var res = hamPath(nodes);
+/*
+            resEl.value = 'nodes: ';
+            resEl.value += '\n' + res[1];
+            if (dna === res[1]) {
+                resEl.value+= '\nEqual';
+         }
+            else if (dna.length == res[1].length) {
+                resEl.value+= '\nNot Equal but same len';
+            }
+            else {
+                resEl.value+= '\nNot Equal';
+            }
+            res[0].forEach(function(el) {
+                var pred,succ;
+                pred = el.predecessors ? el.predecessors.length : 0;
+                succ = el.successors ? el.successors.length : 0;
+                resEl.value += '\n' + el.dna + ' p: ' + pred + ' s: ' + succ;
+
+            });
+            */
+            break;
+
+        case '4':
+            var k = parseInt(par2El.value);
+            par1El.value = cleanContents(par1El.value);
+            var dna = par1El.value;
+            //var nodes = createDebNodes(dna,k);
+            var debGraph = new DebGraph(dna,k);
+
+
+
+            var resArray = [];
+            for (var i = 0;i < parseInt(par3El.value);++i) {
+                //resArray.push(debPath(nodes));
+             //   resArray.push(debGraph.debPath());
+                debGraph.debCycle();
+
+                debruijnCanvas(debGraph);
+
+                resArray.push([[],debGraph.edgePathReconstructed()]);
+            }
+            resEl.value = 'results\n';
+            var eqCount = 0;
+            var neButSameLengthCount = 0;
+
+           // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+            resArray.forEach(function(el,i) {
+
+
+            //resArray.forEach(function(el,i) {
+                //resEl.value += el[1];
+                if (dna === el[1]) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value+= ' Equal ' + i;
+                    ++eqCount;
+                }
+                else if (dna.length == el[1].length) {
+                    var circ = false;
+
+
+                    for (var ch = 0;ch < dna.length - k;++ch) {
+                        if (dna === el[1].substring(ch) + el[1].substring(0,ch)) {
+                            resEl.value += '\n' + el[1];
+                            resEl.value+= ' Yep circ ' + i;
+                            ++neButSameLengthCount;
+                            circ = true;
+                            break;
+
+                        }
+                    }
+                    if (!circ) {
+                        resEl.value += '\n' + el[1];
+                        resEl.value += ' Nope sl ' + i;
+                        ++neButSameLengthCount;
+                    }
+                }
+                else if (el[1] === '') {
+                    resEl.value+= ' \n' + 'First not found';
+                }
+                else {
+                    resEl.value+= ' \n' + 'x' + el[1];
+                }
+
+            });
+
+            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
+                resEl.value+= ' \n' + 'None found';
+            }
             break;
         default:
             break;
@@ -1801,6 +2012,197 @@ function collectStats(dna,sk,bc) {
     }
 
     return stats;
+
+
+}
+
+function initGraphCanvas() {
+
+    var c = document.getElementById("moreCanvas");
+
+    var h = c.height;
+    var w = c.width;
+
+    c.setAttribute('width', '800');
+    c.setAttribute('height', '150');
+
+    var ctx = c.getContext("2d");
+
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = ('#FFFFFF');
+    ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = ('#000000');
+
+    return ctx;
+
+}
+
+
+function hamiltonCanvas(hamNodes,hamPathNodes) {
+
+    var ctx = initGraphCanvas();
+
+    ctx.beginPath();
+
+    var linNum = 1;
+
+    //Build and Print nodes
+
+    var nodePrinters = [];
+    hamNodes.forEach(function(hamNode,i) {
+        var nodeAlreadyThere = false;
+        for (var j = 0;j < nodePrinters.length;++j) {
+            if (nodePrinters[j].node == hamNode) {
+                nodeAlreadyThere = true;
+                break;
+            }
+        }
+        if (nodeAlreadyThere) {
+
+        }
+        else {
+            var nodeP = new NodePrinter(hamNode, NodePrinter.startX + ((linNum - 1) * NodePrinter.xInc), NodePrinter.startY,linNum);
+            ++linNum;
+
+            nodePrinters.push(nodeP);
+
+        }
+
+    });
+
+
+
+    nodePrinters.forEach(function(nodeP) {
+        nodeP.print(ctx);
+
+    });
+
+    ctx.stroke();
+
+
+    //Print path
+
+    var backCount = 1;
+    var forwardCount = 1;
+
+    for (var i = 0;i < hamPathNodes.length - 1;++i) {
+        ctx.beginPath();
+
+        var stNode,endNode;
+
+        stNode = null;
+        endNode = null;
+        for (var j = 0;j < nodePrinters.length; ++j) {
+            if (nodePrinters[j].node == hamPathNodes[i]) {
+                stNode = nodePrinters[j];
+
+            }
+            if (nodePrinters[j].node == hamPathNodes[i+1]) {
+                endNode = nodePrinters[j];
+
+            }
+
+        }
+        if (stNode.linearNum > endNode.linearNum) {
+            stNode.numBackward = backCount;
+            ++backCount;
+        }
+        else {
+            stNode.numForward = forwardCount;
+            ++forwardCount;
+
+        }
+
+        stNode.join(ctx,endNode,1);
+
+        ctx.stroke();
+
+
+    }
+
+
+
+
+    ctx.stroke();
+    ctx.closePath();
+
+
+
+}
+
+function debruijnCanvas(deb) {
+
+   var ctx = initGraphCanvas();
+
+    ctx.beginPath();
+
+    var linNum = 1;
+
+    //Build and Print nodes
+
+    var nodePrinters = [];
+    deb.edgePath.forEach(function(edge,i) {
+        var nodeAlreadyThere = false;
+        for (var j = 0;j < nodePrinters.length;++j) {
+            if (nodePrinters[j].node == edge.sourceNode) {
+                nodeAlreadyThere = true;
+                break;
+            }
+        }
+        if (nodeAlreadyThere) {
+
+        }
+        else {
+            var nodeP = new NodePrinter(edge.sourceNode, NodePrinter.startX + ((linNum - 1) * NodePrinter.xInc), NodePrinter.startY,linNum);
+            ++linNum;
+
+            nodePrinters.push(nodeP);
+
+        }
+
+    });
+
+
+
+    nodePrinters.forEach(function(nodeP) {
+        nodeP.print(ctx);
+
+   });
+
+   ctx.stroke();
+
+    //Print path
+
+    for (var i = 0;i < deb.edgePath.length;++i) {
+        ctx.beginPath();
+
+        var stNode,endNode;
+
+        stNode = null;
+        endNode = null;
+        for (var j = 0;j < nodePrinters.length; ++j) {
+            if (nodePrinters[j].node == deb.edgePath[i].sourceNode) {
+                stNode = nodePrinters[j];
+
+            }
+            if (nodePrinters[j].node == deb.edgePath[i].targetNode) {
+                endNode = nodePrinters[j];
+
+            }
+
+        }
+        stNode.join(ctx,endNode,deb.edgePath[i].walkNum);
+
+        ctx.stroke();
+
+
+    }
+
+
+
+    ctx.stroke();
+    ctx.closePath();
+
 
 
 }

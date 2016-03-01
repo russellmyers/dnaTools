@@ -163,6 +163,7 @@ body {
 
 
 
+
 #debugDiv {
     display: inline-block;
     width: 35%;
@@ -183,6 +184,17 @@ body {
     width: 30%;
     height: 100%;
     margin-left: 15px;
+}
+
+
+#moreCanvas {
+    display: inline-block;
+   /* width: 65%;
+    height: 100%;*/
+    width: 800px;
+    height: 150px;
+    background-color: white;
+    vertical-align: top;
 }
 
 #motifLogo {
