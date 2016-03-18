@@ -3128,7 +3128,12 @@ self.addEventListener('message', function(e) {
             self.postMessage({'task': 'gibbsSampler','msgType' : 'result','txtStuff' : 'Score: ' + res[1],'indArray' : res[0]});
             break;
 
+        case 'seqCyclopeptide' :
 
+            //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            var res = cycloPeptideSequencing(e.data.spectrum,countProgMostFreqWithStages);
+            self.postMessage({'task': 'seqCyclopeptide','msgType' : 'result','txtStuff' : res});
+            break;
 
         default:
             break;

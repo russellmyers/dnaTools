@@ -376,6 +376,12 @@ function setUpWorkerListeners() {
                     processReturnedMotif(e);
                     break;
 
+                case 'seqCyclopeptide':
+                    var resEl = document.getElementById('miscQuickResult');
+                    resEl.value = 'results\n';
+                    resEl.value += e.data.txtStuff;
+                    break;
+
                 default:
                      break;
             }
@@ -2489,15 +2495,23 @@ function executeMisc(e) {
 
         case '26': //Cyclopeptide sequencing
 
+           // var paramObj = initialiseMotifParams();
 
             var experimentalSpectrum = par1El.value;
 
 
-            resEl.value = 'results\n';
+            w.postMessage({
+                'task': 'seqCyclopeptide',
+                'spectrum': experimentalSpectrum
+            }); // Start the worker.
 
-            var res = cycloPeptideSequencing(experimentalSpectrum);
 
-            resEl.value +=  res;
+
+            //resEl.value = 'results\n';
+
+           // var res = cycloPeptideSequencing(experimentalSpectrum);
+
+           // resEl.value +=  res;
 
             break;
 

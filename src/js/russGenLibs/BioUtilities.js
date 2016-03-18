@@ -2146,7 +2146,7 @@ function allPossiblePeptidesWithWeight(w) {
     return wMatrix[w];
 }
 
-function cycloPeptideSequencing(expSpectrum) {
+function cycloPeptideSequencing(expSpectrum,progCallback) {
     var expSpectrumAr = expSpectrum.split(' ');
     expSpectrumAr = expSpectrumAr.map(function (el) {
         return parseInt(el);
@@ -2170,15 +2170,28 @@ function cycloPeptideSequencing(expSpectrum) {
 
     });
 
+    var round = 0;
+    var progThreshold = 100;
+
 
     while (!done) {
+        ++round;
+
+
 
         //bound
-        candidates = candidates.filter(function (cand) {
+        candidates = candidates.filter(function (cand,candInd) {
             var candW = cand.reduce(function (a, b) {
                 return a + b;
             });
             // var pep = new Peptide(Peptide.AminoArrFromStr(cand));
+
+            if (progCallback) {
+                if ((round % progThreshold == 0) ) {
+                    progCallback('Process bo [' + candInd + '/' + candidates.length + '] round ',round,'unknown');
+                }
+            }
+
             if (expSpectrumAr.indexOf(candW) > -1) {
 
                 if (candW == parentWeight) {
@@ -2223,7 +2236,14 @@ function cycloPeptideSequencing(expSpectrum) {
 
 
         var newCandidates = [];
-        candidates.forEach(function (cand) {
+        candidates.forEach(function (cand,candInd) {
+
+            if (progCallback) {
+                if ((candInd % progThreshold == 0) ) {
+                    progCallback('Process br [' + candInd + '/' + candidates.length + '] round ',round,'unknown');
+                }
+            }
+
             allAminoWeights.forEach(function (amW) {
                 var newCand = cand.map(function(el) {
                    return el;
