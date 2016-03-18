@@ -191,10 +191,11 @@ body {
     display: inline-block;
    /* width: 65%;
     height: 100%;*/
-    width: 800px;
+    width: 660px;
     height: 150px;
     background-color: white;
     vertical-align: top;
+
 }
 
 #motifLogo {
@@ -220,13 +221,54 @@ input[type=number] {
 
 }
 #dnaviewer {
+    display: inline-block;
     background-color: beige;
     width: 100%;
     height: 100%;
     overflow:auto;
+   /* display:none;*/
 
 
 }
+
+#graphviewer {
+    background-color: firebrick;
+    width: 100%;
+    height: 100%;
+    overflow:auto;
+    display:none;
+
+}
+
+#graphDnaDiv {
+    display: block;
+    background-color: #b3d4fc;
+    width: 100%;
+    height: 7%;
+}
+#graphReadsDiv {
+    display: block;
+    background-color: cadetblue;
+    width: 100%;
+    height: 10%;
+}
+#graphAdjListDiv {
+    display: block;
+    background-color: darkorchid;
+    width: 100%;
+    height: 20%;
+    overflow: scroll;
+}
+#graphGraphDiv {
+    display: block;
+    background-color: #e2d892;
+    width: 100%;
+    height: 150px;
+   overflow-x: scroll;
+
+}
+
+
 
 .dnaChar {
     font-family: monospace;
@@ -317,6 +359,13 @@ input[type=number] {
     display:none;
     height: 100px;
 }
+
+#sequencingTools {
+
+    display:none;
+    height: 100px;
+}
+
 
 #motifsInput {
     vertical-align: baseline;
@@ -461,6 +510,14 @@ input[type=number] {
     width: 30%;
 }
 
+#midSeq {
+    margin-left: 30px;
+    width: 15%;
+}
+#rightSeq {
+    width: 30%;
+}
+
 .alignLab {
     display: inline-block;
      float: left;
@@ -475,18 +532,31 @@ input[type=number] {
 }
 
 
+
+
 .fixedBut {
     width: 110px;
 }
 
 
+#miscParam1 {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border: groove;
+    vertical-align: top;
+    overflow: scroll;
+
+}
 
 #miscRadioBox {
     display: inline-block;
-    width: 300px;
-    height: 70px;
+    width: 350px;
+    height: 100px;
     background-color: blue;
     vertical-align: top;
+    overflow: scroll;
 }
 
 .spacedBut {

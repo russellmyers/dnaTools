@@ -668,7 +668,7 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
     var kmers = [];
     var kmerInds = [];
 
-    var numStarts = 2000;
+    var numStarts = 20;
 
     for (var s = 0;s < numStarts; ++s ) {
         if (progCallback) {
@@ -1647,12 +1647,24 @@ function mostFrequentKMersFreqArray(k,dna,inclRevCompl,maxMismatch,ltClumpThresh
 
     // return cleaned;
     if (debug) {
+
+        /*
         var freqCountArray = freqArray.map(function(el) {
-
-            // return el[0].length + el[1].length;
-            return (totIndArrayLen(el));
-
+          return (totIndArrayLen(el));
         });
+        */
+
+        var freqCountArray = [];
+        var lim = Math.pow(4,k);
+        for (var i = 0;i < lim;++i) {
+            if (freqArray[i]) {
+                freqCountArray.push(totIndArrayLen(freqArray[i]));
+            }
+            else {
+                freqCountArray.push(0);
+            }
+        }
+
         return [newFreqArray,freqCountArray];
     }
     else {
@@ -3025,12 +3037,11 @@ self.addEventListener('message', function(e) {
             var inclRevCompl = e.data.inclRevCompl;
             var maxMismatch = e.data.maxMismatch;
             var indArray = motifSearch(dnaStrings,k,maxMismatch,inclRevCompl,countProgMostFreqWithStages);
-           /* var indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
             var txtArray = '';
             indArray.forEach(function(el) {
-                txtArray+=' ' + el;
+                txtArray+=el[1] + '\n';
             });
-            */
+
             self.postMessage({'task': 'motifSearch','msgType' : 'result','txtStuff' : txtArray,'indArray' : indArray});
             break;
 

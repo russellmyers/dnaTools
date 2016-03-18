@@ -11,9 +11,9 @@ var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
 
 
-//deBruijn Graph routines
+//Directed Graph routines
 
-function DebEdge(sourceNode,targetNode,artificial) {
+function DEdge(sourceNode,targetNode,artificial) {
     this.sourceNode = sourceNode;
     this.targetNode = targetNode;
     this.visited = false;
@@ -23,17 +23,63 @@ function DebEdge(sourceNode,targetNode,artificial) {
     this.artificial = artificial; // indicates added to make cycle
 
     this.edgeLabel = function() {
+        if (this.sourceNode.pairedDna) {
+            return [this.sourceNode.dna + this.targetNode.dna.substring(this.targetNode.dna.length-1),
+                this.sourceNode.pairedDna + this.targetNode.pairedDna.substring(this.targetNode.pairedDna.length-1)];
+
+        }
         return this.sourceNode.dna + this.targetNode.dna.substring(this.targetNode.dna.length-1);
     }
 }
 
-function DebNode(dna) {
-    this.dna = dna;
+function DNode(dna,repeatNum) {
+    if (typeof(dna) == 'object') {
+        this.dna = dna[0];
+        this.pairedDna = dna[1];
+
+    }
+    else {
+        this.dna = dna;
+        this.pairedDna = null;
+    }
 
     this.visited = false;
 
     this.successors = [];
     this.predecessors = [];
+
+    if (repeatNum) {
+        this.repeatNum = repeatNum; //for nodes with same label
+    }
+    else {
+        this.repeatNum = 1;
+    }
+
+
+    this.prefix = function() {
+        if (this.pairedDna) {
+            return [this.dna.substring(0, this.dna.length - 1), this.pairedDna.substring(0, this.pairedDna.length - 1)];
+        }
+        else {
+            return this.dna.substring(0, this.dna.length - 1);
+
+        }
+
+    };
+
+    this.suffix  = function() {
+        if (this.pairedDna) {
+            return [this.dna.substring(1, this.dna.length), this.pairedDna.substring(1, this.pairedDna.length)];
+        }
+        else {
+            return this.dna.substring(1, this.dna.length);
+
+        }
+
+    };
+
+
+
 
     this.outDegree = function() {
         return this.successors.length;
@@ -41,6 +87,10 @@ function DebNode(dna) {
     this.InDegree = function() {
         return this.predecessors.length;
     };
+
+    this.degree = function() {
+        return this.InDegree() + this.outDegree();
+    }
 
     this.resetEdgesVisited = function() {
         this.successors.forEach(function(edge) {
@@ -75,20 +125,66 @@ function DebNode(dna) {
 
 }
 
-function DebGraph(dna,k) {
+//
+function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
 
-    this.dna = dna;
+    this.sourceType = sourceType;
+
+    this.graphType = graphType;
+
+    switch (this.sourceType)  {
+        case DGraph.fromDna:
+        case DGraph.fromPairedDna:
+            this.dna = source; //dna
+            break;
+        case DGraph.fromReads:
+        case DGraph.fromPairedReads:
+            this.reads = source; //array of reads
+            break;
+        case DGraph.fromAdjList:
+            this.adjList = source; // array of adjacencies
+        default:
+            break;
+    }
+
+
+    if (makeCycle) {
+        this.makeCycle = makeCycle;
+    }
+    else {
+        this.makeCycle = false;
+    }
+   // this.dna = dna;
+
     this.k = k;
+    this.pairDist = pairDist ? pairDist : null;
+
+    /*
+    if (this.pairDist) {
+        this.dna = this.dna + this.dna.substring(0,this.k + this.pairDist - 1); // extend so pairs work up to end
+    }*/
 
     this.nodes = [];
 
     this.edgePath = [];
 
+    this.numEdges = function() {
+        return this.nodes.map(function(el) {
+            return el.outDegree();
+        }).reduce(function(a,b) {
+            return a + b;
+        });
+    };
+
+    this.numNodes = function() {
+        return this.nodes.length;
+    }
+
     this.isBalanced = function() {
         var balanced = true;
 
         for (var i = 0;i < this.nodes.length; ++i) {
-            if (this.nodes[i].InDegree() == this.nodes.outDegree()) {
+            if (this.nodes[i].InDegree() == this.nodes[i].outDegree()) {
             }
             else {
                 balanced = false;
@@ -100,6 +196,93 @@ function DebGraph(dna,k) {
         return balanced;
 
 
+
+    };
+
+    this.isBalancedLinear = function() {
+        //checks if all nodes balanced except one start node (predecessors = successors - 1) and one
+        //end node (predecessors = successors + 1)
+
+        var balanced = true;
+
+        var foundStart = false;
+        var foundEnd = false;
+
+        for (var i = 0;i < this.nodes.length; ++i) {
+            if (this.nodes[i].InDegree() == this.nodes[i].outDegree()) {
+            }
+            else if (this.nodes[i].InDegree() == this.nodes[i].outDegree() - 1) {
+                if (foundStart) {
+                    balanced = false; //already found a start node - can't have two
+                    break;
+                }
+                else {
+                    foundStart = true;
+                }
+            }
+             else if (this.nodes[i].InDegree() == this.nodes[i].outDegree() + 1) {
+                if (foundEnd) {
+                    balanced = false; //already found an end node - can't have two
+                    break;
+                }
+                else {
+                    foundEnd = true;
+                }
+            }
+            else {
+                //completely unbalanced
+                balanced = false;
+                break;
+
+            }
+        }
+
+        return balanced;
+
+
+
+    };
+
+
+    this.getAdjList = function() {
+
+       // var resStr = '';
+
+        var adj = [];
+
+
+        var adjStr;
+
+        this.nodes.forEach(function(node) {
+
+            adjStr = node.dna + ' -> ';
+            node.successors.forEach(function (suc, i) {
+                adjStr += suc.targetNode.dna;
+                if (i < node.successors.length - 1) {
+                    adjStr += ',';
+                }
+
+            });
+            adj.push(adjStr);
+        });
+        return adj;
+    };
+
+    this.sumInfo = function() {
+
+        var n = this.numNodes();
+        var e = this.numEdges();
+        var bc =  this.isBalanced() ? 'Cycle Balanced' : 'Cycle Unbalanced';
+        var bl =  this.isBalancedLinear() ? 'Linear Balanced' : 'Linear Unbalanced';
+        var f =  this.definiteFirst() ? this.definiteFirst().dna : '?';
+        var l = this.definiteLast() ? this.definiteLast().dna : '?';
+
+        return ('Nodes / Edges: ' + n + ' / ' + e + '\n'
+              //  + 'Num Edges: ' + e + '\n'
+                + 'First / Last: ' + f   + ' / ' + l + '\n'
+               // + 'Last node: ' + l  + '\n'
+                + bl + '\n'
+                + bc);
 
     };
 
@@ -122,11 +305,22 @@ function DebGraph(dna,k) {
         var firstFound = false;
         var first = null;
 
-        for (var i = 0;i < this.nodes.length; ++i) {
-            if (this.nodes[i].InDegree() == 0) {
-                first = this.nodes[i];
-                firstFound = true;
-                break;
+        if (this.graphType == DGraph.hamGraph) {
+            for (var i = 0; i < this.nodes.length; ++i) {
+                if (this.nodes[i].InDegree() == 0) {
+                    first = this.nodes[i];
+                    firstFound = true;
+                    break;
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < this.nodes.length; ++i) {
+                if (this.nodes[i].InDegree() == this.nodes[i].outDegree() - 1) {
+                    first = this.nodes[i];
+                    firstFound = true;
+                    break;
+                }
             }
         }
 
@@ -139,11 +333,23 @@ function DebGraph(dna,k) {
         var lastFound = false;
         var last = null;
 
-        for (var i = 0;i < this.nodes.length; ++i) {
-            if (this.nodes[i].outDegree() == 0) {
-                last = this.nodes[i];
-                lastFound = true;
-                break;
+        if (this.graphType == DGraph.hamGraph) {
+            for (var i = 0; i < this.nodes.length; ++i) {
+                if (this.nodes[i].outDegree() == 0) {
+                    last = this.nodes[i];
+                    lastFound = true;
+                    break;
+                }
+            }
+
+        }
+        else {
+            for (var i = 0; i < this.nodes.length; ++i) {
+                if (this.nodes[i].outDegree() == this.nodes[i].InDegree() - 1) {
+                    last = this.nodes[i];
+                    lastFound = true;
+                    break;
+                }
             }
         }
 
@@ -153,10 +359,87 @@ function DebGraph(dna,k) {
     };
 
 
+    this.maximalNonBranchingPaths = function() {
+
+
+        var svdThis = this;
+
+        var contigs = [];
+
+        var isolatedCycleUsedNodes = [];
+
+        this.nodes.forEach(function(node) {
+            if (  (node.InDegree() == 1) && (node.outDegree() == 1)) {
+
+                if (isolatedCycleUsedNodes.indexOf(node)==-1) {
+                    //check for isolated cycle
+                    var startNode = node;
+                    var cyc = [];
+                    cyc.push(startNode);
+                    var curNode = startNode.successors[0].targetNode;
+
+
+                    var isolatedCycleFound = false;
+                    while ((curNode.InDegree() == 1) && (curNode.outDegree() == 1)) {
+                        if (curNode == startNode) {
+                            cyc.push(curNode);
+                            isolatedCycleFound = true;
+                            break;
+                        }
+                        else {
+                            cyc.push(curNode);
+                            curNode = curNode.successors[0].targetNode;
+                        }
+                    }
+                    if (isolatedCycleFound) {
+                        var cycPath = [];
+                        cyc.forEach(function (el) {
+                            cycPath.push(el.dna);
+                            isolatedCycleUsedNodes.push(el);
+                        });
+                        contigs.push(cycPath);
+                    }
+                }
+
+            }
+            else {
+
+                node.successors.forEach(function(suf) {
+                    var curNode;
+                    var contig = [];
+                    contig.push(suf.sourceNode.dna);
+                    contig.push(suf.targetNode.dna);
+                    curNode = suf.targetNode;
+                    while ((curNode.outDegree() == 1) && (curNode.InDegree() == 1)) {
+                        contig.push(curNode.successors[0].targetNode.dna);
+                        curNode = curNode.successors[0].targetNode;
+                    }
+                    contigs.push(contig);
+
+                });
+            }
+
+        });
+
+
+
+
+        return contigs;
+
+
+
+    };
+
+
     this.edgePathToText = function() {
         var str = '';
         for (var i=0;i < this.edgePath.length; ++i) {
-            str += this.edgePath[i].sourceNode.dna + '->' + this.edgePath[i].targetNode.dna + '\n';
+            if (i == 0) {
+                str += this.edgePath[i].sourceNode.dna + '->' + this.edgePath[i].targetNode.dna;
+            }
+            else {
+                str += '->' + this.edgePath[i].targetNode.dna;
+            }
 
         }
         return str;
@@ -164,17 +447,104 @@ function DebGraph(dna,k) {
 
     };
 
+    this.edgePathReconstructedPairs = function() {
+
+        var svdThis = this;
+
+        var origStr = '';
+        var pairStr = '';
+
+        this.edgePath.forEach(function(ed,i) {
+            var lab = ed.edgeLabel();
+
+
+
+            if (i == 0) {
+                origStr += lab[0];
+                pairStr += lab[1];
+            }
+            else {
+                origStr += lab[0].substring(lab[0].length - 1);
+                pairStr += lab[1].substring(lab[1].length - 1);
+            }
+
+
+
+        });
+
+        var totLen = origStr.length + this.k + this.pairDist;
+
+        var extra =  this.k + this.pairDist;
+
+        var padding = '';
+        if (pairStr.length < extra) {
+            for (var i = pairStr.length;i < extra;++i) {
+                padding += 'x';
+            }
+
+        }
+
+        var overlapLen = origStr.length - extra;
+        var mismatch = false;
+        if (origStr.substring(extra) == pairStr.substring(0,origStr.length - extra)) {
+
+        }
+        else {
+            mismatch = true;
+        }
+
+
+        return origStr + padding + pairStr.substring(pairStr.length - extra) + (mismatch ? ' Mismatch' : '');
+
+
+
+        /*
+        var len = this.edgePath.length + this.k - 1  + this.k + this.pairDist;
+        var reconAr = [];
+        for (var i = 0;i < len; ++i) {
+            reconAr[i] = 'x';
+        }
+
+        var svdThis = this;
+
+        this.edgePath.forEach(function(ed,i) {
+            var lab = ed.edgeLabel();
+            for (var j = 0; j < lab[0].length;++j) {
+                reconAr[i + j] = lab[0].substring(j,j+1);
+                reconAr[i + j + lab[0].length + svdThis.pairDist] = lab[1].substring(j,j+1);
+            }
+        });
+
+        var str = '';
+        reconAr.forEach(function(el) {
+            str+=el;
+
+        });
+        return str;
+        */
+
+
+    };
+
     this.edgePathReconstructed = function() {
+
+        if ((this.sourceType == DGraph.fromPairedReads) || (this.sourceType == DGraph.fromPairedDna)) {
+            return this.edgePathReconstructedPairs();
+        }
+
         var str = '';
         for (var i=0;i < this.edgePath.length; ++i) {
             if (i == 0) {
                 str += this.edgePath[i].edgeLabel();
             }
-            else if (i >= this.edgePath.length - this.k + 1) {
+           // else if ((this.makeCycle) && (i >= this.edgePath.length - this.k + 1)) {
+            else if ((this.isBalanced()) && (i >= this.edgePath.length - this.k + 1)) {
+
 
             }
             else   {
-                str += this.edgePath[i].edgeLabel().substring(this.edgePath[i].edgeLabel().length - 1);
+                //str += this.edgePath[i].edgeLabel().substring(this.edgePath[i].edgeLabel().length - 1);
+                str+= this.edgePath[i].targetNode.dna.substring(this.edgePath[i].targetNode.dna.length - 1);
             }
 
 
@@ -209,31 +579,52 @@ function DebGraph(dna,k) {
     };
 
 
-    this.makeCycle = function() {
+    this.makeCyclical = function() {
         var f = this.definiteFirst();
         var l = this.definiteLast();
 
        // if (f || l) {
 
-            var kmers = kmerComposition(this.dna.substring(this.dna.length - (this.k - 1)) + this.dna.substring(0,this.k-1),this.k);
-            var svdThis = this;
-            kmers.forEach(function(kmer) {
-                var pref = kmer.substring(0,svdThis.k - 1);
-                var suf = kmer.substring(1,svdThis.k);
-                var prefNode = svdThis.findNode(pref);
-                var sufNode = svdThis.findNode(suf);
-                if (!prefNode) {
-                    prefNode = new DebNode(pref);
-                    svdThis.nodes.push(prefNode);
-                }
+        if (this.pairedDist) {
+            return; //already added to dna to make enough
+        }
 
-                if (!sufNode) {
-                    sufNode = new DebNode(suf);
-                    svdThis.nodes.push(sufNode);
-                }
+        var kmers;
+        if (this.pairDist)  {
+            kmers = kmerPairedComposition(this.dna.substring(this.dna.length - (this.k - 1)) + this.dna.substring(0,this.k-1),this.k,this.pairDist);
+        }
+        else {
+            kmers = kmerComposition(this.dna.substring(this.dna.length - (this.k - 1)) + this.dna.substring(0,this.k-1),this.k);
+        }
+        var svdThis = this;
+        kmers.forEach(function(kmer) {
+            var pref,suf;
+            if (pairDist) {
+                pref = [kmer[0].substring(0,svdThis.k - 1),kmer[1].substring(0,svdThis.k - 1)];
+                suf = [kmer[0].substring(1,svdThis.k),kmer[1].substring(1,svdThis.k)];
+            }
+            else {
+                pref = kmer.substring(0,svdThis.k - 1);
+                suf = kmer.substring(1,svdThis.k);
 
-                prefNode.successors.push(new DebEdge(prefNode,sufNode,true));
-                sufNode.predecessors.push(prefNode);
+            }
+
+            var prefNode = svdThis.findNode(pref);
+            var sufNode = svdThis.findNode(suf);
+            if (!prefNode) {
+                prefNode = new DNode(pref);
+                svdThis.nodes.push(prefNode);
+            }
+
+            if (!sufNode) {
+                sufNode = new DNode(suf);
+                svdThis.nodes.push(sufNode);
+            }
+
+            prefNode.successors.push(new DEdge(prefNode,sufNode));
+            sufNode.predecessors.push(prefNode);
+
+
 
 
             });
@@ -243,40 +634,146 @@ function DebGraph(dna,k) {
     };
 
 
-    this.findNode = function(dna) {
+    this.findOverlapNodesWithPrefix = function(node)   {
+        var matches = [];
+
         for (var i = 0;i < this.nodes.length;++i ) {
-            if (this.nodes[i].dna === dna) {
-                return this.nodes[i];
+            if (this.nodes[i] === node) {
+
             }
+            else {
+                if ((this.sourceType == DGraph.fromPairedDna) || (this.sourceType == DGraph.fromPairedReads)) {
+                    if ((this.nodes[i].suffix()[0] == node.prefix()[0]) && (this.nodes[i].suffix()[1] == node.prefix()[1])) {
+                        matches.push(this.nodes[i]);
+                    }
+                }
+                else {
+                    if (this.nodes[i].suffix() == node.prefix()) {
+                        matches.push(this.nodes[i]);
+                    }
+                }
+
+            }
+        }
+        return matches;
+
+
+    };
+
+    this.findOverlapNodesWithSuffix = function(node)   {
+        var matches = [];
+
+        for (var i = 0;i < this.nodes.length;++i ) {
+            if (this.nodes[i] === node) {
+
+            }
+            else {
+                if ((this.sourceType == DGraph.fromPairedDna) || (this.sourceType == DGraph.fromPairedReads)) {
+                    if ((this.nodes[i].prefix()[0] == node.suffix()[0]) && (this.nodes[i].prefix()[1] == node.suffix()[1])) {
+                        matches.push(this.nodes[i]);
+                    }
+
+                }
+                else {
+                    if (this.nodes[i].prefix() == node.suffix()) {
+                        matches.push(this.nodes[i]);
+                    }
+                }
+            }
+
+
+        }
+        return matches;
+
+
+    };
+
+    this.findNodes = function(dna) {
+        //return all nodes which match
+
+        var matchingNodes = [];
+
+        for (var i = 0;i < this.nodes.length;++i ) {
+            if (typeof dna == 'object') {
+                if (this.nodes[i].dna === dna[0] && this.nodes[i].pairedDna === dna[1]) {
+                    matchingNodes.push(this.nodes[i]);
+                }
+            }
+            else {
+                if (this.nodes[i].dna === dna) {
+                    matchingNodes.push(this.nodes[i]);
+
+
+                }
+            }
+
+
+        }
+        return matchingNodes;
+
+    }
+
+    this.findNode = function(dna,repNum) {
+
+        for (var i = 0;i < this.nodes.length;++i ) {
+            if (typeof dna == 'object') {
+                if (this.nodes[i].dna === dna[0] && this.nodes[i].pairedDna === dna[1]) {
+                    if (repNum) {
+                        if (repNum == this.nodes[i].repeatNum) {
+                            return this.nodes[i];
+                        }
+                    }
+                    else {
+                        return this.nodes[i];
+                    }
+                }
+
+
+            }
+            else {
+                if (this.nodes[i].dna === dna) {
+                    if (repNum) {
+                        if (repNum == this.nodes[i].repeatNum) {
+                            return this.nodes[i];
+                        }
+                    }
+                    else {
+                        return this.nodes[i];
+                    }
+                }
+          }
+
+
         }
         return null;
 
     };
 
-    this.chooseStartCycle = function() {
+    this.chooseStartCycle = function(linear) {
+
+        //linear flag: used if looking for linear path rather than cycle
 
         var nodesAvail = [];
 
       //  if (this.nodesVisited().length == 0) {
         if (this.edgePath.length == 0) {
-             //starting - purely random node
+             //starting - get first linear node
 
-            for (var i = 0; i < this.nodes.length; ++i) {
-                var r = this.nodes[i].getRandomNonVisitedEdge();
-                if (r == -1) {
+            if (linear) {
+                var f = this.definiteFirst();
+                if (f) {
+                    return [f, null];
                 }
                 else {
-                    nodesAvail.push(this.nodes[i]);
+                    return [null, null]; // no definite first. Won't work
                 }
             }
-
-            if (nodesAvail.length == 0) {
-                return [null,null];
-            }
             else {
-                var r = getRandomInt(0, nodesAvail.length - 1);
-                return [nodesAvail[r],null];
+                var r = getRandomInt(0,this.nodes.length - 1);
+                return [this.nodes[r],null];
             }
+
+
         }
         else {
             // choose an unexplored path along nodes already visited
@@ -295,15 +792,6 @@ function DebGraph(dna,k) {
            //nodesAvail = this.visitedNodesWithUnvisitedEdges();
         }
 
-        /*
-        if (nodesAvail.length == 0) {
-            return null;
-        }
-        else {
-            var r = getRandomInt(0,nodesAvail.length - 1);
-            return nodesAvail[r];
-        }
-        */
 
 
     };
@@ -372,29 +860,151 @@ function DebGraph(dna,k) {
 
     };
 
+
+    this.hamPath = function() {
+        this.resetEdges();
+
+        var allFinished = false;
+
+        var walkNum = 0;
+
+      //  while (!allFinished) {
+            ++walkNum;
+            var res = this.chooseStartCycle(true);
+            var startNode = res[0];
+            var edgePathInsert = res[1];
+
+            var currNode;
+
+            if (startNode) {
+                currNode = startNode;
+                currNode.visited = true;
+            }
+            else {
+                allFinished = true;
+              //  break;
+            }
+
+            var done = false;
+            var newEdgePath = [];
+
+            while (!done) {
+                var potentialNext = currNode.successors;
+                var nonVisited = [];
+                currNode.successors.forEach(function (el, i) {
+                    if (!el.targetNode.visited) {
+                        nonVisited.push(i);
+                    }
+
+                });
+                if (nonVisited.length == 0) {
+                    done = true;
+                }
+                else {
+                    var r = getRandomInt(0, nonVisited.length - 1);
+                    currNode.successors[nonVisited[r]].visited = true;
+                    currNode.successors[nonVisited[r]].walkNum = walkNum;
+
+                    newEdgePath.push(currNode.successors[nonVisited[r]]);
+                    currNode = currNode.successors[nonVisited[r]].targetNode;
+                    currNode.visited = true;
+
+                }
+
+            }
+
+            if (this.edgePath.length == 0) {
+                this.edgePath = newEdgePath.map(function (el) {
+                    return el;
+                });
+            }
+            else {
+                svdThis = this;
+                newEdgePath.forEach(function (el, i) {
+                    svdThis.edgePath.splice(i + edgePathInsert, 0, el);
+                });
+            }
+
+
+        //}
+
+    };
+
+
+
     this.debPath = function() {
+        this.resetEdges();
+
+        var allFinished = false;
+
+        var walkNum = 0;
+
+        while (!allFinished) {
+            ++walkNum;
+            var res = this.chooseStartCycle(true);
+            var startNode = res[0];
+            var edgePathInsert = res[1];
+
+            var currNode;
+
+            if (startNode) {
+                currNode = startNode;
+                currNode.visited = true;
+            }
+            else {
+                allFinished = true;
+                break;
+            }
+
+            var done = false;
+            var newEdgePath = [];
+            while (!done) {
+                var nonVisited = [];
+                var r = currNode.getRandomNonVisitedEdge();
+                if (r == -1) {
+                    done = true;
+                }
+                else {
+                    //this.edgePath.push(currNode.successors[r]);
+                    newEdgePath.push(currNode.successors[r]);
+
+                    currNode.successors[r].visited = true;
+                    currNode.successors[r].walkNum = walkNum;
+                    currNode = currNode.successors[r].targetNode;
+                    currNode.visited = true;
+                }
+            }
+            if (this.edgePath.length == 0) {
+                this.edgePath = newEdgePath.map(function(el) {
+                    return el;
+                });
+            }
+            else {
+                var svdThis = this;
+                newEdgePath.forEach(function(el,i) {
+                    svdThis.edgePath.splice(i + edgePathInsert,0,el);
+                });
+            }
+
+
+
+        }
+
+
+
+
+
+    };
+
+    this.debPathOrig = function() {
         var first;
         var path = [];
 
         var definiteFirstFound = false;
         var definiteLastFound = false;
-/*
-        nodes.forEach(function(node) {
-            node.resetEdgesVisited();
-        });
-        */
+
         this.resetEdges();
 
-/*
-        for (var i = 0;i < this.nodes.length; ++i) {
-            if (this.nodes[i].InDegree() == 0) {
-                first = this.nodes[i];
-                definiteFirstFound = true;
-                break;
-            }
-        }
-
-        */
         var first = this.definiteFirst();
         if (first) {
             definiteFirstFound = true;
@@ -457,31 +1067,273 @@ function DebGraph(dna,k) {
 
     };
 
-    this.initGraph = function() {
-        var kmers = kmerComposition(this.dna,this.k);
+    this.buildNodesFromKmers = function() {
         var svdThis = this;
-        kmers.forEach(function(kmer) {
-            var pref = kmer.substring(0,svdThis.k - 1);
-            var suf = kmer.substring(1,svdThis.k);
+
+        if (this.graphType == DGraph.hamGraph) {
+            var svdThis = this;
+            this.reads.forEach(function(kmer) {
+                var node = new DNode(kmer);
+                svdThis.nodes.push(node);
+            });
+
+            this.nodes.forEach(function(node) {
+                var suffs = svdThis.findOverlapNodesWithSuffix(node);
+                var prefs = svdThis.findOverlapNodesWithPrefix(node);
+
+                suffs.forEach(function(sufNode) {
+                    node.successors.push(new DEdge(node,sufNode));
+
+                });
+                prefs.forEach(function(prefNode) {
+                    node.predecessors.push(prefNode);
+
+                });
+
+
+            });
+
+
+        }
+        else {
+
+            this.reads.forEach(function (kmer) {
+                var pref, suf;
+
+                if (svdThis.pairDist) {
+                    pref = [kmer[0].substring(0, svdThis.k - 1), kmer[1].substring(0, svdThis.k - 1)];
+                    suf = [kmer[0].substring(1, svdThis.k), kmer[1].substring(1, svdThis.k)];
+                }
+                else {
+                    pref = kmer.substring(0, svdThis.k - 1);
+                    suf = kmer.substring(1, svdThis.k);
+
+                }
+
+                var prefNode = svdThis.findNode(pref);
+                if (!prefNode) {
+                    prefNode = new DNode(pref);
+                    svdThis.nodes.push(prefNode);
+                }
+
+                var sufNode = svdThis.findNode(suf);
+
+
+                if (!sufNode) {
+                    sufNode = new DNode(suf);
+                    svdThis.nodes.push(sufNode);
+                }
+
+                prefNode.successors.push(new DEdge(prefNode, sufNode));
+                sufNode.predecessors.push(prefNode);
+            });
+
+        }
+
+
+
+    };
+
+    this.buildNodesFromAdjList = function(adjList) {
+        var svdThis = this;
+
+        adjList.forEach(function (adj) {
+
+            var spl = adj.split(' -> ');
+            var pref = spl[0];
+
+            var node = new DNode(pref);
+
+            var matches = svdThis.findNodes(pref);
+            if (matches.length > 0) {
+
+                node.repeatNum = matches.length + 1;
+            }
+            svdThis.nodes.push(node);
+
+
+
+        });
+
+        adjList.forEach(function (adj,i) {
+
+            var spl = adj.split(' -> ');
+            var pref = spl[0];
+            var sufs = spl[1].split(',');
+            var sufNode;
+
+
+
+            var prevSuf;
+            var rep = 0;
+            sufs.forEach(function(suf,ii) {
+                if (ii == 0) {
+                    prevSuf = suf;
+                    rep = 0;
+                }
+                if (suf == prevSuf) {
+                    ++rep;
+                }
+                else {
+                    prevSuf = suf;
+                    rep = 1;
+                }
+
+                if (svdThis.graphType == DGraph.debGraph) {
+                    //no repeat nodes (glue together)
+                    rep = 1;
+                }
+
+                sufNode = svdThis.findNode(suf,rep);
+                if (!sufNode) {
+                    sufNode = new DNode(suf);
+                    sufNode.repeatNum = rep;
+                    svdThis.nodes.push(sufNode);
+                }
+
+                svdThis.nodes[i].successors.push(new DEdge(svdThis.nodes[i], sufNode));
+                sufNode.predecessors.push(svdThis.nodes[i]);
+            });
+
+        });
+
+
+
+            /*
+            adjList.forEach(function (adj) {
+                var spl = adj.split(' -> ');
+                var pref = spl[0];
+                var sufs = spl[1].split(',');
+                var suf;
+
+                var prefNode = svdThis.findNode(pref);
+
+                if (!prefNode) {
+                    prefNode = new DNode(pref);
+                    svdThis.nodes.push(prefNode);
+                }
+
+                sufs.forEach(function(suf) {
+                    var sufNode = svdThis.findNode(suf);
+                    if (!sufNode) {
+                        sufNode = new DNode(suf);
+                        svdThis.nodes.push(sufNode);
+                    }
+                    prefNode.successors.push(new DEdge(prefNode, sufNode));
+                    sufNode.predecessors.push(prefNode);
+
+                });
+
+
+            });
+            */
+
+
+
+    };
+
+
+    this.initGraph = function() {
+        var kmers;
+
+        switch (this.sourceType)  {
+            case DGraph.fromDna:
+                kmers = kmerComposition(this.dna, this.k,true);
+                this.reads = [];
+                this.readPosns = [];
+                svdThis = this;
+                kmers.forEach(function(el) {
+                    svdThis.reads.push(el[0]);
+                    svdThis.readPosns.push(el[1]);
+                });
+                //this.reads = kmers;
+                this.buildNodesFromKmers();
+                break;
+            case DGraph.fromReads:
+                //kmers = this.reads;
+
+                this.buildNodesFromKmers();
+                break;
+            case DGraph.fromPairedDna:
+                kmers = kmerPairedComposition(this.dna, this.k, this.pairDist);
+                this.reads = kmers;
+                this.buildNodesFromKmers();
+                break;
+
+            case DGraph.fromPairedReads:
+                //kmers = this.reads;
+                this.buildNodesFromKmers();
+                break;
+
+            case DGraph.fromAdjList:
+                this.buildNodesFromAdjList(this.adjList);
+                break;
+            default:
+                break;
+        }
+
+
+
+
+        /*
+        if (reads) {
+
+        }
+        else {
+            if (this.pairDist) {
+                kmers = kmerPairedComposition(this.dna, this.k, this.pairDist);
+            }
+            else {
+                kmers = kmerComposition(this.dna, this.k);
+            }
+        }
+        */
+
+        /*
+
+        var svdThis = this;
+        kmers.forEach(function (kmer) {
+            var pref, suf;
+            if (pairDist) {
+                pref = [kmer[0].substring(0, svdThis.k - 1), kmer[1].substring(0, svdThis.k - 1)];
+                suf = [kmer[0].substring(1, svdThis.k), kmer[1].substring(1, svdThis.k)];
+            }
+            else {
+                pref = kmer.substring(0, svdThis.k - 1);
+                suf = kmer.substring(1, svdThis.k);
+
+            }
+
             var prefNode = svdThis.findNode(pref);
             var sufNode = svdThis.findNode(suf);
             if (!prefNode) {
-                prefNode = new DebNode(pref);
+                prefNode = new DNode(pref);
                 svdThis.nodes.push(prefNode);
             }
 
             if (!sufNode) {
-                sufNode = new DebNode(suf);
+                sufNode = new DNode(suf);
                 svdThis.nodes.push(sufNode);
             }
 
-            prefNode.successors.push(new DebEdge(prefNode,sufNode));
+            prefNode.successors.push(new DEdge(prefNode, sufNode));
             sufNode.predecessors.push(prefNode);
 
 
         });
 
-        this.makeCycle(); // make graph into cycle if not already
+        */
+
+        var balBefore = this.isBalanced();
+        var balLinearBefore = this.isBalancedLinear();
+
+        if (this.makeCycle) {
+            this.makeCyclical(); // make graph into cycle if not already
+        }
+
+        var balAfter = this.isBalanced();
+        var balLinearAfter = this.isBalancedLinear();
+
 
     };
 
@@ -491,7 +1343,21 @@ function DebGraph(dna,k) {
 
 }
 
+DGraph.fromDna = 1;
+DGraph.fromReads = 2;
+DGraph.fromAdjList = 3;
+DGraph.fromPairedDna = 4;
+DGraph.fromPairedReads = 5;
 
+DGraph.hamGraph = 1;
+DGraph.debGraph = 2;
+
+DGraph.seqTypeComp = 1;
+DGraph.seqTypePath = 2;
+DGraph.seqTypeCycle = 3;
+
+
+/*
 //Hamilton path routines
 
 function HamNode(dna,k) {
@@ -584,8 +1450,15 @@ function hamPath(nodes) {
     return [path,reconstructed,nodePath];
 }
 
-function createHamNodes(dna,k) {
-    var kmers = kmerComposition(dna,k);
+function createHamNodes(dna,reads,k) {
+    var kmers;
+    if (dna) {
+        kmers = kmerComposition(dna, k);
+    }
+    else {
+        kmers = reads;
+    }
+
     var nodes = kmers.map(function(el) {
         var node = new HamNode(el,k);
         return node;
@@ -623,11 +1496,810 @@ function createHamNodes(dna,k) {
     //});
 
 }
+*/
 
-function kmerComposition(dna,k) {
+function stringFromGenomePath(path) {
+    // not very useful - assumes as input array of kmers which all overlap previous by 1
+
+    var str = '';
+
+    path.forEach(function(el,i) {
+
+        if (i == 0) {
+            str = el;
+        }
+        else {
+            str+=el[el.length-1];
+        }
+
+    });
+
+    return str;
+
+}
+
+function Amino(amino) {
+
+    this.short = amino;
+
+    this.init = function() {
+
+    };
+
+    this.medText = function() {
+        if (this.short in Amino.transTable) {
+            return Amino.transTable[this.short][0];
+        }
+        else {
+            return this.short;
+        }
+    };
+
+    this.longText = function() {
+        if (this.short in Amino.transTable)  {
+            return Amino.transTable[this.short][1];
+        }
+        else {
+            return this.short;
+        }
+    };
+    this.getIntegerWeight = function() {
+        if (this.short in Amino.transTable) {
+            return Amino.transTable[this.short][2];
+        }
+        else {
+            return 0;
+        }
+
+    };
+
+    this.init();
+}
+
+Amino.transTable =  {
+    'K' : ['Lys','Lycine',128],
+    'V' : ['Val','Valine',99],
+    'Q' : ['Gln','Glutamine',128],
+    'N' : ['Asn','Asparagine',114],
+    'F' : ['Phe','Phenylalanine',147],
+    'L' : ['Leu','Leucine',113],
+    'I' : ['Ile','Isoleucine',113],
+    'M' : ['Met','Methionine',131],
+    'S' : ['Ser','Serine',87],
+    'P' : ['Pro','Proline',97],
+    'T' : ['Thr','Threonine',101],
+    'A' : ['Ala','Alanine',71],
+    'Y' : ['Tyr','Tyrosine',163],
+    '*' : ['Sto','Stop',0],
+    'H' : ['His','Histidine',137],
+    'D' : ['Asp','Aspartic Acid',115],
+    'E' : ['Glu','Glutamic Acid',129],
+    'C' : ['Cys','Cysteine',103],
+    'W' : ['Trp','Tryptophan',186],
+    'R' : ['Arg','Arginine',156],
+    'G' : ['Gly','Glysine',57]
+
+};
+
+Amino.AminoWeights = function() {
+    var aminoWeights = [];
+
+    for (var amEntry in Amino.transTable) {
+        if (amEntry == '*') {
+
+        }
+        else {
+            if (aminoWeights.indexOf(Amino.transTable[amEntry][2]) == -1) {
+                aminoWeights.push(Amino.transTable[amEntry][2]);
+            }
+        }
+
+    }
+    aminoWeights.sort(function(a,b) {
+        return a - b;
+
+    });
+    return aminoWeights;
+};
+
+Amino.AllAminos = function() {
+
+    var amList = [];
+
+    for (var amEntry in Amino.transTable) {
+        if (amEntry == '*') {
+
+        }
+        else {
+          amList.push(amEntry);
+
+
+        }
+
+    }
+    amList.sort();
+
+    return amList;
+
+}
+
+
+function Codon(codon) {
+    this.codon = codon;
+
+    this.init = function() {
+
+    };
+
+    this.isStartCodon = function() {
+        return (Codon.StartCodons.indexOf(this.codon) > -1);
+    };
+
+    this.isStopCodon = function() {
+        return (Codon.StopCodons.indexOf(this.codon) > -1);
+    };
+
+    this.translate = function() {
+        if (this.codon in Codon.transTable) {
+            return new Amino(Codon.transTable[this.codon]);
+        }
+        else {
+            return null;
+        }
+
+
+    };
+
+    this.init();
+
+}
+
+Codon.len = 3;
+Codon.StartCodons = ['AUG'];
+Codon.StopCodons = ['UAA','UAG','UGA'];
+
+Codon.transTable = {
+    'AAA' : 'K',
+    'AAC' : 'N',
+    'AAG' : 'K',
+    'AAU' : 'N',
+    'ACA' : 'T',
+    'ACC' : 'T',
+    'ACG' : 'T',
+    'ACU' : 'T',
+    'AGA' : 'R',
+    'AGC' : 'S',
+    'AGG' : 'R',
+    'AGU' : 'S',
+    'AUA' : 'I',
+    'AUC' : 'I',
+    'AUG' : 'M',
+    'AUU' : 'I',
+    'CAA' : 'Q',
+    'CAC' : 'H',
+    'CAG' : 'Q',
+    'CAU' : 'H',
+    'CCA' : 'P',
+    'CCC' : 'P',
+    'CCG' : 'P',
+    'CCU' : 'P',
+    'CGA' : 'R',
+    'CGC' : 'R',
+    'CGG' : 'R',
+    'CGU' : 'R',
+    'CUA' : 'L',
+    'CUC' : 'L',
+    'CUG' : 'L',
+    'CUU' : 'L',
+    'GAA' : 'E',
+    'GAC' : 'D',
+    'GAG' : 'E',
+    'GAU' : 'D',
+    'GCA' : 'A',
+    'GCC' : 'A',
+    'GCG' : 'A',
+    'GCU' : 'A',
+    'GGA' : 'G',
+    'GGC' : 'G',
+    'GGG' : 'G',
+    'GGU' : 'G',
+    'GUA' : 'V',
+    'GUC' : 'V',
+    'GUG' : 'V',
+    'GUU' : 'V',
+    'UAA' : '*',
+    'UAC' : 'Y',
+    'UAG' : '*',
+    'UAU' : 'Y',
+    'UCA' : 'S',
+    'UCC' : 'S',
+    'UCG' : 'S',
+    'UCU' : 'S',
+    'UGA' : '*',
+    'UGC' : 'C',
+    'UGG' : 'W',
+    'UGU' : 'C',
+    'UUA' : 'L',
+    'UUC' : 'F',
+    'UUG' : 'L',
+    'UUU' : 'F'
+
+};
+
+function Peptide(aminoArr) {
+    this.peptide = aminoArr;
+
+    this.init = function() {
+
+    };
+
+    this.toString = function(detailLevel,separator) {
+
+        var sep;
+        if (separator == null) {
+            sep = '-'
+        }
+        else {
+            sep  = separator;
+        }
+
+        if (!detailLevel) {
+            detailLevel = Peptide.Short;
+        }
+
+        var str = '';
+        this.peptide.forEach(function(am,i) {
+            if (i > 0) {
+                str += sep;
+            }
+
+            if (am) {
+                switch (detailLevel) {
+                    case Peptide.Short:
+                        str+= am.short;
+                        break;
+
+                    case Peptide.Medium:
+                        str+=am.medText();
+                        break;
+                    case Peptide.Long:
+                        str+=am.longText();
+                        break;
+                    default:
+                        str+= am.short;
+                        break;
+
+                }
+
+
+            }
+            else {
+                str += 'unk';
+            }
+        });
+        return str;
+
+    };
+
+    this.toMedString = function(separator) {
+        return this.toString(Peptide.Medium,separator);
+    };
+
+    this.toLongString = function(separator) {
+       return this.toString(Peptide.Long,separator);
+    };
+
+    this.toShortString = function(separator) {
+        return this.toString(Peptide.Short,separator);
+    };
+
+    this.toWeightString = function(separator) {
+
+        var sep = '-';
+
+        if (separator) {
+            if (separator.length == 0) {
+                sep = '';
+            }
+            else {
+                sep = separator;
+            }
+        }
+        var mapped = this.peptide.map(function(am) {
+            return am ? am.getIntegerWeight() : 0;
+        });
+
+        var str = '';
+        mapped.forEach(function(el,i) {
+            str+=el;
+            if (i < mapped.length - 1) {
+                str+=sep;
+            }
+
+        });
+        return str;
+
+    };
+
+
+    this.getIntegerWeight = function() {
+        var mapped = this.peptide.map(function(am) {
+            return am ? am.getIntegerWeight() : 0;
+        });
+
+
+        return mapped.reduce(function(a,b) {
+
+            return a + b;
+        });
+    };
+
+
+    this.spectrum = function(cyclic) {
+
+
+        var prefixMasses = [0];
+        this.peptide.forEach(function (am, i) {
+            var prefMass = am.getIntegerWeight() + prefixMasses[i];
+            prefixMasses.push(prefMass);
+
+        });
+
+        var peptideMass = prefixMasses[prefixMasses.length - 1];
+
+        var w;
+        var spec = [0];
+
+        for (var st = 0; st < this.peptide.length + 1; ++st) {
+            for (var end = st + 1; end < this.peptide.length + 1; ++end) {
+                w = prefixMasses[end] - prefixMasses[st];
+                spec.push(w);
+                if (st > 0 && end < this.peptide.length) {
+                    if (cyclic) {
+                        spec.push(peptideMass - w); //wrap around bit
+                    }
+                }
+            }
+        }
+
+
+      return spec.sort(function(a,b) {
+          return a - b;
+
+      });
+
+    };
+
+    this.linearSpectrum = function() {
+        return this.spectrum(false);
+    };
+
+    this.cyclicSpectrum = function() {
+        return this.spectrum(true);
+    };
+
+
+    this.init();
+
+
+
+};
+
+
+Peptide.Short = 1;
+Peptide.Medium = 2;
+Peptide.Long = 3;
+
+Peptide.AminoArrFromStr = function(str) {
+    var amAr = [];
+
+    for (var i = 0;i < str.length; ++i) {
+        var am = new Amino(str.substring(i,i+1));
+        amAr.push(am);
+    }
+
+    return amAr;
+
+};
+
+Peptide.AminoArrFromWeights = function(weights) {
+
+    var amArr = weights.map(function(w) {
+        for (var amEntry in Amino.transTable) {
+            if (Amino.transTable[amEntry][2] == w) {
+                return new Amino(amEntry);
+            }
+        }
+        return '*';
+
+    });
+    return amArr;
+
+};
+
+function RNA(rna) {
+
+    this.rna = rna;
+
+    this.init = function() {
+
+    };
+
+    this.codons = function(frameOffset) {
+        var arr = [];
+
+        for (var i = frameOffset;i < this.rna.length - Codon.len + 1;i = i + Codon.len ) {
+            var cod = new Codon(this.rna.substring(i,i + Codon.len));
+            arr.push(cod);
+
+        }
+        return arr;
+
+    };
+
+    this.translate = function(frameOffset,forceTranslate) {
+        var cods = this.codons(frameOffset);
+
+        var started = false;
+        var stopped = false;
+
+        if (forceTranslate) {
+            started = true; //ie don't wait for start codon
+        }
+
+        var tranCods = cods.filter(function(cod) {
+
+            if (stopped) {
+                return false;
+            }
+
+            if (!started) {
+                if (cod.isStartCodon()) {
+                    started = true;
+                }
+            }
+
+            if (started) {
+                if (cod.isStopCodon()) {
+                    stopped = true;
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                return false;
+            }
+
+        });
+
+        var aminos = tranCods.map(function(cod) {
+            return cod.translate();
+
+        });
+        return new Peptide(aminos);
+    };
+
+    this.init();
+}
+
+RNA.Uracil = 'U';
+
+function DNA(dna) {
+
+    this.dna = dna;
+
+    this.init = function() {
+
+    };
+
+    this.rnaTranscript = function() {
+        return this.dna.split(DNA.Thymine).join(RNA.Uracil);
+    };
+
+    this.reverseComplement = function() {
+
+        var revCompl = {
+            'A': 'T',
+            'C': 'G',
+            'G': 'C',
+            'T': 'A',
+            'a': 't',
+            'c': 'g',
+            'g': 'c',
+            't': 'a'
+
+        };
+
+        var rev = '';
+
+        for (var i = this.dna.length-1;i >= 0;--i) {
+            rev += revCompl[this.dna[i]];
+        }
+
+        return new DNA(rev);
+    };
+
+    this.init();
+}
+
+DNA.Thymine = 'T';
+
+
+function allPossiblePeptidesWithWeight(w) {
+
+    var wMatrix = [];
+    for (var i = 0;i <= w;++i) {
+        wMatrix[i] = 0;
+    }
+
+    var aminoWeights = Amino.AminoWeights();
+
+
+    var possWeightsPrevLen = [];
+    var totWeightsMatched = 0;
+
+    var done = false;
+
+    //for (var len = 1;len < 25; ++len) {
+    var round = 0;
+
+    while (!done) {
+        ++round;
+        console.log('round: ' + round);
+        var wMatrixThisLen  = [];
+        var weightsMatchedThisLen = 0;
+
+        var wNewMatrix = [];
+        for (var i = 0;i <= w;++i) {
+            wNewMatrix[i] = 0;
+        }
+
+        if (round == 1) {
+            aminoWeights.forEach(function(el) {
+                if (el > w) {
+                  wNewMatrix[el] = 0;
+                }
+                else {
+                    ++wNewMatrix[el];
+                }
+
+            });
+
+        }
+        else {
+
+            wNewMatrix = wMatrix.map(function(el) {
+                return el;
+            });
+
+            wMatrix.forEach(function(matCount,matInd) {
+                if (matCount == 0) {
+                    //wNewMatrix[matInd] = 0;
+
+                }
+                else if (matInd == w) {
+                    /*
+                    if (wNewMatrix[matInd] == 0) {
+                        wNewMatrix[matInd] = wMatrix[matInd];
+                    }
+                    */
+                }
+                else {
+                    var subtr = 0;
+                    aminoWeights.forEach(function (amW,amInd) {
+                        var thisW = matInd + amW;
+                        if ((thisW > w) && (amInd == 0)) {
+                            //assumes aminoweights are sorted, thus as soon as one blows, all blow
+
+                                wNewMatrix[matInd] = 0;
+
+                        }
+                        else if (thisW > w) {
+
+                        }
+                        else {
+                            if (thisW == w) {
+                                console.log('thisw = w: ' + w +  ' matind: ' + matInd + ' amw: ' + amW + ' matCount: ' + matCount);
+                            }
+                         //   if (wNewMatrix[thisW] == 0) {
+                                wNewMatrix[thisW]  = wNewMatrix[thisW] + matCount;
+                                subtr = matCount;
+
+                          //  }
+                           // else {
+                           //     wNewMatrix[thisW]  = wNewMatrix[thisW] + matCount;
+                           // }
+
+                        }
+                    });
+                    wNewMatrix[matInd] -= subtr;
+                }
+
+
+
+            });
+
+        }
+
+        var totLeft = 0;
+
+        wMatrix = wNewMatrix.map(function(el,j) {
+            if (j == wNewMatrix.length - 1) {
+
+            }
+            else {
+                totLeft += el;
+            }
+           return el;
+        });
+
+
+        console.log('count at end of round ' + round + ' ' + wMatrix[w]);
+
+        if (totLeft == 0) {
+            done = true;
+        }
+    }
+
+    return wMatrix[w];
+}
+
+function cycloPeptideSequencing(expSpectrum) {
+    var expSpectrumAr = expSpectrum.split(' ');
+    expSpectrumAr = expSpectrumAr.map(function (el) {
+        return parseInt(el);
+    });
+
+    var done = false;
+
+    var goodOnes = [];
+
+    var parentWeight = expSpectrumAr[expSpectrumAr.length - 1];
+
+
+    //var candidates = Amino.AllAminos();
+
+    var allAminoWeights = Amino.AminoWeights();
+
+    var candidates = Amino.AminoWeights();
+
+    candidates = candidates.map(function (el) {
+        return [el];
+
+    });
+
+
+    while (!done) {
+
+        //bound
+        candidates = candidates.filter(function (cand) {
+            var candW = cand.reduce(function (a, b) {
+                return a + b;
+            });
+            // var pep = new Peptide(Peptide.AminoArrFromStr(cand));
+            if (expSpectrumAr.indexOf(candW) > -1) {
+
+                if (candW == parentWeight) {
+                    console.log('aha');
+                    var candPep = new Peptide(Peptide.AminoArrFromWeights(cand));
+                    var candSpec = candPep.cyclicSpectrum();
+                    var match = true;
+                    if(candSpec.length !== expSpectrumAr.length) {
+                        match = false;
+
+                    }
+                    else {
+                        for(var ii = candSpec.length; ii--;) {
+                            if(candSpec[ii] !== expSpectrumAr[ii]) {
+                                match = false;
+                                break;
+                            }
+                        }
+
+                    }
+                    if (match) goodOnes.push(cand);
+
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                return false;
+
+            }
+        });
+
+        if (candidates.length == 0) {
+            done = true;
+            break;
+
+        }
+
+        //branch
+
+
+        var newCandidates = [];
+        candidates.forEach(function (cand) {
+            allAminoWeights.forEach(function (amW) {
+                var newCand = cand.map(function(el) {
+                   return el;
+                });
+                newCand.push(amW);
+                newCandidates.push(newCand);
+            });
+
+        });
+        candidates = newCandidates.map(function(el) {
+            return el;
+        });
+
+    }
+
+
+    var goodStrings = '';
+
+    var str;
+    goodOnes.forEach(function(goodOne) {
+        str = '';
+        goodOne.forEach(function(weight,weightInd) {
+            str+=weight;
+
+            if (weightInd == goodOne.length - 1) {
+
+            }
+            else {
+                str+='-';
+
+            }
+
+
+        });
+        goodStrings+= str + ' ';
+
+    });
+
+
+    return goodStrings;
+        //done = true;
+
+
+        //aminoWeights.forEach(function(am) {
+
+        //});
+
+
+
+
+}
+
+function kmerComposition(dna,k,includePositions) {
+
+    //includePositions = flag to determine whether the positions of each kmer are also returned
+
     kmers = [];
-    for (i = 0;i < dna.length - k + 1;++i) {
-        kmers.push(dna.substring(i,i+k));
+
+
+    for (i = 0; i < dna.length - k + 1; ++i) {
+        if (includePositions) {
+            kmers.push([dna.substring(i, i + k),i]);
+        }
+        else {
+            kmers.push(dna.substring(i, i + k));
+        }
+
+    }
+    return kmers.sort();
+
+}
+
+function kmerPairedComposition(dna,k,dist) {
+    kmers = [];
+    for (i = 0;i < dna.length - (k*2)  - dist + 1;++i) {
+        kmers.push([dna.substring(i,i+k),dna.substring(i+ k + dist,i+ k + dist+k)]);
     }
     return kmers.sort();
 }
@@ -906,17 +2578,43 @@ function randomDNA(len) {
 
 function indToKmer(ind,k) {
 
-    var curr = ind;
-    var pow;
+    if (typeof(ind) === 'string') {
+        //assuming big int
 
-    var inds = '';
+        var curr = BigInteger(ind);
+        var pow;
 
-    for (var i = 0;i < k;++i) {
-        pow = k - i - 1;
-        var sum = Math.floor(curr / Math.pow(c_NumBases,pow));
-        var rem = curr % Math.pow(c_NumBases,pow);
-        inds+= c_Bases[sum];
-        curr = rem;
+        var inds = '';
+
+        for (var i = 0;i < k;++i) {
+            pow = k - i - 1;
+            var currPow = BigInteger(c_NumBases).pow(BigInteger(pow));
+            var sum = curr.divide(currPow);
+           // var sum = Math.floor(curr / Math.pow(c_NumBases,pow));
+            var rem = curr.remainder(currPow);
+            inds+= c_Bases[sum.valueOf()];
+            curr = rem;
+
+        }
+
+
+    }
+
+    else {
+        var curr = ind;
+        var pow;
+
+        var inds = '';
+
+        for (var i = 0;i < k;++i) {
+            pow = k - i - 1;
+            var sum = Math.floor(curr / Math.pow(c_NumBases,pow));
+            var rem = curr % Math.pow(c_NumBases,pow);
+            inds+= c_Bases[sum];
+            curr = rem;
+
+        }
+
 
     }
 
@@ -932,14 +2630,20 @@ function kMerToInd(kmer) {
     var vals = {'A':0,'C':1,'G':2,'T':3};
 
 
+    var big = BigInteger(0);
     for (var i = kmer.length-1;i >= 0; --i) {
-
-        sum+= vals[kmer[i]] * (Math.pow(c_NumBases,pow));
+        var placeVal = BigInteger(vals[kmer[i]]);
+        var bigPow = BigInteger(c_NumBases);
+        bigPow = bigPow.pow(BigInteger(pow));
+        var curr = placeVal.multiply(bigPow);
+        big = big.add(curr);
+        //sum+= vals[kmer[i]] * (Math.pow(c_NumBases,pow));
         ++pow;
 
     }
 
-    return sum;
+   // return sum;
+    return big.toString();
 
 
 }

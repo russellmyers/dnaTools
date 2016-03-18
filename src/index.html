@@ -102,13 +102,25 @@
 
             </div>
         </div>
+        <div id = "sequencingTools">
+            <div id = "sequencingInputTools">
+                <textarea name = "sequencingStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true,'|')" id = "sequencingStrings" ></textarea>
+                <button type = "button" id="sequencingInput" onclick="sequencingInput(event)">Apply</button>
+                <label for  fileSequencingInput>Load Input :</label>
+                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
+                <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number"  name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
+            </div>
+        </div>
 
-         <div id="tabs">
+
+        <div id="tabs">
             <a href="#"  onclick="tab_click(0,tabClickDone);">Most Frequent k-mers</a>
             <a href="#"  onclick="tab_click(1,tabClickDone);">LT Clumps</a>
             <a href="#"  onclick="tab_click(2,tabClickDone);">Search for k-mer</a>
             <a href="#" onclick="tab_click(3,tabClickDone);">Motifs</a>
-            <a href="#" onclick="tab_click(4,tabClickDone);">Misc</a>
+            <a href="#" onclick="tab_click(4,tabClickDone);">Sequencing</a>
+            <a href="#" onclick="tab_click(5,tabClickDone);">Misc</a>
             <!--a href="#tabs" onclick="tab_click(2);">tab 3</a-->
         </div>
         <div id="tabDataPlusCanvas">
@@ -337,22 +349,147 @@
 
 
             </article>
+            </section>
+                <section class="tabFieldset">
+                    <h3 id="tabFieldsetHead5">Sequencing</h3>
+
+                    <article id="art8">
+                        <!--label for kmer>DNA strings:</label-->
+                        <div class="leftClump">
+                            <!--textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
+                            <button type = "button" onclick="motifsInput(event)">Apply</button-->
+
+                            <label for kmerLenSA  id = kmerLenLabSA class="alignLab">Read Len</label>
+                            <input type = "number" class="alignEl"  name = "kmerLenSA" onchange="kMerLenChanged(event)" id = "kmerLenSA" value = 3 min = 1 max = 100>
+                            <label for pairDistSA id="pairDistLabSA" class="alignLab">Pair Distance:</label>
+                            <input type = "number" class = "sensibleNum alignEl" name = "pairDistSA"   id = "pairDistSA" value = 1 min = 1>
+                            <label for numItersSA id="numItersLabSA" class="alignLab">Num Iterations:</label>
+                            <input type = "number" class = "sensibleNum alignEl" name = "numItersSA"   id = "numItersSA" value = 1 min = 1>
+                            <label for seqGraphTypeHam id = "seqGraphTypeHamLab" class="alignLab">Hamilton Graph</label>
+                            <input type="radio" name="seqGraphType"   class = "alignEl"  id ="seqGraphTypeHam" value="seqGraphTypeHam" checked >
+                            <label for seqGraphTypeDeb  id = "seqGraphTypeDebLab" class="alignLab">DeBruijn Graph</label>
+                            <input type="radio" name="seqGraphType"  class = "alignEl"  id ="seqGraphTypeDeb" value="seqGraphTypeDeb"  >
+
+                            <label for debugSA class="alignLab">Debug</label>
+                            <input type = "checkbox" class="alignEl" name = "debugSA" id = "debugSA">
+
+
+
+                        </div>
+                        <div class="midClump" id = "midSeq"> <!--id = "midMotif"-->
+                            <input type="radio"  name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqDNA" value="seqDNA" checked  >DNA
+                            <br>
+                            <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqReads" value="seqReads"  >Reads
+                            <br>
+                            <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqAdjList" value="seqAdjList" >Adjacency List                            <br>
+
+                            <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedDNA" value="seqPairedDNA" >Paired DNA                            <br>
+
+                            <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedReads" value="seqPairedReads" >Paired Reads                            <br>
+
+
+
+                        </div>
+                        <div class="rightClump" id = "rightSeq"> <!-- id="rightMotif"-->
+
+                            <button type = "button" class="fixedBut" onclick="runSequencing(event)">Run</button>
+                            <br>
+
+                            <input type="radio"  name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqComp" value="seqComp"  >Graph
+                            <br>
+                            <input type="radio" name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqPath" value="seqPath" checked >Path
+                            <br>
+                            <input type="radio" name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqCycle" value="seqCycle" >Cycle                            <br>
+
+                            <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->
+                        </div>
+
+
+
+
+
+
+
+
+
+
+                        <!--button type = "button" class="fixedBut" onclick="motifSearch(event)">k d Motifs</button>
+                        <br>
+                        <button type = "button" class="fixedBut" onclick="bruteMotifSearch(event)">Brute</button>
+                        <button type = "button" class="fixedBut" onclick="medianString(event)">Median String</button>
+                        <button type = "button" class="fixedBut" onclick="greedyMotif(event)">Greedy Motif</button>
+                        <button type = "button" class="fixedBut" onclick = "randomMotif(event)">Random Motif</button>
+                        <button type = "button" class = "fixedBut" onclick = "gibbsSampler(event)">Gibbs Sampler</button-->
+
+
+
+
+
+
+
+
+
+
+
+                    </article>
 
         </section>
             <section class="tabFieldset">
-                <h3 id="tabFieldsetHead5">Misc</h3>
+                <h3 id="tabFieldsetHead6">Misc</h3>
 
                 <article id="art7">
                     <!--label for kmer>DNA strings:</label-->
-                    <textarea name = "miscParam1" placeholder = "Enter  param 1" rows = "6" cols = "15"  id = "miscParam1" ></textarea>
-                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "15"  id = "miscParam2" ></textarea>
-                    <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "15"  id = "miscParam3" ></textarea>
+                    <textarea name = "miscParam1" contenteditable="true"  placeholder = "Enter  param 1" rows = "6" cols = "14"  id = "miscParam1" ></textarea>
+                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" ></textarea>
+                    <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "12"  id = "miscParam3" ></textarea>
                     <div id = "miscRadioBox">
-                    <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Compl
+                    <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Comp
 
-                    <input type="radio" name="miscRadio" id = "miscFunc2"  value="2">Profile Most Prob
-                    <input type="radio" name="miscRadio" id = "miscFunc3"  value="3">create ham nodes
-                    <input type="radio" name="miscRadio" id = "miscFunc4"  value="4">create deBruijn nodes
+                    <input type="radio" name="miscRadio" id = "miscFunc2"  value="2">Prof Most Prob
+                        <br>
+                    <!--input type="radio" name="miscRadio" id = "miscFunc3"  value="3">Create hamilton
+
+                    <input type="radio" name="miscRadio" id = "miscFunc4"  value="4">deB cyc from dna
+                        <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc5"  value="5">paired composition
+
+                    <input type="radio" name="miscRadio" id = "miscFunc6"  value="6">deB path from paired dna
+                        <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc7"  value="7">deB path from reads
+
+                    <input type="radio" name="miscRadio" id = "miscFunc8"  value="8">deB path from dna
+                        <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc9"  value="9">deB path from paired reads
+                        <br-->
+                    <input type="radio" name="miscRadio" id = "miscFunc10"  value="10">Pattern to Number
+                    <input type="radio" name="miscRadio" id = "miscFunc11"  value="11">Number to Pattern
+                        <br>
+
+                    <input type="radio" name="miscRadio" id = "miscFunc12"  value="12">d-Neighbourhood
+                    <input type="radio" name="miscRadio" id = "miscFunc13"  value="13">Dist pattern vs strings
+                       <br>
+                    <!--input type="radio" name="miscRadio" id = "miscFunc14"  value="14">kmer Composition-->
+                    <input type="radio" name="miscRadio" id = "miscFunc15"  value="15">string from genome path
+                        <br>
+
+                    <input type="radio" name="miscRadio" id = "miscFunc16"  value="16">Overlap graph
+                    <!--input type="radio" name="miscRadio" id = "miscFunc17"  value="17">debCycle from adj list
+                        <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc18"  value="18">debPath from adj list-->
+                    <input type="radio" name="miscRadio" id = "miscFunc19"  value="19">Universal string
+                         <BR>
+                    <input type="radio" name="miscRadio" id = "miscFunc20"  value="20">Genome Path to string
+                    <input type="radio" name="miscRadio" id = "miscFunc21"  value="21">DNA to Amino String
+                    <input type="radio" name="miscRadio" id = "miscFunc22"  value="22">RNA to Amino String
+                    <input type="radio" name="miscRadio" id = "miscFunc23"  value="23">Find Amino Acid sequence in genome
+                    <input type="radio" name="miscRadio" id = "miscFunc24"  value="24">Spectrum
+                    <input type="radio" name="miscRadio" id = "miscFunc25"  value="25">Num peptides with mass
+                    <input type="radio" name="miscRadio" id = "miscFunc26"  value="26">Cyclopeptide sequencing
+
+
+
+
+
                     </div>
 
                     <button type = "button" onclick="executeMisc(event)">Execute</button>
@@ -384,8 +521,28 @@
         <div id = "mainAreaDiv">
 
             <div id="leftMainDiv">
+
                 <div id = "dnaviewer">
                     <div id = "dnaView" onclick="clickInDNA(event)"></div>
+                </div>
+                <div id = "graphviewer">
+                    <div id = "graphGraphDiv">
+                        <canvas id = "moreCanvas">
+                            hhh
+                        </canvas>
+
+                    </div>
+                    <div id = "graphDnaDiv">
+
+                    </div>
+                    <div id = "graphReadsDiv">
+
+                    </div>
+                    <div id = "graphAdjListDiv">
+
+                    </div>
+
+
                 </div>
 
             </div>
@@ -416,16 +573,16 @@
         <div id = "moreDetailDiv">
             <!--textarea id = "debugText"></textarea-->
             <textArea id = "moreDetailText"></textArea>
-            <canvas id = "moreCanvas">
+            <!--canvas id = "moreCanvas">
                 hhh
-            </canvas>
+            </canvas-->
         </div>
 
 
         <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/{{JQUERY_VERSION}}/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-{{JQUERY_VERSION}}.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script-->
-
+        <script src = "js/vendor/biginteger.js"></script>
         <script src = "js/russGenLibs/GenUtilities.js"></script>
         <script src="js/russGenLibs/GenAlg.js"></script>
         <script src = "js/russGenLibs/BioUtilities.js"></script>
