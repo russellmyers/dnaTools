@@ -13,11 +13,25 @@ var dnaPageOffset = 0;
 
 var dnaMasterStrings = []; // used for Motif search
 
+var rnaMaster = ''; //used for Transcription/translation
+var proteinMaster = '';
+var spectrumMaster = '';
+var sequencedWeights = '';
+var convMaster = '';
+
+var progExtraInfo; // extra info during background processing
+
+
 var basesPerPage = 20000;
 
 var clumps = [];
 var stop = false;
 var myParams = Params.getInstance();
+
+
+//used for expanding/collapsing divs
+var expDebugState = true;
+var expMultiState = true;
 
 var w = new Worker('js/worker.js');
 
@@ -51,30 +65,55 @@ function testStuff() {
    // var testMotifs = ['TCGGGGGTTTTT','CCGGTGACTTAC','ACGGGGATTTTC','TTGGGGACTTTT','AAGGGGACTTCC','TTGGGGACTTCC','TCGGGGATTCAT','TCGGGGATTCCT','TAGGGGAACTAC','TCGGGTATAACC'];
    // logoCanvas(testMotifs);
 
-
+/*
     var rands = [];
     for (var i = 0;i < 100; ++i) {
         rands.push(getRandomFromProbDist([0.05,0.05,0.05,0.7,0.05,0.05]));
     }
+    */
 
+    /*
+    var pep = new Peptide(Peptide.AminoArrFromArr(['A','V','G','134','Q','M','M']));
 
-    var spaceString = 'ACATTGGAATTATTGAAGTCGGCAAAAGAGCCAGAAGGGGTTTAATATGGGCAGGACTACATGGGAGACGTCGAATGTACAAGTGCGGCTCGCTTACACACTG GGATACGGAATGAGTATAATTGATTTGAGCCGGGCACGGCTCAGGAGCTACAGAGGCTACTTGGTAAGGGGTCTGGTAACTTGTGGAATCGCCCCTGTGGCAG GAATTAGCGAGATGCTCTCCTAAGTTCGTTCCTTAGATTCTGTAATAAGGACTACGAATATGAAGCCCTCGTAGCGATAATACGATCCGCTGATAAGGCACAT GGTCAGATCTCAGGCGTGTTGGCGTTTAGCTGTGGCACCAGCTTTAACTGCGCGAGCATCCACTTGATGGCTGTTACGAATAATTGCGAGCTCATAAACATCA TTCGTTACATTTTCCCGCCAGTCTGGCACTCCAGCCGGAGTGGTTCACTCACTTTTCGGCTGATTTTTGCCCAATACGGGGGAAGGCCCTCTAAAGAACAACT GTTGCAGTCGGGAAATTAGAACGTATTCTTGGTTGACTATCCTAGCGCGGAGTATCACCCAGCGGACTGCCAACTCCTTCCCTGGTATGTCTTTGACTTCTTA GCACCTTGACTGGAACCCGCGGTAACAGGAATAAGAATTTTGAACCAGACGGGAGAAAGGGTCCAGCACTTGTCCATGCATGGGGAGCAAAGGTTAGTTTACT GTAACGACCCCGAGGAGTCAACCGCAGATTACGGGCCCGAGCGGGGATGTTGCCGGGTCGGTGTTGGGGCATTCGCACCTGGTGGGGGTTGGAAGTACCACCA CGCACCGAGTCGTACTATCGTTCTTGACAGACTTGGCTCGACACCTGGACCGTACATTTGCGGCCAATGACCAAGCCTGTAGCACACCTCAAACAGCCGCTCA GACTGGGTGGATGTTCAGTAATTACTCGTATCATGGGCGCTTCGTTGATCCGAAGCCCGAAACGACTCTACGAACCTGTCCAAGAGGGTCCCGGTCGAAACGT GTGTCAAAAGAGTAATTAGTAAGGCAAACTACGCAGGTCCCACGTAAAGTGGCTCTAGCGTCGACGGCCAGAACGGTAGCGACCTTAATTTGGATAAAGAACT AGCCAGTCATGTGCATCCTCGTGAGGATTCTCTCTGCAGTGCGTTGCGAACATTGCGCAAGGCGAGATTCTCCATCCTAAGAGTGTGGTTTATTTCTGCAAGT CTGAGTAATCGGCTTAGGTATTATGTCGGCGTAAGTCCCCTGACTCCAGCCGCCAGAAGTGTCTAACTTGAAGGTTACTCGCCACTGACGGTGATTTGCCGTT TACGCTATAATGATATAGTCACGGCACGAGAGCAAGTACTTTGCGCACAATTGGGCGTATCCCAGTTGATCTACAACCACTGGAACAACTTGCCGACTATCGG AACATAGAAAAGCGTAACCCGCGACGATTGCTGTTATTGAATCAAGTAAAATTCAGATCAGTAGAGCGATTTGCGGTGCATCTTTCAGGACACGTTATTCGGC ATCCCACCTATCCCTCCGTCATGTAATTACAATGAGGAGGCGTATCAATTGTTACAGAAGCTTCCACATATAGTTGTTGTGGTATCTTTTCGTTAGAAAGCCT GTCGAAGATACCAGTAATCATCGATCAGCGATTAGTATGATGTGGAGGGCGTGCATCTCCTCGGAGACACGTTCTATAGACAATGAGCGGAATAGTCAGTTAA GGGCGGAACCCGGAACTAAATTGAGCGTCCGAGGACCTGGTCTTTACAGATGGAGGGGAAGTGGGACTAGTTGATTTTGAGAGGAAACCATGGGAGTTTGGGG CGCGTTCAAATATGCCTCATCGGATCGCGTTTCCCTACAACCACCAGATCAAAACTGCCCAAAGATCAAACGCTTACAGCCTGGCAGCCTTCATTCCTTGATG ATCCCATCTAAGACGCCCGCAATTTCCAGCGACTTGTGTCAGGCTGTACTTTAATGCCATATATGGTGGACAGCCAGCGCACTCATCGGTGATAATCCAAAAA AGCAGAGGCAGAACTGTTGGTCCTTCTATGGGCATACGGGTGTAAGTTTCTCCCGTGGAGCACCTATCCGTCCTACATAACAGGCGAGGCACTAGGGTCTGCT GGTATTCATGTCCTCGCACACATGTAGTACTATGCGATTTTGCAAAATCAAGAGCATTATGCCCGTCTACTCCGTTATCATTTTAGAAACCCTCTGATGTAGG ACTCATTTAACGCCCGGGTCATGAGGAAATTACCTCTACTAGCACTCATCTTGCGAACGACACCTCATAACGATTGAGTTTCTTAAGCCGTCAATAGTCTTTA ATCAAAGGTTCAGTGAAGCTTCTGCACTGAAGCGCACATTTCTTTGCAGGTGACGTTCAAGCCCGCTATGGAATTGATACGGAGATTTCCCCGCCGGTGATGG AGGAAATCAGTGCTTTTCCTCCAATCCCTTGGCCCTTTTGTCGGCTCCGTAAATAACCAAGGTGCAGTTCGAATTCGATGAATAGCCATGCTGACGGACCTTC TGTCGCTGGGCGCAAGGGCACCACATGTTTCTACGTGCTTGGGTGCTAACTTGGTGAATTGGTTAAGGGTGCGCGGACGCTCGTCACCAACCGGACAACAGTA AGAGCTACGACAGCTTAGGCTCCGGAGGATTCGCTTTCCGGTAAAGATCACCTCTAACCGATGCAACGCCCTCCGGTCAAACACGAGTCCAAAATTTTACACC TGGGTTGAGATCCTCAGAGTCCAATGCGCGGGCATCCTCACAGAACAATATTTCTGAGTTATCTATAACGTCCTTCTCATGTTTCAGCCTTGGCCTAATGTTG CTTTTGTAGGGCATGTATAATGCTGACAATGACGAAAGCTTTTTCGGCCCCATTTGAACTCCGGCTTTGCCTTCATTAATTAATTTAGGCCAGCAGTCATTCC AGGCTTTGGAGGCAAGCTGTTCGATAGGGTGGTATTTGTAGGATACGACAAAGCAGGTGGAGACTGATTCCATGAAGCAGCCTGGCTCCAGCCAGACACAGAC GCACGTGCGCAGTAATATGTATCTTCCCTTTGGGTCGCTAGCTGAGCGTCTACTCCGACGGTTGCCCTCTTCCATGTCTAACTCGGAGGCGGATCCTGCAGGA AACGAATTTAGAACGAGCGTTAAGCGGCTCAATAAAATTGAGGGCCAAAACCGACTAGGTCAAATGTGCTGAAGTAGCACATAAACTAAAACATGCGGGGGAA GACGCTAAAACTCGCTTATAGTTGGCTTTACATTGGTCTCCAAAAAAATCGTTCGACTCAGCGCGAGCACCTTTTCACCTGACTAGACGTGTGTAGATTATAA CTATGACACGCCAAGTCGTAAGTGTGCATGAAGCCCATTGGACTTCACGTGCTAGATGGCAAAATCGCAGCAGCCGGTAGCTTGCTCACACCACCCGAATAAT';
-    var arr = spaceString.split(' ');
-    var filtered = arr.filter(function(el) {
-        if (el.length == 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
+    var am = Amino.AllUniqueWeightAminos(true);
+
+    //var leaders = 'LAST ALST TLLT TQAS'.split(' ');
+    var leaders = 'GFAQHVMEGIGLDVKFTNIISCFFDHEWSTCHCKHHNSINHTMSMVF LIGDDDEADNCMMMVQSIKWKTLLRYGAFFTFPFYSYAILHVFYVLW KPMWWAFIFGFCDMKNCFDAPFWMHNSVQWEQHYRCNDVKMMSQLCW MAPRDIRMYFDKYHETAALDSQWIIQQIYHLMNVRKLNRTNRFTSVG FEKYHQQQILIDAQRVRLVHTVARAGPGWVQTGGWQQTCPRYKPYAW NVNPCERSSPPNFSWFMSFWADNSDYGDVIFCCPSVLRTMEMQSKKG WDTDTFFQKAMLKKDETADQIFNLRPYSLTCHNENILGNDNQEKQAG TLGSGENDKGHTVGAGHKGHPEREFEAPIERHEHPRVMMTKVGCYWI VCGHHHEQTVIMKAFDAWKVGFLGPIVAWVIFPAVYLWGKSLCPWTN YDSPTTYLSTHCHRLTNRMVHENPVICPPQDFAKYLIQSGWEFPLVA KDPINQTGDTNVRNFNVGCFCGCYFQWERHDGTPMHFWFSQKLSLTW HMKKLFWGIMKHHILFDFVNQPAFTNKAKGPTPHKAEELIRNLGQEK FNDRQRLVCHTNQCCAYKNKVVCSGGGSEISTNAHTYHFLALGHQVG MYYSAWTEPYYPPTLQIWWWYWKYGCTACQTGPHTMVFVQPTCKCVH YYGYRQCSWCQRWTVRRMLCWIDVLHKALHWHVCLLFHQALYGFSHE WASIGAIMRSAKDMYESLEFHKTHCTYFVYMVCKEARPGWTFFIEWV'.split(' ');
+    leaders = leaders.map(function(el) {
+       var pep = new Peptide(Peptide.AminoArrFromStr(el));
+       return pep;
     });
+  // var spec = '0 71 87 101 113 158 184 188 259 271 372'.split(' ');
+    var spec = '0 71 87 97 97 99 101 101 101 101 101 103 103 113 113 113 113 113 113 113 113 114 114 115 115 128 128 129 129 129 129 129 129 131 131 131 137 137 147 147 156 156 156 163 163 163 186 186 198 200 200 202 202 204 214 214 216 216 216 226 228 230 234 242 242 242 242 242 242 244 245 253 257 257 257 259 260 266 266 268 269 271 276 276 276 276 278 283 284 285 287 293 294 299 301 303 313 317 317 317 327 329 331 343 343 347 354 355 355 356 359 363 363 370 370 371 371 372 379 382 384 388 389 397 397 400 405 407 408 408 413 413 415 415 416 418 418 420 422 428 430 430 432 434 439 444 455 456 458 459 473 476 484 484 485 485 487 499 500 501 506 507 510 510 511 513 515 518 522 526 527 528 529 529 531 533 533 537 540 541 544 544 545 547 558 559 562 568 569 571 572 574 585 586 588 597 598 607 610 612 616 619 620 624 624 625 626 631 636 641 644 646 650 657 657 660 662 663 669 669 670 671 672 674 675 678 681 684 685 689 691 692 696 698 699 700 700 701 711 733 733 735 738 738 739 741 753 771 772 772 773 775 775 775 778 779 782 783 783 786 788 789 794 794 797 798 798 800 801 802 804 805 806 808 810 813 815 828 837 840 846 854 862 864 864 866 869 882 884 885 886 888 889 899 901 902 902 903 904 907 908 911 911 914 914 924 925 926 928 935 935 937 937 941 941 945 952 955 961 961 975 975 977 984 987 988 992 995 999 1002 1013 1015 1016 1017 1017 1017 1022 1025 1032 1032 1038 1039 1039 1040 1044 1051 1055 1058 1058 1059 1062 1065 1066 1070 1070 1072 1074 1084 1088 1097 1099 1100 1101 1103 1104 1105 1106 1118 1118 1121 1130 1133 1135 1142 1150 1151 1153 1153 1154 1154 1156 1165 1171 1172 1186 1187 1194 1196 1198 1200 1201 1201 1202 1207 1212 1213 1214 1215 1216 1217 1217 1218 1218 1219 1231 1233 1234 1234 1236 1248 1255 1259 1264 1267 1272 1279 1281 1285 1298 1300 1301 1309 1311 1315 1315 1315 1316 1318 1319 1319 1321 1325 1330 1331 1334 1335 1338 1341 1343 1344 1346 1347 1348 1352 1363 1363 1372 1379 1395 1396 1398 1402 1410 1414 1414 1422 1422 1428 1429 1429 1430 1431 1432 1433 1434 1435 1435 1438 1447 1448 1450 1452 1460 1461 1471 1472 1472 1476 1476 1478 1481 1494 1499 1509 1515 1517 1521 1525 1532 1534 1535 1535 1535 1543 1546 1548 1551 1557 1557 1561 1561 1561 1562 1566 1566 1573 1577 1581 1585 1585 1589 1603 1605 1606 1608 1609 1609 1612 1618 1628 1634 1635 1636 1638 1647 1663 1664 1664 1664 1672 1672 1674 1674 1677 1680 1682 1686 1690 1694 1699 1702 1708 1713 1715 1716 1718 1718 1722 1723 1724 1740 1741 1743 1748 1749 1756 1763 1777 1777 1778 1781 1785 1792 1801 1803 1803 1805 1810 1811 1811 1815 1819 1819 1822 1823 1827 1830 1837 1837 1842 1844 1849 1850 1853 1869 1872 1876 1878 1878 1879 1887 1905 1906 1906 1912 1916 1916 1916 1924 1925 1929 1934 1936 1939 1940 1940 1940 1948 1948 1950 1965 1972 1979 1979 1991 1993 1996 2000 2000 2005 2007 2007 2009 2017 2019 2019 2026 2031 2034 2035 2039 2042 2053 2053 2058 2061 2064 2076 2079 2079 2087 2087 2094 2096 2097 2103 2113 2118 2120 2120 2123 2125 2132 2132 2135 2135 2136 2138 2140 2147 2150 2167 2171 2171 2192 2193 2200 2200 2200 2205 2209 2216 2216 2219 2224 2226 2226 2232 2233 2233 2233 2235 2237 2250 2252 2262 2266 2266 2268 2276 2284 2287 2296 2300 2303 2313 2318 2334 2334 2334 2336 2336 2337 2339 2347 2349 2355 2355 2356 2363 2363 2365 2366 2379 2380 2389 2397 2397 2413 2413 2416 2418 2434 2435 2437 2446 2447 2449 2449 2452 2466 2468 2468 2473 2476 2490 2492 2493 2494 2494 2494 2502 2510 2511 2519 2526 2533 2536 2542 2547 2549 2550 2553 2560 2578 2579 2579 2586 2597 2605 2605 2615 2620 2622 2623 2624 2624 2625 2627 2631 2632 2634 2648 2650 2650 2650 2651 2655 2689 2691 2706 2710 2711 2715 2733 2733 2733 2735 2738 2742 2742 2744 2747 2751 2753 2756 2761 2763 2768 2771 2779 2802 2807 2813 2820 2824 2825 2828 2836 2836 2836 2843 2846 2862 2862 2866 2871 2873 2876 2876 2881 2882 2900 2903 2907 2924 2933 2933 2937 2938 2944 2944 2949 2953 2957 2965 2972 2975 2975 2975 2987 2995 2999 3004 3018 3034 3034 3037 3037 3038 3039 3058 3062 3066 3066 3070 3073 3078 3078 3082 3088 3101 3104 3112 3119 3130 3135 3138 3149 3151 3152 3163 3163 3171 3172 3179 3190 3191 3193 3195 3217 3217 3220 3229 3238 3241 3241 3243 3244 3248 3250 3251 3276 3286 3291 3292 3300 3308 3318 3320 3321 3330 3335 3342 3351 3351 3354 3354 3357 3358 3358 3372 3387 3405 3407 3420 3422 3429 3431 3433 3433 3434 3439 3448 3455 3471 3483 3485 3486 3486 3488 3510 3514 3521 3533 3534 3534 3535 3546 3551 3552 3568 3585 3596 3599 3599 3600 3611 3611 3614 3615 3622 3634 3635 3647 3649 3664 3664 3681 3682 3696 3697 3708 3713 3727 3728 3728 3728 3735 3748 3750 3751 3771 3777 3797 3809 3812 3827 3828 3837 3841 3841 3842 3851 3857 3864 3864 3868 3868 3884 3898 3913 3940 3940 3942 3943 3955 3965 3969 3970 3970 3977 3981 4013 4014 4027 4027 4044 4053 4054 4056 4057 4083 4096 4098 4099 4110 4126 4140 4140 4140 4145 4155 4158 4167 4171 4184 4209 4211 4212 4223 4253 4255 4259 4268 4272 4284 4296 4296 4299 4303 4313 4352 4368 4373 4374 4397 4397 4397 4400 4409 4409 4416 4428 4465 4469 4487 4501 4510 4510 4526 4529 4538 4560 4566 4572 4584 4630 4639 4639 4639 4643 4651 4673 4673 4681 4685 4752 4752 4752 4768 4782 4786 4786 4802 4829 4853 4867 4881 4881 4883 4915 4915 4942 4968 4968 4982 4994 5028 5044 5069 5069 5071 5095 5097 5157 5157 5170 5184 5198 5210 5258 5270 5299 5311 5313 5371 5373 5412 5426 5474 5486 5527 5575 5587 5642 5688 5743 5844'.split(' ');
+    spec = spec.map(function(el) {
+        return parseInt(el);
+    });
+   var N = 5;
+   var trimmed = trimLeaderboard(leaders,spec,N);
+
+    var str = '';
+   trimmed.forEach(function(el) {
+      str += el.toShortString('') + ' ';
+   });
+
+    console.log('trimmed leader: ' + str);
+
+    var spc = new Spectrum('0 137 186 323');
+
+    var top = spc.topElements(3);
+
+    var conv = spc.convolution();
 
 
    // var cyc = cycloPeptideSequencing('0 113 128 186 241 299 314 427');
-    var cyc = cycloPeptideSequencing('0 113 114 128 129 242 242 257 370 371 484');
+    var cyc = cyclopeptideSequencing('0 113 114 128 129 242 242 257 370 371 484');
 
 
     //var all = allPossiblePeptidesWithWeight(1024);
+
+    */
+
+    /*
 
     var dna = new DNA('AGTUTGGAGCTGATGTATGGCCAAAACGCTTAGCTAGCCGTG');
     //alert(dna.rnaTranscript());
@@ -98,6 +137,25 @@ function testStuff() {
     var tst = new Peptide(Peptide.AminoArrFromStr('NQEL'));
 
     var tstSpec = tst.linearSpectrum();
+
+
+    var tstA = Amino.AllUniqueWeightAminos();
+    */
+
+    /*
+     var spaceString = 'ACATTGGAATTATTGAAGTCGGCAAAAGAGCCAGAAGGGGTTTAATATGGGCAGGACTACATGGGAGACGTCGAATGTACAAGTGCGGCTCGCTTACACACTG GGATACGGAATGAGTATAATTGATTTGAGCCGGGCACGGCTCAGGAGCTACAGAGGCTACTTGGTAAGGGGTCTGGTAACTTGTGGAATCGCCCCTGTGGCAG GAATTAGCGAGATGCTCTCCTAAGTTCGTTCCTTAGATTCTGTAATAAGGACTACGAATATGAAGCCCTCGTAGCGATAATACGATCCGCTGATAAGGCACAT GGTCAGATCTCAGGCGTGTTGGCGTTTAGCTGTGGCACCAGCTTTAACTGCGCGAGCATCCACTTGATGGCTGTTACGAATAATTGCGAGCTCATAAACATCA TTCGTTACATTTTCCCGCCAGTCTGGCACTCCAGCCGGAGTGGTTCACTCACTTTTCGGCTGATTTTTGCCCAATACGGGGGAAGGCCCTCTAAAGAACAACT GTTGCAGTCGGGAAATTAGAACGTATTCTTGGTTGACTATCCTAGCGCGGAGTATCACCCAGCGGACTGCCAACTCCTTCCCTGGTATGTCTTTGACTTCTTA GCACCTTGACTGGAACCCGCGGTAACAGGAATAAGAATTTTGAACCAGACGGGAGAAAGGGTCCAGCACTTGTCCATGCATGGGGAGCAAAGGTTAGTTTACT GTAACGACCCCGAGGAGTCAACCGCAGATTACGGGCCCGAGCGGGGATGTTGCCGGGTCGGTGTTGGGGCATTCGCACCTGGTGGGGGTTGGAAGTACCACCA CGCACCGAGTCGTACTATCGTTCTTGACAGACTTGGCTCGACACCTGGACCGTACATTTGCGGCCAATGACCAAGCCTGTAGCACACCTCAAACAGCCGCTCA GACTGGGTGGATGTTCAGTAATTACTCGTATCATGGGCGCTTCGTTGATCCGAAGCCCGAAACGACTCTACGAACCTGTCCAAGAGGGTCCCGGTCGAAACGT GTGTCAAAAGAGTAATTAGTAAGGCAAACTACGCAGGTCCCACGTAAAGTGGCTCTAGCGTCGACGGCCAGAACGGTAGCGACCTTAATTTGGATAAAGAACT AGCCAGTCATGTGCATCCTCGTGAGGATTCTCTCTGCAGTGCGTTGCGAACATTGCGCAAGGCGAGATTCTCCATCCTAAGAGTGTGGTTTATTTCTGCAAGT CTGAGTAATCGGCTTAGGTATTATGTCGGCGTAAGTCCCCTGACTCCAGCCGCCAGAAGTGTCTAACTTGAAGGTTACTCGCCACTGACGGTGATTTGCCGTT TACGCTATAATGATATAGTCACGGCACGAGAGCAAGTACTTTGCGCACAATTGGGCGTATCCCAGTTGATCTACAACCACTGGAACAACTTGCCGACTATCGG AACATAGAAAAGCGTAACCCGCGACGATTGCTGTTATTGAATCAAGTAAAATTCAGATCAGTAGAGCGATTTGCGGTGCATCTTTCAGGACACGTTATTCGGC ATCCCACCTATCCCTCCGTCATGTAATTACAATGAGGAGGCGTATCAATTGTTACAGAAGCTTCCACATATAGTTGTTGTGGTATCTTTTCGTTAGAAAGCCT GTCGAAGATACCAGTAATCATCGATCAGCGATTAGTATGATGTGGAGGGCGTGCATCTCCTCGGAGACACGTTCTATAGACAATGAGCGGAATAGTCAGTTAA GGGCGGAACCCGGAACTAAATTGAGCGTCCGAGGACCTGGTCTTTACAGATGGAGGGGAAGTGGGACTAGTTGATTTTGAGAGGAAACCATGGGAGTTTGGGG CGCGTTCAAATATGCCTCATCGGATCGCGTTTCCCTACAACCACCAGATCAAAACTGCCCAAAGATCAAACGCTTACAGCCTGGCAGCCTTCATTCCTTGATG ATCCCATCTAAGACGCCCGCAATTTCCAGCGACTTGTGTCAGGCTGTACTTTAATGCCATATATGGTGGACAGCCAGCGCACTCATCGGTGATAATCCAAAAA AGCAGAGGCAGAACTGTTGGTCCTTCTATGGGCATACGGGTGTAAGTTTCTCCCGTGGAGCACCTATCCGTCCTACATAACAGGCGAGGCACTAGGGTCTGCT GGTATTCATGTCCTCGCACACATGTAGTACTATGCGATTTTGCAAAATCAAGAGCATTATGCCCGTCTACTCCGTTATCATTTTAGAAACCCTCTGATGTAGG ACTCATTTAACGCCCGGGTCATGAGGAAATTACCTCTACTAGCACTCATCTTGCGAACGACACCTCATAACGATTGAGTTTCTTAAGCCGTCAATAGTCTTTA ATCAAAGGTTCAGTGAAGCTTCTGCACTGAAGCGCACATTTCTTTGCAGGTGACGTTCAAGCCCGCTATGGAATTGATACGGAGATTTCCCCGCCGGTGATGG AGGAAATCAGTGCTTTTCCTCCAATCCCTTGGCCCTTTTGTCGGCTCCGTAAATAACCAAGGTGCAGTTCGAATTCGATGAATAGCCATGCTGACGGACCTTC TGTCGCTGGGCGCAAGGGCACCACATGTTTCTACGTGCTTGGGTGCTAACTTGGTGAATTGGTTAAGGGTGCGCGGACGCTCGTCACCAACCGGACAACAGTA AGAGCTACGACAGCTTAGGCTCCGGAGGATTCGCTTTCCGGTAAAGATCACCTCTAACCGATGCAACGCCCTCCGGTCAAACACGAGTCCAAAATTTTACACC TGGGTTGAGATCCTCAGAGTCCAATGCGCGGGCATCCTCACAGAACAATATTTCTGAGTTATCTATAACGTCCTTCTCATGTTTCAGCCTTGGCCTAATGTTG CTTTTGTAGGGCATGTATAATGCTGACAATGACGAAAGCTTTTTCGGCCCCATTTGAACTCCGGCTTTGCCTTCATTAATTAATTTAGGCCAGCAGTCATTCC AGGCTTTGGAGGCAAGCTGTTCGATAGGGTGGTATTTGTAGGATACGACAAAGCAGGTGGAGACTGATTCCATGAAGCAGCCTGGCTCCAGCCAGACACAGAC GCACGTGCGCAGTAATATGTATCTTCCCTTTGGGTCGCTAGCTGAGCGTCTACTCCGACGGTTGCCCTCTTCCATGTCTAACTCGGAGGCGGATCCTGCAGGA AACGAATTTAGAACGAGCGTTAAGCGGCTCAATAAAATTGAGGGCCAAAACCGACTAGGTCAAATGTGCTGAAGTAGCACATAAACTAAAACATGCGGGGGAA GACGCTAAAACTCGCTTATAGTTGGCTTTACATTGGTCTCCAAAAAAATCGTTCGACTCAGCGCGAGCACCTTTTCACCTGACTAGACGTGTGTAGATTATAA CTATGACACGCCAAGTCGTAAGTGTGCATGAAGCCCATTGGACTTCACGTGCTAGATGGCAAAATCGCAGCAGCCGGTAGCTTGCTCACACCACCCGAATAAT';
+     var arr = spaceString.split(' ');
+     var filtered = arr.filter(function(el) {
+     if (el.length == 0) {
+     return false;
+     }
+     else {
+     return true;
+     }
+     });
+
+
+
 
     var d2 = patternSequencesDist('CTCTGG',filtered);
 
@@ -127,13 +185,16 @@ function testStuff() {
             ''
         ],true);
 
-
+     */
 }
 
 function initialisePage() {
 
     myParams.tabActive = 5;
-    tab_click(4); //tab stuff
+    tab_click(7);
+    tab_click(6); //tab stuff
+    tab_click(5);
+    tab_click(4);
     tab_click(3);
     tab_click(2);
     tab_click(1);
@@ -148,10 +209,28 @@ function initialisePage() {
     document.getElementById('fileMotifInput')
         .addEventListener('change', readSingleSequencesFile, false);
 
+
+    document.getElementById('fileSequencingInput')
+        .addEventListener('change',readSingleSequencingFile,false);
+
+
 //  document.getElementById('motifBrute').checked = true;
     motifRadClicked('motifBrute');
     sequencingRadClicked('seqPath');
     sequencingInputRadClicked('seqDNA');
+
+    document.getElementById('trTranscribe').checked = true;
+    transRadClicked('trTranscribe');
+
+    document.getElementById('pepIdealSpectrum').checked = true;
+    peptideRadClicked('pepIdealSpectrum');
+
+
+    expDebugState = false;
+    expStateChanged('expDebug',false);
+    expMultiState = true;
+    expStateChanged('expMulti',true);
+
 
 }
 
@@ -377,10 +456,34 @@ function setUpWorkerListeners() {
                     break;
 
                 case 'seqCyclopeptide':
+                    /*
                     var resEl = document.getElementById('miscQuickResult');
                     resEl.value = 'results\n';
                     resEl.value += e.data.txtStuff;
+                    */
+                    processReturnedPeptide(e);
                     break;
+
+                case 'seqLeaderboardCyclopeptide':
+                  
+                    /*
+                    var resEl = document.getElementById('miscQuickResult');
+                    resEl.value = 'results\n';
+                    resEl.value += e.data.txtStuff;
+                    */
+                    processReturnedPeptide(e);
+                    break;
+
+                case 'seqLeaderboardConvCyclopeptide':
+
+                    /*
+                     var resEl = document.getElementById('miscQuickResult');
+                     resEl.value = 'results\n';
+                     resEl.value += e.data.txtStuff;
+                     */
+                    processReturnedPeptide(e);
+                    break;
+
 
                 default:
                      break;
@@ -400,7 +503,23 @@ function outputProgress(e) {
         document.getElementById('progress').innerHTML = e.data.stage + ' ' + document.getElementById('progress').innerHTML ;
     }
 
-}
+    if (e.data.extraInfo) {
+        switch (e.data.task) {
+            case 'seqLeaderboardCyclopeptide':
+                progExtraInfo = e.data.extraInfo;
+                colourPep();
+                break;
+            case 'seqLeaderboardConvCyclopeptide':
+                progExtraInfo = e.data.extraInfo;
+                colourPep();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    }
 
 function processReturnedMotif(e) {
     mfMotif = e.data.indArray;
@@ -430,7 +549,7 @@ function processReturnedMotif(e) {
     }
 
 
-    var numKmerVal = parseInt(numKmer.value);
+  //  var numKmerVal = parseInt(numKmer.value);
     var dna = dnaMaster; // document.getElementById('dnaInput').value;
 
     if (mfMotif.length == 0) {
@@ -452,8 +571,8 @@ function processReturnedMotif(e) {
 
     if (document.getElementById('debugMS').checked) {
 
-        var txtStuff = e.data.txtStuff;
-        document.getElementById('debugText').value = txtStuff;
+
+        document.getElementById('debugText').value = e.data.txtStuff;
 
         var extraInfoAr = [];
 
@@ -481,6 +600,19 @@ function processReturnedMotif(e) {
     }
 
 }
+
+function processReturnedPeptide(e) {
+
+    sequencedWeights = e.data.txtStuff;
+    colourDNA(null,null,false);
+
+    if (document.getElementById('debugPS').checked) {
+       document.getElementById('debugText').value = e.data.txtStuff;
+
+    }
+
+}
+
 
 
 function readSingleFile(e) {
@@ -528,6 +660,21 @@ function readSingleSequencesFile(e) {
     reader.readAsText(file);
     //e.target.files[0] = '';
    // document.getElementById('fileMotifInput').value = '';
+}
+
+function readSingleSequencingFile(e) {
+    //for genome assembly
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        sequencingInput(e,contents);
+    };
+    reader.readAsText(file);
+
 }
 
 
@@ -1037,6 +1184,10 @@ function skTimeoutLoop(dna,numAtATime) {
     //    basesDone = sk[2].length - 1;
    // }
    // while (basesDone < dna.length) {
+
+    if (!dna) {
+        return;
+    }
    
     sk = gcSkew(dna,numAtATime, sk);
 
@@ -1659,6 +1810,8 @@ function executeMisc(e) {
     var par2El = document.getElementById('miscParam2');
     var par3El = document.getElementById('miscParam3');
 
+    var dna,k,res,nodes,resArray,eqCount,neButSameLengthCount, splFloat, dist, resStr, debGraph, pairDist;
+
     switch (val) {
         case '1' :
             var rev = reverseComplement(par1El.value);
@@ -1671,7 +1824,7 @@ function executeMisc(e) {
             });
             var profMat = ar2.map(function(el) {
                 var spl = el.split(' ');
-                var splFloat = spl.map(function(el2) {
+                splFloat = spl.map(function(el2) {
                         return parseFloat(el2);
 
                     }
@@ -1679,18 +1832,18 @@ function executeMisc(e) {
                 return splFloat;
 
             });
-            var dna = par2El.value;
-            var k = parseInt(par3El.value);
+            dna = par2El.value;
+            k = parseInt(par3El.value);
 
-            var res = profileMostProbable(profMat,dna,k);
+            res = profileMostProbable(profMat,dna,k);
             resEl.value = 'Best kmer: \n' + res[0] + '\nBest prob:\n' + res[1];
 
 
             break;
         case '3': //Hamilton path
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
+            dna = par1El.value;
 
             resEl.value = 'results\n';
             var hamGraph = new DGraph(dna,DGraph.fromDna,DGraph.hamGraph,k,false);
@@ -1699,8 +1852,8 @@ function executeMisc(e) {
             resEl.value += '\n' + hamGraph.getAdjList();
 
 
-            var nodes = createHamNodes(dna,null,k);
-            var resArray = [];
+            nodes = createHamNodes(dna,null,k);
+            resArray = [];
 
            // hamiltonCanvas(nodes);
 
@@ -1710,8 +1863,8 @@ function executeMisc(e) {
             }
 
             resEl.value+= '\nresults';
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             resArray.forEach(function(el,i) {
 
@@ -1759,15 +1912,15 @@ function executeMisc(e) {
             break;
 
         case '4': //deb cycle from dna
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
+            dna = par1El.value;
             //var nodes = createDebNodes(dna,k);
-            var debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,true);
+             debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,true);
 
 
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
              //   resArray.push(debGraph.debPath());
@@ -1778,8 +1931,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructed()]);
             }
             resEl.value = 'results\n';
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -1828,11 +1981,11 @@ function executeMisc(e) {
             break;
 
         case '5':
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
-            var dist = parseInt(par3El.value);
-            var res = kmerPairedComposition(dna,k,dist);
+            dna = par1El.value;
+            dist = parseInt(par3El.value);
+            res = kmerPairedComposition(dna,k,dist);
 
             resEl.value = 'results: ';
             res.forEach(function(el) {
@@ -1843,15 +1996,15 @@ function executeMisc(e) {
             break;
 
         case '6': //deb path from paired dna
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
-            var pairDist = parseInt(par3El.value);
+            dna = par1El.value;
+            pairDist = parseInt(par3El.value);
             //var nodes = createDebNodes(dna,k);
-            var debGraph = new DGraph(dna,DGraph.fromPairedDna,DGraph.debGraph,k,false,pairDist);
+            debGraph = new DGraph(dna,DGraph.fromPairedDna,DGraph.debGraph,k,false,pairDist);
 
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
@@ -1862,8 +2015,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructedPairs()]);
             }
             resEl.value = 'results\n';
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -1916,13 +2069,13 @@ function executeMisc(e) {
            // var dna = par1El.value;
             var reads = par1El.value.split('\n');
 
-            var k = reads[0].length;
+            k = reads[0].length;
 
-            var debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
+            debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
 
             resEl.value = 'results\n';
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
@@ -1947,8 +2100,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructed()]);
             }
 
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -1965,25 +2118,25 @@ function executeMisc(e) {
 
 
         case '8': //debruijn path from dna
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
+            dna = par1El.value;
             //var nodes = createDebNodes(dna,k);
 
-            var debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,false);
+            debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,false);
 
         resEl.value = 'results\n';
 
         resEl.value+= debGraph.sumInfo();
 
-          var resArray = [];
+          resArray = [];
             for (var i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
 
                 debGraph.debPath();
 
-                var resStr = debGraph.getAdjList();
+                resStr = debGraph.getAdjList();
                 /*
                 resStr = '';
                 debGraph.nodes.forEach(function(node) {
@@ -2010,8 +2163,8 @@ function executeMisc(e) {
 
 
 
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -2059,10 +2212,10 @@ function executeMisc(e) {
             }
             break;
         case '9': //deb path from paired reads
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             //par1El.value = cleanContents(par1El.value);
            // var dna = par1El.value;
-            var reads = par1El.value.split('\n');
+            reads = par1El.value.split('\n');
 
             reads = reads.map(function(el) {
                 var pair = el.split('|');
@@ -2070,12 +2223,12 @@ function executeMisc(e) {
                 return pair;
             });
 
-            var pairDist = parseInt(par3El.value);
+            pairDist = parseInt(par3El.value);
             //var nodes = createDebNodes(dna,k);
-            var debGraph = new DGraph(reads,DGraph.fromPairedReads,DGraph.debGraph,k,false,pairDist);
+            debGraph = new DGraph(reads,DGraph.fromPairedReads,DGraph.debGraph,k,false,pairDist);
 
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < 1;++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
@@ -2086,8 +2239,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructedPairs()]);
             }
             resEl.value = 'results\n';
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -2112,7 +2265,7 @@ function executeMisc(e) {
         case '11': //number to pattern
 
             var ind = par1El.value; //string, because can't handle really big ints
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             // var dna =         par1El.value;
             resEl.value = 'results\n';
             resEl.value+= indToKmer(ind,k);
@@ -2126,7 +2279,7 @@ function executeMisc(e) {
 
             // var dna =         par1El.value;
             resEl.value = 'results\n';
-            var res = kMersWithMaxDist(par1El.value,d);
+            res = kMersWithMaxDist(par1El.value,d);
             var resStr = '';
             res.forEach(function(el) {
                 resStr+=el + '\n';
@@ -2143,7 +2296,7 @@ function executeMisc(e) {
 
             // var dna =         par1El.value;
             resEl.value = 'results\n';
-            var res = patternSequencesDist(par1El.value,strs);
+            res = patternSequencesDist(par1El.value,strs);
 
             resEl.value+= res;
 
@@ -2153,11 +2306,11 @@ function executeMisc(e) {
 
 
         case '14': //kmer composition
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
-            var dna = par1El.value;
+            dna = par1El.value;
             var dist = parseInt(par3El.value);
-            var res = kmerComposition(dna,k);
+            res = kmerComposition(dna,k);
 
             resEl.value = 'results: ';
             var resStr = '';
@@ -2172,7 +2325,7 @@ function executeMisc(e) {
         case '15': //str from genome path
             var path = par1El.value.split('\n');
 
-            var res = stringFromGenomePath(path);
+            res = stringFromGenomePath(path);
 
             resEl.value = 'results: ';
 
@@ -2184,16 +2337,16 @@ function executeMisc(e) {
         case '16': //overlap graph
 
             //par1El.value = cleanContents(par1El.value);
-            var reads = par1El.value.split('\n');
-            var k = reads[0].length;
-            var nodes = createHamNodes(null,reads,k);
-            var resArray = [];
+            reads = par1El.value.split('\n');
+            k = reads[0].length;
+            nodes = createHamNodes(null,reads,k);
+            resArray = [];
 
             // hamiltonCanvas(nodes);
 
-            var res = hamPath(nodes);
+            res = hamPath(nodes);
 
-            var resStr = '';
+            resStr = '';
 
             res[2].forEach(function(node) {
                 resStr+='\n'  + node.dna;
@@ -2206,8 +2359,8 @@ function executeMisc(e) {
             });
             resEl.value = 'results';
             resEl.value+= resStr;
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             var el = res;
 
@@ -2217,16 +2370,16 @@ function executeMisc(e) {
 
             break;
         case '17':
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             //par1El.value = cleanContents(par1El.value);
             // var dna = par1El.value;
             var adjList = par1El.value.split('\n');
 
             //var nodes = createDebNodes(dna,k);
-            var debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
+            debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
             resEl.value = 'results\n';
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < 1;++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
@@ -2255,8 +2408,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructedPairs()]);
             }
 
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -2271,13 +2424,13 @@ function executeMisc(e) {
             break;
 
         case '18':
-            var k = parseInt(par2El.value);
+            k = parseInt(par2El.value);
             var adjList = par1El.value.split('\n');
 
-            var debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
+            debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
             resEl.value = 'results\n';
 
-            var resArray = [];
+            resArray = [];
             for (var i = 0;i < 1;++i) {
                debGraph.debPath();
                 resEl.value += debGraph.edgePathToText();
@@ -2291,13 +2444,13 @@ function executeMisc(e) {
             break;
 
         case '19':
-            var k = parseInt(par1El.value);
+            k = parseInt(par1El.value);
 
             resEl.value = 'results\n';
 
             var pad = "00000000000000";
 
-            var reads = [];
+            reads = [];
             for (var i = 0;i < Math.pow(2,k);++i) {
                 var binStr = (i >>> 0).toString(2);
                 binStr = pad + binStr;
@@ -2309,11 +2462,11 @@ function executeMisc(e) {
            }
 
 
-            var debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
+            debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
 
             resEl.value+= 'results\n';
 
-            var resArray = [];
+            resArray = [];
             lim = parseInt(par3El.value);
             if (lim == 0) {
                 lim = 1;
@@ -2343,8 +2496,8 @@ function executeMisc(e) {
                 resArray.push([[],debGraph.edgePathReconstructed()]);
             }
 
-            var eqCount = 0;
-            var neButSameLengthCount = 0;
+            eqCount = 0;
+            neButSameLengthCount = 0;
 
             // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
@@ -2363,7 +2516,7 @@ function executeMisc(e) {
 
             var path = par1El.value.split('\n');
 
-            var str = '';
+            str = '';
             path.forEach(function(el,i) {
                 if (i == 0) {
                     str+=el;
@@ -2383,7 +2536,7 @@ function executeMisc(e) {
 
         case '21': //DNA to amino string
 
-            var dna = new DNA(par1El.value);
+            dna = new DNA(par1El.value);
 
             var rna = new RNA(dna.rnaTranscript());
 
@@ -2406,14 +2559,14 @@ function executeMisc(e) {
 
             resEl.value = 'results\n';
 
-            resEl.value = 'len: ' + dna.dna.length + '\n';
+            resEl.value = 'len: ' + pep.peptide.length + '\n';
 
             resEl.value +=pep.toShortString('');
             break;
 
         case '23': //Find Amino Acid Sequence in genome
 
-            var dna = par1El.value;
+            dna = par1El.value;
             var targetSeq = par2El.value;
             var targetDNALen = targetSeq.length * Codon.len;
 
@@ -2488,7 +2641,7 @@ function executeMisc(e) {
 
             resEl.value = 'results\n';
 
-            var res = allPossiblePeptidesWithWeight(mass);
+            res = allPossiblePeptidesWithWeight(mass);
 
             resEl.value +=  res;
             break;
@@ -2501,9 +2654,9 @@ function executeMisc(e) {
 
 
             w.postMessage({
-                'task': 'seqCyclopeptide',
-                'spectrum': experimentalSpectrum
-            }); // Start the worker.
+            'task': 'seqCyclopeptide',
+            'spectrum': experimentalSpectrum
+    }); // Start the worker.
 
 
 
@@ -2515,6 +2668,95 @@ function executeMisc(e) {
 
             break;
 
+        case '27': //Cyclopeptide scoring
+
+            var pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
+
+            var expSpec = par2El.value.split(' ');
+            expSpec = expSpec.map(function(el) {
+                return parseInt(el);
+            });
+
+            useLinear = parseInt(par3El.value);
+
+            resEl.value = 'results\n';
+
+            res = pep.score(expSpec,useLinear);
+
+            resEl.value +=  res;
+            break;
+
+        case '28': //Leaderboard Cyclopeptide sequencing
+
+            var expSpec = par1El.value; //.split(' ');
+
+            var N = parseInt(par2El.value);
+
+            var M = parseInt(par3El.value);
+
+           // expSpec = expSpec.map(function(el) {
+           //     return parseInt(el);
+           // });
+
+            w.postMessage({
+                'task': 'seqLeaderboardCyclopeptide',
+                'spectrum': expSpec,
+                'M':M,
+                'N': N
+            }); // Start the worker.
+
+            //var res =leaderboardCyclopeptideSequencing(expSpec,N);
+
+            resEl.value = 'results\n';
+            resEl.value+= res.toShortString('') + '\n';
+
+            resEl.value +=  res.toWeightString('');
+            break;
+
+        case '29': //Trim leaderboard
+
+            var leaders = par1El.value.split(' ');
+
+            leaders = leaders.map(function(el) {
+                return new Peptide(Peptide.AminoArrFromStr(el));
+
+            });
+            var spec = par2El.value.split(' ');
+            spec = spec.map(function(el) {
+                return parseInt(el);
+            });
+
+            var N = parseInt(par3El.value);
+
+            res =  trimLeaderboard(leaders,spec,N);
+
+
+
+            resEl.value = 'results\n';
+
+            var str = '';
+
+            res.forEach(function(el) {
+                str+= el.toShortString('') + ' ';
+
+            });
+            resEl.value += str;
+
+
+            break;
+
+        case '30': //Convolution
+
+            var spec = new Spectrum(par1El.value);
+            res =  spec.convolutionStr();
+
+            resEl.value = 'results\n';
+
+
+            resEl.value += res;
+
+
+            break;
         default:
             break;
     }
@@ -2742,7 +2984,7 @@ function medianString(e) {
 
     // var dna = dnaMaster; //document.getElementById('dnaInput').value;
 
-    var inclRevCompl = false//document.getElementById('includeRevComplMS').checked;
+    var inclRevCompl = false;//document.getElementById('includeRevComplMS').checked;
 
     var maxMismatch = parseInt(document.getElementById('maxMismatchMS').value);
 
@@ -2984,6 +3226,195 @@ function initialiseSequencingParams() {
 
 }
 
+
+function initialiseTransParams() {
+
+    var paramObj = {};
+
+
+    var numKmer = document.getElementById('numKmers');
+    numKmer.value = 1;
+
+
+    paramObj.debug = document.getElementById('debugTT').checked;
+
+    paramObj.useStartCodon = document.getElementById('startCodTT').checked;
+    paramObj.useStopCodon = document.getElementById('stopCodTT').checked;
+    paramObj.useAllReadingFrames = document.getElementById('readFrameTT').checked;
+    paramObj.readingFrameOffset = parseInt(document.getElementById('readFrameOffsetTT').value);
+    paramObj.inclRevCompl = document.getElementById('revComplTT').checked;
+
+    var rads = document.getElementsByName('trMethod');
+
+    var methodSelected;
+
+    for (var i = 0;i < rads.length;++i) {
+        if (rads[i].checked) {
+            methodSelected = rads[i];
+            break;
+
+        }
+    }
+
+    switch (methodSelected.id) {
+        case 'trTranscribe':
+            paramObj.trMethod = DNA.TransMethodTranscribe;
+            break;
+        case 'trTranslate':
+            paramObj.trMethod = DNA.TransMethodTranslate;
+            break;
+        case 'trRetro':
+            paramObj.trMethod = DNA.TransMethodRetro;
+            break;
+        default:
+            break;
+
+
+    }
+
+    rads = document.getElementsByName('trInput');
+
+    var inputSelected;
+
+    for (var i = 0;i < rads.length;++i) {
+        if (rads[i].checked) {
+            inputSelected = rads[i];
+            break;
+
+        }
+    }
+
+    switch (inputSelected.id) {
+        case 'trDNA':
+            paramObj.trInput = DGraph.fromDna;
+            break;
+        case 'trRNA':
+            paramObj.trInput = DGraph.fromRna;
+            break;
+        case 'trProtein':
+            paramObj.trInput = DGraph.fromProtein;
+            break;
+        default:
+            break;
+
+
+    }
+
+
+    return paramObj;
+
+}
+
+function initialisePeptideParams() {
+
+    var paramObj = {};
+
+
+    var numKmer = document.getElementById('numKmers');
+    numKmer.value = 1;
+
+
+    paramObj.debug = document.getElementById('debugPS').checked;
+
+
+    paramObj.convSize = parseInt(document.getElementById('convPS').value);
+    paramObj.leaderboardSize = parseInt(document.getElementById('leaderPS').value);
+    
+    paramObj.useTheseAminos = document.getElementById('peptideUseTheseAminos').value;
+
+    var rads = document.getElementsByName('pepMethod');
+
+    var methodSelected;
+
+    for (var i = 0;i < rads.length;++i) {
+        if (rads[i].checked) {
+            methodSelected = rads[i];
+            break;
+
+        }
+    }
+
+    switch (methodSelected.id) {
+        case 'pepIdealSpectrum':
+            paramObj.pepMethod = Peptide.PepMethodIdealSpectrum;
+            break;
+        case 'pepSequenceBrute':
+            paramObj.pepMethod = Peptide.PepMethodSequenceBrute;
+            break;
+        case 'pepSequenceLeaderboard':
+            paramObj.pepMethod = Peptide.PepMethodSequenceLeaderboard;
+            break;
+        case 'pepSequenceLeaderboardConv':
+            paramObj.pepMethod = Peptide.PepMethodSequenceLeaderboardConv;
+            break;
+
+
+        default:
+            break;
+
+
+    }
+
+    rads = document.getElementsByName('pepInput');
+
+    var inputSelected;
+
+    for (var i = 0;i < rads.length;++i) {
+        if (rads[i].checked) {
+            inputSelected = rads[i];
+            break;
+
+        }
+    }
+
+    switch (inputSelected.id) {
+        case 'pepPeptide':
+            paramObj.pepInput = DGraph.fromProtein
+            break;
+        case 'pepSpectrum':
+            paramObj.pepInput = DGraph.fromSpectrum;
+            break;
+
+        default:
+            break;
+
+
+    }
+
+    rads = document.getElementsByName('pepPeptideType');
+
+    var peptideType;
+
+    for (var i = 0;i < rads.length;++i) {
+        if (rads[i].checked) {
+            peptideType = rads[i];
+            break;
+
+        }
+    }
+
+    switch (peptideType.id) {
+        case 'pepPeptideTypeLinear':
+            paramObj.pepType = Peptide.linear;
+            break;
+        case 'pepPeptideTypeCircular':
+            paramObj.pepType = Peptide.circular;
+            break;
+
+        default:
+            break;
+
+
+    }
+
+
+
+    return paramObj;
+
+}
+
+
+
 function readsToMfk(grph) {
     var prevKmer = '';
     var currInds = [];
@@ -3034,7 +3465,7 @@ function readsToMfk(grph) {
 
 function runSequencing(e) {
 
-    sequencingInput();
+   // sequencingInput();
 
     initialiseResults();
 
@@ -3161,11 +3592,12 @@ function runSequencing(e) {
 
 
     if (document.getElementById('debugSA').checked) {
+        document.getElementById('debugText').value += '\nReads: ';
         var resStr = '';
         grph.reads.forEach(function (el) {
             resStr += '\n' + el;
         });
-        document.getElementById('debugText').value = resStr;
+        document.getElementById('debugText').value += resStr;
     }
 
 
@@ -3192,6 +3624,321 @@ function runSequencing(e) {
     }
 
 */
+
+}
+
+function readBreak(e) {
+    if (!dnaMasterStrings) {
+         return;
+    }
+
+    strArr =  dnaMasterStrings.split('\n');
+    brokenArr = [];
+    brokenDict = {};
+
+    strArr.forEach(function(el,i) {
+        var pref = el.substring(0,el.length - 1);
+        var suf = el.substring(1,el.length);
+        if (pref in brokenDict) {
+            brokenDict[pref][0].push(i);
+        }
+        else {
+            var dictEntry = [];
+            dictEntry.push([i]);
+            dictEntry.push([]);
+            brokenDict[pref] = dictEntry;
+        }
+        if (suf in brokenDict) {
+            brokenDict[suf][1].push(i);
+        }
+        else {
+            var dictEntry = [];
+            dictEntry.push([]);
+            dictEntry.push([i]);
+            brokenDict[suf] = dictEntry;
+        }
+
+
+        brokenArr.push(el.substring(0,el.length - 1));
+        brokenArr.push(el.substring(1,el.length ));
+    });
+
+    brokenArr.sort();
+
+    var key;
+
+    var removeDupArr = [];
+
+    for (key in brokenDict) {
+        var dupCount = 0;
+        var sameCount = 0; //pref and suf same in single item. need to retain
+        var curr = brokenDict[key];
+
+        var count = 0;
+
+       // var matchFound = false;
+       // var nonMatchFound = false;
+        for (var p = 0;p < curr[0].length;++p) {
+            var pref = curr[0][p];
+            // curr[0].forEach(function(pref) {
+            var ind = curr[1].indexOf(pref);
+            if (ind > -1) {
+                // matchFound = true;
+                curr[0][p] = -1;
+                curr[1][ind] = -1;
+                ++count;
+
+            }
+            else {
+                for (var sufInd = 0; sufInd < curr[1].length; ++sufInd) {
+                    if (curr[1][sufInd] != pref) {
+                        curr[1][sufInd] = -1;
+                        curr[0][p] = -1;
+                        ++count;
+                        break;
+                    }
+
+                }
+            }
+
+        }
+
+       // curr[1].forEach(function(suf) {
+
+        for (var s = 0;s < curr[1].length;++s) {
+            var suf = curr[1][s];
+            if (suf == -1) {
+                continue;
+            }
+
+            var ind = curr[0].indexOf(suf);
+            if (ind > -1) {
+                // matchFound = true;
+                curr[0][ind] = -1;
+                curr[1][s] = -1;
+                ++count;
+
+            }
+            else {
+                for (var prefInd = 0; prefInd < curr[0].length; ++prefInd) {
+                    if (curr[0][prefInd] != suf) {
+                        curr[1][s] = -1;
+                        curr[0][prefInd] = -1;
+                        ++count;
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        curr[0].forEach(function(el) {
+            if (el == -1) {
+
+            }
+            else {
+                ++count;
+            }
+
+        });
+        curr[1].forEach(function(el) {
+            if (el == -1) {
+
+            }
+            else {
+                ++count;
+            }
+
+        });
+
+        for (var i = 0;i < count;++i) {
+            removeDupArr.push(key);
+        }
+
+
+
+
+    }
+
+
+    dnaMasterStrings = removeDupArr.join('\n');
+    dnaMasterChanged();
+
+
+
+}
+
+function pairedToReads(e) {
+    if (!dnaMasterStrings) {
+        return;
+    }
+
+    outArr = [];
+    strArr =  dnaMasterStrings.split('\n');
+    strArr.forEach(function(el) {
+        var split = el.split('|');
+        outArr.push(split[0]);
+        outArr.push(split[1]);
+    });
+
+    dnaMasterStrings = outArr.join('\n');
+    dnaMasterChanged();
+
+
+
+}
+
+
+
+
+function runTrans(e) {
+
+    transInput();
+
+    initialiseResults();
+
+    paramObj = initialiseTransParams();
+
+
+    //var input = dnaMaster;
+
+
+    switch (paramObj.trMethod) {
+        case    DNA.TransMethodTranscribe:
+            var dnaObj;
+            if (paramObj.inclRevCompl) {
+                dnaObj =  new DNA(dnaMaster).complement(); //new DNA(dnaMaster);
+            }
+            else {
+                dnaObj =  new DNA(dnaMaster);
+            }
+
+            var r = dnaObj.rnaTranscript();
+            rnaMaster = new RNA(r);
+            var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+            proteinMaster = prot;
+            break;
+        case DNA.TransMethodTranslate:
+            //rnaMaster = new RNA(dnaMaster);
+
+            var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+            proteinMaster = prot;
+            break;
+        case DNA.TransMethodRetro:
+            break;
+        default:
+            break;
+
+    }
+
+
+
+    // graphChanged(grph);
+
+
+    colourDNA(null, null, false);
+
+
+    if (document.getElementById('debugTT').checked) {
+        var resStr = '';
+        resStr += '\nDebug pressed';
+        resStr += '\nDNA: ' + dnaObj.dna;
+        resStr += '\nRNA: ' + r;
+
+        document.getElementById('debugText').value = resStr;
+    }
+
+
+}
+
+function runPeptide(e) {
+
+
+
+    peptideInput();
+
+    initialiseResults();
+
+    paramObj = initialisePeptideParams();
+
+
+    //var input = dnaMaster;
+
+    var spec;
+
+    switch (paramObj.pepMethod) {
+
+        case Peptide.PepMethodIdealSpectrum:
+
+            //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+            spectrumMaster = proteinMaster.spectrum(paramObj.pepType == Peptide.circular,true);
+            colourDNA(null, null, false);
+
+            if (document.getElementById('debugPS').checked) {
+                var resStr = '';
+                resStr += '\nDebug pressed';
+                resStr += '\nProtein: ' + proteinMaster.toMedString();
+                resStr += '\nSpectrum length: ' + spectrumMaster.length;
+                resStr += '\nSpectrum: ' + proteinMaster.spectrum(paramObj.pepType == Peptide.circular,false);
+
+
+
+                document.getElementById('debugText').value = resStr;
+            }
+
+            break;
+        case Peptide.PepMethodSequenceBrute:
+
+        w.postMessage({
+            'task': 'seqCyclopeptide',
+            'spectrum': spectrumMaster,
+            'pepType': paramObj.pepType
+        }); // Start the worker.
+
+        //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+
+        break;
+        case Peptide.PepMethodSequenceLeaderboard:
+
+            w.postMessage({
+                'task': 'seqLeaderboardCyclopeptide',
+                'spectrum': spectrumMaster,
+                'M':paramObj.convSize,
+                'N': paramObj.leaderboardSize,
+                'pepType':paramObj.pepType
+            }); // Start the worker.
+
+            //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+
+            break;
+        case Peptide.PepMethodSequenceLeaderboardConv:
+
+            w.postMessage({
+                'task': 'seqLeaderboardConvCyclopeptide',
+                'spectrum': spectrumMaster,
+                'useTheseAminos':paramObj.useTheseAminos,
+                'M':paramObj.convSize,
+                'N': paramObj.leaderboardSize,
+                'pepType':paramObj.pepType
+            }); // Start the worker.
+
+            //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+
+            break;
+
+        default:
+            break;
+
+    }
+
+
+
+    // graphChanged(grph);
+
+
+
+
+
 
 }
 
@@ -3378,6 +4125,10 @@ function pathFromReads(e) {
 //display routines
 
 function collectStats(dna,sk,bc) {
+    if (!dna) {
+        return '';
+    }
+
 
     sk = sk || null;
 
@@ -4003,7 +4754,15 @@ function logoCanvas(motifs) {
 
 }
 function skewCanvas(skewData) {
+
     var c = document.getElementById("skewCanvas");
+
+    var ctx;
+    if (!skewData) {
+        ctx = c.getContext("2d");
+        ctx.clearRect(0,0,w,h);
+        return;
+    }
 
     var h = c.height;
     var w = c.width;
@@ -4052,7 +4811,7 @@ function skewCanvas(skewData) {
     }
 
 
-    var ctx = c.getContext("2d");
+    ctx = c.getContext("2d");
     ctx.clearRect(0,0,w,h);
 
     ctx.font = '10pt Arial';
@@ -4106,8 +4865,10 @@ function initialiseResults()  {
     t.id = 'kMerResultsTab';
 
     var el = document.getElementById('kMerResultsTab');
-    el.parentNode.removeChild(el);
-    document.getElementById('rightOne').appendChild(t);
+    if (el) {
+        el.parentNode.removeChild(el);
+    }
+   // document.getElementById('rightOne').appendChild(t);
 
     document.getElementById('debugText').value = '';
     document.getElementById('moreDetailText').value = 'Extra Info:';
@@ -4254,11 +5015,394 @@ function colourMFK(dna,lowThisPage,highThisPage,inclRevCompl,view,bases,mark) {
 
 }
 
+function createSpan(text,spanClass) {
+    return '<span class = "' + spanClass + '">' + text + '</span>';
+}
+
+function colourTrans() {
+    var trans = document.getElementById('transViewer');
+    var gap = 10;
+
+
+    var revCompl = document.getElementById('revComplTT').checked;
+
+    var startPos = -1;
+    var endPos = -1;
+
+    var codonNum = 0;
+
+    var dnaTit = 'DNA&nbsp;';
+    var revTit = '&nbsp;&nbsp;&nbsp;&nbsp;';
+    var rnaTit = 'RNA&nbsp;';
+    var proTit = 'PROT';
+    var headTit = '&nbsp;&nbsp;&nbsp;&nbsp;';
+
+
+    var len;
+    if (dnaMaster) {
+        len = dnaMaster.length;
+    }
+    else if (rnaMaster) {
+        len = rnaMaster.rna.length;
+    }
+    else {
+        len = 0;
+    }
+
+    if (proteinMaster) {
+        startPos = proteinMaster.startPosInRNA;
+        endPos = proteinMaster.peptide.length * Codon.len + startPos -1;
+    }
+
+    if (revCompl) {
+        var svdSt = startPos;
+        startPos =  len - 1 - endPos;
+        endPos = len - 1 - svdSt;
+
+    }
+
+    var prefix;
+    var protStr = '';
+    var shortProtStr = '';
+
+    var headPrimePrefix =  revCompl ? '<<&nbsp;' : '>>&nbsp;';
+    var headPrimeSuffix =  revCompl ? '&nbsp;<<' : '&nbsp;>>';
+    var primePrefix = '&nbsp;&nbsp;&nbsp;';
+
+    var fivePrime = "5'";
+    var threePrime = "3'";
+    var sp = "&nbsp;";
+
+
+    var startPrime = revCompl ? threePrime + sp : fivePrime + sp;
+    var endPrime = revCompl ? sp + fivePrime : sp + threePrime;
+
+
+    var d;
+    var rd;
+    if (dnaMaster) {
+        d = new DNA(dnaMaster);
+        rd = d.complement();
+    }
+    else {
+        d = new DNA('');
+        rd = d.complement();
+    }
+
+
+    if (proteinMaster) {
+
+
+        var i;
+        prefix = '';
+        if (revCompl) {
+            for (i = 0; i < startPos; ++i) {
+                prefix += '&nbsp;';
+            }
+
+        }
+        else {
+            for (i = 0; i < proteinMaster.startPosInRNA; ++i) {
+                prefix += '&nbsp;';
+            }
+
+        }
+
+        if (revCompl) {
+            protStr = proTit + headPrimePrefix + prefix + proteinMaster.toString(Peptide.Medium,'',revCompl) + headPrimeSuffix;
+        }
+        else {
+            protStr = proTit + headPrimePrefix + prefix + proteinMaster.toMedString('') + headPrimeSuffix;
+        }
+
+        var singles;
+        if (revCompl) {
+            singles = proteinMaster.toString(Peptide.Short,'',revCompl);
+        }
+        else {
+            singles = proteinMaster.toShortString('');
+        }
+
+        for (var ch = 0;ch < singles.length;++ch) {
+
+            shortProtStr += singles[ch] + '&nbsp;&nbsp';
+        }
+        shortProtStr = proTit + primePrefix + prefix + shortProtStr;
+
+        if (singles.length == 0) {
+            protStr = proTit + headPrimePrefix + '&nbsp;&nbsp;&nbsp;&nbsp;No protein';
+            shortProtStr = '';
+        }
+
+    }
+
+
+   var markStr = '|1';
+
+
+
+  // if (rnaMaster) {
+       for (var i = 1; i < len; ++i) {
+
+
+           var pos = i + 1;
+           if (pos % gap == 0) {
+               var now = pos.toString();
+               /*
+               if (startPos == i) {
+                   markStr += '[' + now;
+               }
+               else if (i == endPos) {
+                   markStr += 'v' + now;
+               }
+               else {
+               */
+                   markStr += '|' + now;
+              // }
+               i += now.length;
+           }
+           else {
+               /*
+               if (startPos == i) {
+                   markStr += 'v';
+               }
+               else if (i == endPos) {
+                   markStr += 'v';
+
+               }
+
+               else {
+               */
+                   markStr += '&nbsp;';
+              // }
+           }
+
+
+       }
+  // }
+
+    if (len > 10) {
+        markStr = headTit + primePrefix + markStr;
+    }
+    else {
+        markStr = '';
+
+    }
+
+
+
+
+
+    var rnaStr = '';
+
+
+
+
+    if (rnaMaster) {
+       // var rna = revCompl ?  rnaMaster.rna.split("").reverse().join("") : rnaMaster.rna;
+        var rna = rnaMaster.rna;
+        var rnaColouredStr = '';
+        for (var i = 0;i < rna.length;++i) {
+
+
+            if ((i < startPos) || i > endPos) {
+                rnaColouredStr += rna[i];
+            }
+            else {
+                var codonNum = Math.floor((i - startPos) / Codon.len);
+                var txt = createSpan(rna[i], codonNum % 2 == 0 ? 'evenCodon' : 'oddCodon');
+                rnaColouredStr += txt;
+            }
+        }
+        //rnaStr = rnaMaster.rna;
+        rnaStr = rnaColouredStr;
+
+
+
+        rnaStr = rnaTit + primePrefix +  rnaStr;
+    }
+
+    var dnaPr = '';
+    var dnaPrRev = '';
+
+    if (dnaMaster) {
+        dnaPr = dnaMaster;
+
+        if (revCompl) {
+           // dnaPrRev = revTit + startPrime + dnaPr.split("").reverse().join("") + endPrime;
+            dnaPrRev = revTit + startPrime + rd.dna + endPrime;
+            dnaPr = dnaTit + fivePrime + sp  + dnaPr + sp + threePrime;
+        }
+        else {
+            dnaPr = dnaTit + startPrime + dnaPr + endPrime;
+        }
+    }
+
+    var revDNA = '';
+    if (revCompl) {
+       revDNA = dnaPrRev + '<BR>';
+
+    }
+        trans.innerHTML = markStr + '<BR>' +  dnaPr + '<BR>' + revDNA + rnaStr + '<BR>' + protStr +  '<BR>' + shortProtStr;
+}
+
+function colourPep() {
+    var trans = document.getElementById('transViewer');
+
+    trans.innerHTML = '';
+
+
+    if (progExtraInfo) {
+        var tab = 34;
+        var padStr = '----------------------------------';;
+        trans.innerHTML += 'Top 5 sub-candidates:';
+
+        var lenBit = '';
+        if (progExtraInfo[0][0]) {
+            lenBit = progExtraInfo[0][0].split(' ')[0].length;
+            if (lenBit < 10) {
+                lenBit = '0' + lenBit;
+            }
+        }
+       // trans.innerHTML += ' (rnd ' + lenBit + ')';
+
+        for (var i = 0;i < 14;++i) {
+            trans.innerHTML += '&nbsp';
+        }
+        trans.innerHTML += 'Best 5 complete matches:' + '<BR>';
+        var numLeadersToDisp = 5;
+        var leaderStr = '';
+        for (var i = 0;i < numLeadersToDisp;++i) {
+            if (progExtraInfo[0][i]) {
+                leaderStr += progExtraInfo[0][i];
+                leaderStr += padStr.substring(0,tab - progExtraInfo[0][i].length);
+            }
+            else {
+                leaderStr += '----------------------------------';
+            }
+            if (progExtraInfo[1][i]) {
+                leaderStr += ' ' + progExtraInfo[1][i];
+            }
+            else {
+                leaderStr += ' ' + '----------------------------------';
+            }
+
+            leaderStr += '<BR>';
+        }
+
+
+            /*
+             var bestStr = '';
+             progExtraInfo[1].forEach(function(el,i) {
+             if (i < numLeadersToDisp) {
+             bestStr += el + '<BR>';
+             }
+             });
+             */
+        trans.innerHTML += leaderStr;
+       // trans.innerHTML += 'best: ' + bestStr;
+    }
+
+    if (proteinMaster) {
+        trans.innerHTML += proteinMaster.toMedString();
+    }
+    if ((proteinMaster) && (spectrumMaster)) {
+        //var spec = proteinMaster.spectrum(document.getElementById('pepPeptideTypeCircular').checked,true);
+
+        var specStr = '';
+        spectrumMaster.forEach(function(el) {
+            specStr += el[0] + '[' + el[1] + ']' + '&nbsp;';
+
+        });
+
+        trans.innerHTML += '<BR>' + 'Ideal Spectrum: ' + specStr;
+
+
+    }
+    else {
+        if (spectrumMaster) {
+            trans.innerHTML += '<BR>' + 'Exp Spectrum: ' + spectrumMaster;
+        }
+        if (convMaster) {
+            trans.innerHTML += '<BR>' + 'Top M from Conv: ' + convMaster;
+        }
+        if (sequencedWeights) {
+            var sw = sequencedWeights.split(' ');
+            sw = sw.filter(function(el) {
+                if (el.length == 0) {
+                    return false;
+
+                }
+                else {
+                    return true;
+                }
+
+            });
+            var cycNums = [];
+            var currCycNum = 1;
+            var seqPeps = sw.map(function(el) {
+               cycNums.push(0);
+               return  new Peptide(Peptide.AminoArrFromWeights(el.split('-')));
+            });
+            seqPeps.forEach(function(el,i) {
+                if (cycNums[i] == 0) {
+                    cycNums[i] = currCycNum;
+                    var all = el.allCycles();
+                    for (var j = i+1;j < seqPeps.length; ++j) {
+                        if (all.indexOf(seqPeps[j].toShortString('')) > -1)  {
+                            cycNums[j] = currCycNum;
+                        }
+                    }
+                    ++currCycNum;
+                }
+
+            });
+            var swm = sw.map(function(el,i) {
+                var pep = new Peptide(Peptide.AminoArrFromWeights(el.split('-')));
+                return el + ' ' + pep.toShortString('-') +  ' ' + pep.getIntegerWeight() + ' ' + cycNums[i] +  '<BR>';
+            });
+            var swmStr = '';
+
+            swm.forEach(function(el) {
+                swmStr+=el;
+
+            });
+            if (swm.length == 0) {
+                trans.innerHTML += '<BR>' + ' No Peptides match spectrum';
+            }
+            else {
+                trans.innerHTML += '<BR>' + swmStr;
+            }
+        }
+        else {
+            if (sequencedWeights == null) {
+
+            }
+            else {
+                trans.innerHTML += '<BR>' + ' No Peptides match exp spectrum';
+            }
+        }
+    }
+
+
+
+}
+
 
 function colourDNA(dna,mark,inclRevCompl) {
 
+    if (myParams.tabActive == 5) {
+        colourTrans();
+        return;
+    }
+    else if (myParams.tabActive == 6) {
+        colourPep();
+        return;
+    }
+
     inclRevCompl = false;
     var motifView = false;
+    var assemblyView = false;
 
     switch (myParams.tabActive) {
         case 0:
@@ -4274,6 +5418,11 @@ function colourDNA(dna,mark,inclRevCompl) {
             inclRevCompl = false;// document.getElementById("includeRevComplMS").checked;
             motifView = true;
             break;
+        case 4:
+            assemblyView = true;
+            break;
+        case 5:
+            inclRevCompl = document.getElementById("revComplTT").checked;
         default:
             break;
     }
@@ -4321,6 +5470,17 @@ function colourDNA(dna,mark,inclRevCompl) {
     }
     else {
         colourMFK(dna,lowThisPage,highThisPage,inclRevCompl,view,bases,mark);
+    }
+
+    if ((assemblyView) &&(dnaMasterStrings)) {
+        var strArray = dnaMasterStrings.split('\n');
+        var more = strArray.length - 1;
+        if (strArray.length > 20) {
+            document.getElementById('graphReadsDiv').innerHTML = strArray[0] + ' + ' + more + ' more';
+        }
+        else {
+            document.getElementById('graphReadsDiv').innerHTML = dnaMasterStrings;
+        }
     }
     /*
     for (var totPos = dnaPage * basesPerPage + dnaPageOffset; totPos <  (dnaPage + 1) * basesPerPage + dnaPageOffset; ++totPos) { //dna.length; ++totPos) {
@@ -4452,7 +5612,9 @@ function colourDNA(dna,mark,inclRevCompl) {
      */
 
     var el = document.getElementById('kMerResultsTab');
-    el.parentNode.removeChild(el);
+    if (el) {
+        el.parentNode.removeChild(el);
+    }
     document.getElementById('rightOne').appendChild(t);
 
    /// console.log(resolveMFK(dna, mfk, k));
@@ -4821,6 +5983,8 @@ function dnaMasterChanged() {
         case 4:
             skewRequired = true;
             break;
+        case 5:
+            skewRequired = true;
 
         default:
             break;
@@ -4849,6 +6013,9 @@ function dnaMasterChanged() {
      basesDone = sk[2].length - 1;
      }
      */
+
+    mfk = [];
+    mfMotif = [];
 
     var stats = collectStats(dnaMaster,sk);
     /*
@@ -4883,8 +6050,7 @@ function dnaMasterChanged() {
 
    // document.getElementById('dnaLength').innerHTML = dnaMaster.length;
 
-    mfk = [];
-    mfMotif = [];
+
 
 
     colourDNA(dnaMaster);
@@ -4972,44 +6138,52 @@ function graphChanged(grph) {
 
     var nbps = grph.maximalNonBranchingPaths();
 
-    document.getElementById('debugText').value += '\nMaximal Non Branching:';
 
-    nbps.forEach(function(nbp) {
-        document.getElementById('debugText').value += '\n'
-        nbp.forEach(function(el,i) {
+    var dispMaxBranchRecon = false;
 
-            document.getElementById('debugText').value += el;
-            if (i == nbp.length - 1) {
+    if (dispMaxBranchRecon) {
+        document.getElementById('debugText').value += '\nMaximal Non Branching:';
 
-            }
-            else {
-                document.getElementById('debugText').value += ' -> ';
+        nbps.forEach(function(nbp) {
+            document.getElementById('debugText').value += '\n'
+            nbp.forEach(function(el,i) {
 
-            }
-        });
-
-    });
-
-    document.getElementById('debugText').value += '\nMaximal Non Branching reconstructed:';
-
-    nbps.forEach(function(nbp) {
-        document.getElementById('debugText').value += '\n'
-        nbp.forEach(function(el,i) {
-            if (i == 0) {
                 document.getElementById('debugText').value += el;
-            }
-            else {
-                document.getElementById('debugText').value += el.substring(el.length -1);
-            }
+                if (i == nbp.length - 1) {
 
+                }
+                else {
+                    document.getElementById('debugText').value += ' -> ';
 
+                }
+            });
 
         });
 
-    });
 
 
+        document.getElementById('debugText').value += '\nMaximal Non Branching reconstructed:';
 
+        nbps.forEach(function (nbp) {
+            document.getElementById('debugText').value += '\n'
+            nbp.forEach(function (el, i) {
+                if (i == 0) {
+                    document.getElementById('debugText').value += el;
+                }
+                else {
+                    document.getElementById('debugText').value += el.substring(el.length - 1);
+                }
+
+
+            });
+
+        });
+
+
+    }
+    else {
+        document.getElementById('debugText').value += '\nNum non branch paths: ' + nbps.length;
+    }
 
 
 
@@ -5022,22 +6196,24 @@ function cleanContents(contents,contentType) {
 
     var newContents;
 
+    var spl,parts,joined,newContents;
+
     if (contentType) { //new regime
 
         switch (contentType) {
             case DGraph.fromDna:case DGraph.fromPairedDna: //dna. Can be on multiple lines - concatenated into one
                 if (contents.substring(0, 1) === '>') {
 
-                    var spl = contents.split(/\r\n|\r|\n/);
-                    var parts = contents.split(/\r\n|\r|\n/g);
+                    spl = contents.split(/\r\n|\r|\n/);
+                    parts = contents.split(/\r\n|\r|\n/g);
                     parts.shift();
-                    var joined = parts.join('\n');
+                    joined = parts.join('\n');
                     parts.shift(); // removes the first item from the array
                     contents = parts.join('_');
                 }
 
 
-                var newContents = contents.replace(/[^ACGT0123456789acgt]/gm, "");
+                newContents = contents.replace(/[^ACGT0123456789acgt]/gm, "");
                 newContents = newContents.toUpperCase();
                 return newContents;
 
@@ -5045,7 +6221,7 @@ function cleanContents(contents,contentType) {
 
 
             case DGraph.fromReads: //reads on multiple lines
-                var parts = contents.split(/\r\n|\r|\n/g);
+                parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
                     if (el.substring(0, 1) === '>') {
                         return false;
@@ -5075,7 +6251,7 @@ function cleanContents(contents,contentType) {
                 break;
 
             case DGraph.fromPairedReads: //reads on multiple lines
-                var parts = contents.split(/\r\n|\r|\n/g);
+                parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
                     if (el.substring(0, 1) === '>') {
                         return false;
@@ -5105,7 +6281,7 @@ function cleanContents(contents,contentType) {
                 break;
 
             case DGraph.fromAdjList: //reads on multiple lines
-                var parts = contents.split(/\r\n|\r|\n/g);
+                parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
                     if (el.substring(0, 1) === '>') {
                         return false;
@@ -5134,7 +6310,64 @@ function cleanContents(contents,contentType) {
 
                 break;
 
+            case DGraph.fromRna: //rna. Can be on multiple lines - concatenated into one
+            if (contents.substring(0, 1) === '>') {
+
+                spl = contents.split(/\r\n|\r|\n/);
+                parts = contents.split(/\r\n|\r|\n/g);
+                parts.shift();
+                joined = parts.join('\n');
+                parts.shift(); // removes the first item from the array
+                contents = parts.join('_');
+            }
+
+
+            newContents = contents.replace(/[^ACGU0123456789acgu]/gm, "");
+            newContents = newContents.toUpperCase();
+            return newContents;
+
+            break;
+
+            case DGraph.fromProtein: //protein. Can be on multiple lines - concatenated into one
+                if (contents.substring(0, 1) === '>') {
+
+                    spl = contents.split(/\r\n|\r|\n/);
+                    parts = contents.split(/\r\n|\r|\n/g);
+                    parts.shift();
+                    joined = parts.join('\n');
+                    parts.shift(); // removes the first item from the array
+                    contents = parts.join('_');
+                }
+
+
+                newContents = contents.replace(/[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]/gm, "");
+                newContents = newContents.toUpperCase();
+                return newContents;
+
+                break;
+
+            case DGraph.fromSpectrum: //spectrum. Can be on multiple lines - concatenated into one
+                if (contents.substring(0, 1) === '>') {
+
+                    spl = contents.split(/\r\n|\r|\n/);
+                    parts = contents.split(/\r\n|\r|\n/g);
+                    parts.shift();
+                    joined = parts.join('\n');
+                    parts.shift(); // removes the first item from the array
+                    contents = parts.join('_');
+                }
+
+
+                newContents = contents.replace(/[,]/gm, " ");
+                newContents = newContents.replace(/[^0123456789. ]/gm, "");
+                newContents = newContents.trim();
+                newContents = newContents.toUpperCase();
+                return newContents;
+
+                break;
+
             default:
+                return contents;
                 break;
         }
 
@@ -5142,10 +6375,10 @@ function cleanContents(contents,contentType) {
     else {
         if (contents.substring(0, 1) === '>') {
 
-            var spl = contents.split(/\r\n|\r|\n/);
-            var parts = contents.split(/\r\n|\r|\n/g);
+            spl = contents.split(/\r\n|\r|\n/);
+            parts = contents.split(/\r\n|\r|\n/g);
             parts.shift();
-            var joined = parts.join('\n');
+            joined = parts.join('\n');
             parts.shift(); // removes the first item from the array
             contents = parts.join('_');
         }
@@ -5205,7 +6438,7 @@ function motifsInput(e) {
 
 }
 
-function sequencingInput(e) {
+function sequencingInput(e,input) {
 
     var seqInp = document.getElementsByName('seqInput');
 
@@ -5215,25 +6448,36 @@ function sequencingInput(e) {
             val = seqInp[i].value;
         }
     }
+
+    var source;
+    if (input) {
+        source = input;
+
+    }
+    else {
+        source = document.getElementById('sequencingStrings').value;
+
+    }
+
     var cleaned;
 
         switch (val) {
           case 'seqDNA':
-            cleaned =  cleanContents(document.getElementById('sequencingStrings').value,DGraph.fromDna);
+            cleaned =  cleanContents(source,DGraph.fromDna);
             break;
           case 'seqReads':
-              cleaned =  cleanContents(document.getElementById('sequencingStrings').value,DGraph.fromReads);
+              cleaned =  cleanContents(source,DGraph.fromReads);
                 break;
 
           case 'seqPairedDNA':
-                cleaned =  cleanContents(document.getElementById('sequencingStrings').value,DGraph.fromPairedDna);
+                cleaned =  cleanContents(source,DGraph.fromPairedDna);
                 break;
           case 'seqPairedReads':
-                cleaned =  cleanContents(document.getElementById('sequencingStrings').value,DGraph.fromPairedReads);
+                cleaned =  cleanContents(source,DGraph.fromPairedReads);
                 break;
 
             case 'seqAdjList':
-                cleaned =  cleanContents(document.getElementById('sequencingStrings').value,DGraph.fromAdjList);
+                cleaned =  cleanContents(source,DGraph.fromAdjList);
                 break;
 
 
@@ -5245,55 +6489,179 @@ function sequencingInput(e) {
     }
 
 
-    document.getElementById('sequencingStrings').value = cleaned;
+    if (input) {
+
+    }
+    else {
+
+        document.getElementById('sequencingStrings').value = cleaned;
+    }
+
 
     switch (val) {
         case 'seqDNA':case 'seqPairedDNA':
             dnaMaster = cleaned;
             dnaMasterChanged();
+            document.getElementById('graphDnaDiv').innerHTML = dnaMaster;
             break;
         case 'seqReads':
             dnaMasterStrings = cleaned;
-            break;
+             break;
         case 'seqPairedReads':
             dnaMasterStrings = cleaned;
-            break;
+           break;
         case 'seqAdjList':
             dnaMasterStrings = cleaned;
             break;
-
         default:
             break;
     }
 
 
+    dnaMasterChanged();
 
-    /*
 
-    var sequencingStrings = document.getElementById('sequencingStrings').value.split('\n');
 
-    sequencingStrings = sequencingStrings.filter(function(el) {
-        if (el.length == 0) {
-            return false;
+
+/*
+
+var sequencingStrings = document.getElementById('sequencingStrings').value.split('\n');
+
+sequencingStrings = sequencingStrings.filter(function(el) {
+    if (el.length == 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+});
+sequencingStrings = sequencingStrings.map(function(el) {
+    return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
+
+});
+
+dnaMasterStrings =  sequencingStrings;//document.getElementById('dnaStrings').value.split('\n');
+
+dnaMaster = document.getElementById('sequencingStrings').value.replace(/ /g,'').toUpperCase();
+dnaMaster = dnaMaster.replace(/[^ACGTacgt\n]/gm,"");
+
+document.getElementById('dnaStrings').value = dnaMaster;
+
+dnaMasterChanged();
+*/
+
+}
+
+function transInput(e) {
+
+    var trInp = document.getElementsByName('trInput');
+
+    var val = '';
+    for (var i = 0; i < trInp.length; ++i) {
+        if (trInp[i].checked) {
+            val = trInp[i].value;
         }
-        else {
-            return true;
+    }
+    var cleaned;
+
+    switch (val) {
+        case 'trDNA':
+            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromDna);
+            break;
+        case 'trRNA':
+            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromRna);
+            break;
+
+        case 'trProtein':
+            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromProtein);
+            break;
+
+        default:
+            break;
+
+
+    }
+
+
+    document.getElementById('transInput').value = cleaned;
+
+
+    var revCompl = document.getElementById('revComplTT').checked;
+
+    switch (val) {
+        case 'trDNA':
+
+            dnaMaster =  cleaned; //revCompl? reverseComplement(cleaned) : cleaned;
+            rnaMaster = null;
+            proteinMaster = null;
+            dnaMasterChanged();
+            break;
+
+        default:
+            dnaMaster = null;
+            rnaMaster = new RNA(cleaned);  // rnaMaster = new RNA(revCompl? reverseComplement(cleaned) : cleaned);
+            proteinMaster = null;
+            dnaMasterChanged();
+            break;
+    }
+}
+
+function peptideInput(e) {
+
+
+    var pepInp = document.getElementsByName('pepInput');
+
+    var val = '';
+    for (var i = 0; i < pepInp.length; ++i) {
+        if (pepInp[i].checked) {
+            val = pepInp[i].value;
         }
-    });
-    sequencingStrings = sequencingStrings.map(function(el) {
-        return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
+    }
 
-    });
+    var cleaned;
 
-    dnaMasterStrings =  sequencingStrings;//document.getElementById('dnaStrings').value.split('\n');
+    cleaned = document.getElementById('pepInput').value;
 
-    dnaMaster = document.getElementById('sequencingStrings').value.replace(/ /g,'').toUpperCase();
-    dnaMaster = dnaMaster.replace(/[^ACGTacgt\n]/gm,"");
+    switch(val) {
+        case 'pepPeptide':
+            cleaned = cleanContents(cleaned,DGraph.fromProtein);
+            break;
 
-    document.getElementById('dnaStrings').value = dnaMaster;
+        case 'pepSpectrum':
+            cleaned = cleanContents(cleaned,DGraph.fromSpectrum);
+            break;
+
+    }
+
+
+    document.getElementById('pepInput').value = cleaned;
+
+    dnaMaster =  null; //revCompl? reverseComplement(cleaned) : cleaned;
+    rnaMaster = null;
+    proteinMaster = null;
+    spectrumMaster = null;
+    sequencedWeights = null;
+    convMaster = null;
+
+    switch (val) {
+        case 'pepPeptide':
+            //cleaned = document.getElementById('pepInput').value.toUpperCase();
+            proteinMaster = new Peptide(Peptide.AminoArrFromStr(cleaned));
+            break;
+        case 'pepSpectrum':
+            //cleaned = document.getElementById('pepInput').value;
+            spectrumMaster = cleaned;
+
+            var spec = new Spectrum(spectrumMaster);
+            var topEls = spec.topElements(parseInt(document.getElementById('convPS').value));
+            convMaster = topEls;
+            break;
+
+
+    }
 
     dnaMasterChanged();
-    */
+
 
 }
 
@@ -5718,6 +7086,360 @@ function sequencingRadClicked(id) {
 
 }
 
+function transInputRadClicked(id) {
+    //Motif Radio Button
+    switch (id) {
+        case 'trDNA':
+
+            document.getElementById('trTranscribe').checked = true;
+            transRadClicked('trTranscribe');
+
+
+            break;
+
+        case 'trRNA':
+
+
+            document.getElementById('trTranslate').checked = true;
+            transRadClicked('trTranslate');
+            break;
+
+
+        case 'trProtein':
+
+            document.getElementById('trRetro').checked = true;
+            transRadClicked('trRetro');
+
+            break;
+
+        default:
+
+
+            break;
+
+    }
+
+}
+
+function peptideInputRadClicked(id) {
+    //Motif Radio Button
+    switch (id) {
+        case 'pepPeptide':
+            document.getElementById('pepIdealSpectrum').checked = true;
+            peptideRadClicked('pepIdealSpectrum');
+          break;
+
+        case 'pepSpectrum':
+            document.getElementById('pepSequenceBrute').checked = true;
+            peptideRadClicked('pepSequenceBrute');
+            break;
+
+
+        default:
+
+
+            break;
+
+    }
+
+}
+
+
+function transRadClicked(id) {
+    //Motif Radio Button
+    switch (id) {
+        case 'trTranscribe':
+            document.getElementById('startCodTT').style.display = "block";
+            document.getElementById('stopCodTT').style.display = "block";
+            document.getElementById('readFrameTT').style.display = "none";
+            document.getElementById('readFrameOffsetTT').style.display = "block";
+            document.getElementById('revComplTT').style.display = "block";
+
+            document.getElementById('startCodLabTT').style.display = "block";
+            document.getElementById('stopCodLabTT').style.display = "block";
+            document.getElementById('readFrameLabTT').style.display = "none";
+            document.getElementById('readFrameOffsetLabTT').style.display = "block";
+            document.getElementById('revComplLabTT').style.display = "block";
+
+            /*
+            document.getElementById('trDNA').style.display = "inline-block";
+            document.getElementById('trRNA').style.display = "none";
+            document.getElementById('trProtein').style.display = "none";
+
+            document.getElementById('trDNALab').style.display = "inline-block";
+            document.getElementById('trRNALab').style.display = "none";
+            document.getElementById('trProteinLab').style.display = "none";
+            */
+
+            document.getElementById('trDNA').checked = true;
+
+
+            break;
+
+        case 'trTranslate':
+
+            document.getElementById('startCodTT').style.display = "block";
+            document.getElementById('stopCodTT').style.display = "block";
+            document.getElementById('readFrameTT').style.display = "none";
+            document.getElementById('readFrameOffsetTT').style.display = "block";
+            document.getElementById('revComplTT').style.display = "block";
+
+            document.getElementById('startCodLabTT').style.display = "block";
+            document.getElementById('stopCodLabTT').style.display = "block";
+            document.getElementById('readFrameLabTT').style.display = "none";
+            document.getElementById('readFrameOffsetLabTT').style.display = "block";
+            document.getElementById('revComplLabTT').style.display = "block";
+
+            /*
+            document.getElementById('trDNA').style.display = "none";
+            document.getElementById('trRNA').style.display = "inline-block";
+            document.getElementById('trProtein').style.display = "none";
+
+            document.getElementById('trDNALab').style.display = "none";
+            document.getElementById('trRNALab').style.display = "inline-block";
+            document.getElementById('trProteinLab').style.display = "none";
+            */
+
+            document.getElementById('trRNA').checked = true;
+
+            break;
+
+
+        case 'trRetro':
+
+            document.getElementById('startCodTT').style.display = "none";
+            document.getElementById('stopCodTT').style.display = "none";
+            document.getElementById('readFrameTT').style.display = "none";
+            document.getElementById('readFrameOffsetTT').style.display = "none";
+            document.getElementById('revComplTT').style.display = "none";
+
+            document.getElementById('startCodLabTT').style.display = "none";
+            document.getElementById('stopCodLabTT').style.display = "none";
+            document.getElementById('readFrameLabTT').style.display = "none";
+            document.getElementById('readFrameOffsetLabTT').style.display = "none";
+            document.getElementById('revComplLabTT').style.display = "none";
+
+            /*
+            document.getElementById('trDNA').style.display = "none";
+            document.getElementById('trRNA').style.display = "none";
+            document.getElementById('trProtein').style.display = "inline-block";
+
+            document.getElementById('trDNALab').style.display = "none";
+            document.getElementById('trRNALab').style.display = "none";
+            document.getElementById('trProteinLab').style.display = "inline-block";
+            */
+
+            document.getElementById('trProtein').checked = true;
+
+            alert('Protein reverse translation not yet implemented');
+
+            break;
+
+        default:
+            document.getElementById('startCodTT').style.display = "block";
+            document.getElementById('stopCodTT').style.display = "block";
+            document.getElementById('readFrameTT').style.display = "none";
+            document.getElementById('readFrameOffsetTT').style.display = "block";
+            document.getElementById('revComplTT').style.display = "block";
+
+            document.getElementById('startCodLabTT').style.display = "block";
+            document.getElementById('stopCodLabTT').style.display = "block";
+            document.getElementById('readFrameLabTT').style.display = "none";
+            document.getElementById('readFrameOffsetLabTT').style.display = "block";
+            document.getElementById('revComplLabTT').style.display = "block";
+
+            /*
+            document.getElementById('trDNA').style.display = "none";
+            document.getElementById('trRNA').style.display = "inline-block";
+            document.getElementById('trProtein').style.display = "none";
+
+            document.getElementById('trDNALab').style.display = "none";
+            document.getElementById('trRNALab').style.display = "inline-block";
+            document.getElementById('trProteinLab').style.display = "none";
+            */
+
+            document.getElementById('trRNA').checked = true;
+
+            break;
+
+    }
+
+}
+
+function peptideRadClicked(id) {
+    //Peptide Radio Button
+    switch (id) {
+        case 'pepIdealSpectrum':
+            document.getElementById('convPS').style.display = "none";
+            document.getElementById('leaderPS').style.display = "none";
+
+            document.getElementById('convLabPS').style.display = "none";
+            document.getElementById('leaderLabPS').style.display = "none";
+
+
+            document.getElementById('pepPeptide').checked = true;
+
+
+            break;
+
+        case 'pepSequenceBrute':
+
+            document.getElementById('convPS').style.display = "none";
+            document.getElementById('leaderPS').style.display = "none";
+
+            document.getElementById('convLabPS').style.display = "none";
+            document.getElementById('leaderLabPS').style.display = "none";
+
+
+            document.getElementById('pepSpectrum').checked = true;
+
+            break;
+
+        case 'pepSequenceLeaderboard':
+
+            document.getElementById('convPS').style.display = "block";
+            document.getElementById('leaderPS').style.display = "block";
+
+            document.getElementById('convLabPS').style.display = "block";
+            document.getElementById('leaderLabPS').style.display = "block";
+
+
+            document.getElementById('pepSpectrum').checked = true;
+
+            break;
+
+        case 'pepSequenceLeaderboardConv':
+
+            document.getElementById('convPS').style.display = "block";
+            document.getElementById('leaderPS').style.display = "block";
+
+            document.getElementById('convLabPS').style.display = "block";
+            document.getElementById('leaderLabPS').style.display = "block";
+
+
+            document.getElementById('pepSpectrum').checked = true;
+
+            break;
+        default:
+            document.getElementById('convPS').style.display = "none";
+            document.getElementById('leaderPS').style.display = "none";
+
+            document.getElementById('convLabPS').style.display = "none";
+            document.getElementById('leaderLabPS').style.display = "none";
+
+
+            document.getElementById('pepPeptide').checked = true;
+
+            break;
+
+    }
+
+}
+
+function updateExpColl(elId,newState) {
+    var el = document.getElementById(elId);
+
+    var imgSrc = newState ? 'img/toggle-collapse-alt_blue.png' : 'img/toggle-expand-alt_blue.png';
+
+    el.src = imgSrc;
+
+    switch (elId) {
+        case 'expDebug':
+
+            break;
+
+    }
+
+
+
+    var debMax = '25%';
+    var debMin = '2%';
+
+    var rOneMax = '27%';
+    var rOneMin = '3%';
+
+    var leftMax = '93%';
+    var leftMin = '46%';
+    var leftWithDeb = '70%';
+    var leftWithMulti = '69%';
+
+   // var right = document.getElementById('rightMainDiv');
+    var debDiv =  document.getElementById('debugDiv');
+    var rOneDiv = document.getElementById('rightOne');
+    var left = document.getElementById('leftMainDiv');
+
+    if (expDebugState) {
+        document.getElementById('debugLab').innerHTML = 'Debug Info';
+    }
+    else {
+        document.getElementById('debugLab').innerHTML = '';
+    }
+
+    if (expMultiState) {
+        document.getElementById('rightOneLab').innerHTML = 'Results Selector';
+    }
+    else {
+        document.getElementById('rightOneLab').innerHTML = '';
+    }
+
+
+    if ((expDebugState) && (expMultiState)) {
+       // right.style.width = rightMax;
+        left.style.width = leftMin;
+        debDiv.style.width = debMax;
+        rOneDiv.style.width = rOneMax;
+    }
+    else if (expDebugState)  {
+       // right.style.width = rightWithDeb;
+        left.style.width = leftWithDeb;
+        debDiv.style.width = debMax
+        rOneDiv.style.width = rOneMin;
+    }
+    else if (expMultiState) {
+      //  right.style.width = rightWithMulti;
+        left.style.width = leftWithMulti;
+        debDiv.style.width = debMin;
+        rOneDiv.style.width = rOneMax;
+    }
+    else {
+       // right.style.width = rightMin;
+        left.style.width = leftMax;
+        debDiv.style.width = debMin;
+        rOneDiv.style.width = rOneMin;
+    }
+
+
+
+}
+function expCollClicked(elId) {
+   // alert('exp coll clicked: ' +  elId);
+        var el = document.getElementById(elId);
+
+
+    var newState;
+
+    switch(elId) {
+        case 'expDebug':
+            expDebugState = !expDebugState;
+            expStateChanged(elId,expDebugState);
+
+            break;
+        case 'expMulti':
+            expMultiState = !expMultiState;
+            expStateChanged(elId,expMultiState);
+            break;
+        default:
+            break;
+    }
+}
+
+function expStateChanged(elId,newVal) {
+    //expCollClicked(elId);
+    updateExpColl(elId,newVal);
+
+}
+
+
 
 function clickInDNA(e) {
     //alert('key down. Posn: ' + getCaretCharacterOffsetWithin(document.getElementById('dnaView')));
@@ -5729,30 +7451,117 @@ function clickInDNA(e) {
 
 function tabClickDone(tabNum) {
     //alert('tab clicked: ' + tabNum);
+
+    initialiseResults();
+
+    document.getElementById('rightTwo').style.display = 'block';
+
     switch (tabNum) {
         case 3: //Motif tab
              document.getElementById('mfkTools').style.display = "none";
              document.getElementById('motifTools').style.display = "block";
              document.getElementById('sequencingTools').style.display = "none";
+             document.getElementById('transTools').style.display = "none";
+             document.getElementById('pepTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
             break;
         case 4:  //Sequencing tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "block";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "inline-block";
+            document.getElementById('transViewer').style.display = "none";
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
             break;
-        default:
+
+        case 5:  //Transcription/Translation tab
+            document.getElementById('mfkTools').style.display = "none";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "block";
+            document.getElementById('pepTools').style.display = "none";
+
+            document.getElementById('dnaviewer').style.display = "none";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "inline-block";
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+        case 6: //Peptide sequencing tab
+            document.getElementById('mfkTools').style.display = "none";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "block";
+
+            document.getElementById('dnaviewer').style.display = "none";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "inline-block";
+
+            document.getElementById('rightTwo').style.display = 'none';
+
+
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+        case 7: //Misc tab
             document.getElementById('mfkTools').style.display = "block";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+
+            expDebugState = true;
+            expStateChanged('expDebug',true);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+
+
+        default:  //0, 1, 2 kmer tabs
+            document.getElementById('mfkTools').style.display = "block";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
+
+            document.getElementById('dnaviewer').style.display = "inline-block";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = true;
+            expStateChanged('expMulti',true);
             break;
 
     }

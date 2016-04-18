@@ -18,7 +18,7 @@ var bestFreqArray = []; //used in ltclump
 
 var revComplAlreadyDone = [];
 
-var kMersDone = {}
+var kMersDone = {};
 
 
 var mismatchSeqs = [];
@@ -189,7 +189,7 @@ function kMersWithDist(kmer,dist) {
 
 function findKmerInDnaStrings(dnaStrings,kmer,d,inclRevCompl) {
 
-    var foundInAll = true;
+   // var foundInAll = true;
 
 /*
     dnaStrings.forEach(function(dnaStr) {
@@ -279,9 +279,9 @@ function motifSearch(dnaStrings,k,d,inclRevCompl,progCallback) {
 
 function processBrute(dnaStrings,k,d,laplace,progCallback) {
 
-    var kmers = [];
+   // var kmers = [];
     for (var i = 0;i < dnaStrings[0].length - k + 1; ++i) {
-        var kmer = dnaStrings[0].substring(i,i+k);
+      //  var kmer = dnaStrings[0].substring(i,i+k);
         var restKmers = processBrute(dnaStrings.slice(1),k,d,laplace,progCallback);
     }
 
@@ -294,7 +294,7 @@ function bruteMotifSearch(dnaStrings,k,d,laplace,progCallback) {
 
     var progThreshold = 100;
 
-    var iAr = dnaStrings.map(function(el) {
+    var iAr = dnaStrings.map(function() {
         return 0;
     });
 
@@ -320,6 +320,8 @@ function bruteMotifSearch(dnaStrings,k,d,laplace,progCallback) {
     });
 
 
+    var res;
+
     while (!finished) {
 
         if (progCallback) {
@@ -329,7 +331,7 @@ function bruteMotifSearch(dnaStrings,k,d,laplace,progCallback) {
             }
         }
 
-        var res = scoreMotifs(kmers,laplace);
+        res = scoreMotifs(kmers,laplace);
         var score = res[1];
         var consensus = res[0];
         if (score < bestScore) {
@@ -363,7 +365,7 @@ function bruteMotifSearch(dnaStrings,k,d,laplace,progCallback) {
     }
 
 
-    var res = [
+    res = [
         [
             [
 
@@ -399,6 +401,8 @@ function medianString(dnaStrings,k,d,inclRevCompl,progCallback) {
     var minPosns;
     var median = '';
 
+    var res;
+
     // allPatterns.forEach(function(pat) {
     var limit = Math.pow(4, k);
     for (var i = 0; i < limit; ++i) {
@@ -408,7 +412,7 @@ function medianString(dnaStrings,k,d,inclRevCompl,progCallback) {
             }
         }
         var pat = indToKmer(i,k);
-        var res = patternSequencesDist(pat, dnaStrings, true);
+        res = patternSequencesDist(pat, dnaStrings, true);
         if (res[0] < minDist) {
             minDist = res[0];
             median = pat;
@@ -437,7 +441,7 @@ function medianString(dnaStrings,k,d,inclRevCompl,progCallback) {
     */
     //return newAr;
 
-    var res = [
+    res = [
         [
             [
 
@@ -459,7 +463,7 @@ function medianString(dnaStrings,k,d,inclRevCompl,progCallback) {
 
 function greedyMotif(dnaStrings,k,d,laplace,progCallback) {
 
-    var motifs = {};
+   // var motifs = {};
 
     var progThreshold = 1;
 
@@ -549,8 +553,8 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
 
 
     var bestConsensus = '';
-    var bestMotifs = [];
-    var bestIndexes = [];
+   // var bestMotifs = [];
+   // var bestIndexes = [];
 
 
     var bestScore = 99999;
@@ -572,6 +576,8 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
         kmers = [];
         kmerInds = [];
 
+        var res;
+
         dnaStrings.forEach(function(el) {
             var r = getRandomInt(0, el.length - k);
             kmers.push(el.substring(r,r+k));
@@ -579,7 +585,7 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
         });
 
         var lastScore = 99999;
-        var res = scoreMotifs(kmers,laplace);
+        res = scoreMotifs(kmers,laplace);
         var score = res[1];
         var entropyScore = res[2];
         var profMatrix = res[5];
@@ -589,7 +595,7 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
 
             lastScore = score;
 
-            var res = motifsMostProbable(profMatrix, dnaStrings, k);
+            res = motifsMostProbable(profMatrix, dnaStrings, k);
             kmers = res.map(function (el) {
                 return el[0];
             });
@@ -668,6 +674,8 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
     var kmers = [];
     var kmerInds = [];
 
+    var res,profMatrix;
+
     var numStarts = 20;
 
     for (var s = 0;s < numStarts; ++s ) {
@@ -686,9 +694,9 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
             kmerInds.push(r);
         });
 
-        var res = scoreMotifs(kmers, laplace);
+        res = scoreMotifs(kmers, laplace);
         var score = res[1];
-        var profMatrix = res[5];
+        profMatrix = res[5];
         var consensus = res[0];
 
         if (score < bestScore) {
@@ -703,14 +711,14 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
             var randRow = getRandomInt(0, dnaStrings.length - 1);
             kmers.splice(randRow, 1);
             kmerInds.splice(randRow, 1);
-            var res = scoreMotifs(kmers, laplace);
-            var profMatrix = res[5];
-            var res = profileProbDist(profMatrix, dnaStrings[randRow], k);
+            res = scoreMotifs(kmers, laplace);
+            profMatrix = res[5];
+            res = profileProbDist(profMatrix, dnaStrings[randRow], k);
             var kmer = res[0];
             var ind = res[2];
             kmers.splice(randRow, 0, kmer);
             kmerInds.splice(randRow, 0, ind);
-            var res = scoreMotifs(kmers, laplace);
+            res = scoreMotifs(kmers, laplace);
             consensus = res[0];
             score = res[1];
             if (score < bestScore) {
@@ -954,12 +962,12 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
         freqArray[i] = [];
     }
 */
-    var kMersDone = [];
+   // var kMersDone = [];
     var mostCount = 0;
 
     mostArray = [];
 
-    var kMersDone = {}; //trying object instead of array
+   // kMersDone = {}; //trying object instead of array
 
     maxMismatch = maxMismatch || 0;
 
@@ -1055,12 +1063,14 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
         }
         else {
             ++currCount;
+            var c;
+
             if (el[0] == el[2]) {
-                var c = currPosns[0].concat(el[1]);
+                c = currPosns[0].concat(el[1]);
                 currPosns = [c,currPosns[1]];
             }
             else {
-                var c = currPosns[1].concat(el[1]);
+                c = currPosns[1].concat(el[1]);
                 currPosns = [currPosns[0],c];
             }
         }
@@ -1076,7 +1086,7 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
     }
     else {
         thresh = -1;
-        countArray.forEach(function(el,i) {
+        countArray.forEach(function(el) {
             if (el[0] > thresh) {
                 thresh = el[0];
             }
@@ -1087,7 +1097,7 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
 
 
 
-    var mostLen = -1;
+   // var mostLen = -1;
 
     var newFreqArray = [];
 
@@ -1190,7 +1200,7 @@ function buildBestFreqArray(freqArray,progCallback) {
             }
         }
 
-        var newEl0,newE1;
+        var newEl0;
        if (el.length == 0) {
            return [];
        }
@@ -1304,7 +1314,7 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl) {
 
        // if ( (freqArray[revInd][0].length + freqArray[revInd][1].length) > (bestFreqArray[revInd][0].length + bestFreqArray[revInd][1].length) ) {
        if (totIndArrayLen(freqArray[revInd]) >= totIndArrayLen(bestFreqArray[revInd])) {
-           var newEl0;
+
            if (freqArray[revInd][0]) {
 
 
@@ -1317,7 +1327,7 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl) {
                newEl0 = [];
            }
 
-           var newEl1;
+
            if (freqArray[revInd][1]) {
 
 
@@ -1847,13 +1857,13 @@ function mostFrequentKMers(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug
     var progThreshold = 1;
 
 
-    var kMersDone = [];
+   // var kMersDone = [];
     var mostCount = 0;
 
-    mostArray = [];
+    var mostArray = [];
 
 
-    var kMersDone = {}; //trying object instead of array
+   // kMersDone = {}; //trying object instead of array
 
     debug = debug || false;
 
@@ -1870,7 +1880,7 @@ function mostFrequentKMers(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug
             }
         }
 
-        var count = 0;
+       // var count = 0;
         var kmer = dna.substring(i,i+k);
 
 
@@ -1931,14 +1941,16 @@ function mostFrequentKMers(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug
          */
 
 
+        var ii,ret;
+
         var allDist = [];
-        for (var ii = 0;ii <= maxMismatch;++ii) {
-            var ret = kMersWithDist(kmer, ii);
+        for (ii = 0;ii <= maxMismatch;++ii) {
+            ret = kMersWithDist(kmer, ii);
             allDist = allDist.concat(ret);
         }
         if (inclRevCompl) {
-            for (var ii = 0;ii <= maxMismatch;++ii) {
-                var ret = kMersWithDist(reverseComplement(kmer), ii);
+            for (ii = 0;ii <= maxMismatch;++ii) {
+                ret = kMersWithDist(reverseComplement(kmer), ii);
                 allDist = allDist.concat(ret);
             }
 
@@ -2045,8 +2057,10 @@ function buildTree(dna,k,ltClumpThresh,includeRevCompl,progCallback) {
             }
             else {
 
+                var newNode;
+
                 if (ja.subNodes.length == 0) {
-                    var newNode = new Node(dna[i]);
+                    newNode = new Node(dna[i]);
                     newNode.positions = [i];
                     newNode.sequence = ja.sequence + newNode.letter;
                     ja.subNodes.push(newNode);
@@ -2070,7 +2084,7 @@ function buildTree(dna,k,ltClumpThresh,includeRevCompl,progCallback) {
                         justAddedCurr.push(sn);
                     }
                     else {
-                        var newNode = new Node(dna[i]);
+                        newNode = new Node(dna[i]);
                         newNode.positions = [i];
                         newNode.sequence = ja.sequence + newNode.letter;
                         ja.subNodes.push(newNode);
@@ -2095,7 +2109,7 @@ function buildTree(dna,k,ltClumpThresh,includeRevCompl,progCallback) {
 
 function totIndArrayLen(indArrays) {
 
-    var tot = 0;
+    //var tot = 0;
     if (!indArrays) {
         return 0;
     }
@@ -2131,7 +2145,7 @@ function totIndArrayLen(indArrays) {
 }
 
 function traverseTreeOneNode(baseNode,seq,ltClumpThresh,inclRevCompl,maxMismatch) {
-    var posnsToUse = [];
+    //var posnsToUse = [];
 
 
     /*
@@ -2170,7 +2184,7 @@ function traverseTreeOneNode(baseNode,seq,ltClumpThresh,inclRevCompl,maxMismatch
          else {
          */
 
-        var revComplPosns = [];
+        //var revComplPosns = [];
         //var revComplPosns = findSequenceInTree(baseNode, reverseComplement(node.sequence));
         //console.log('rev compl found in tree');
 
@@ -2284,13 +2298,16 @@ function traverseTree(baseNode,node,k,ltClumpThresh,inclRevCompl,maxMismatch,pro
         }
 
         var allDist = [];
-        for (var ii = 0;ii <= maxMismatch;++ii) {
-            var ret = kMersWithDist(node.sequence, ii);
+
+        var ii,ret;
+
+        for (ii = 0;ii <= maxMismatch;++ii) {
+            ret = kMersWithDist(node.sequence, ii);
             allDist = allDist.concat(ret);
         }
         if (inclRevCompl) {
-            for (var ii = 0;ii <= maxMismatch;++ii) {
-                var ret = kMersWithDist(reverseComplement(node.sequence), ii);
+            for (ii = 0;ii <= maxMismatch;++ii) {
+                ret = kMersWithDist(reverseComplement(node.sequence), ii);
                 allDist = allDist.concat(ret);
             }
 
@@ -2563,6 +2580,9 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
     }
 
     if (useTree) {
+
+        var baseNode,justAdded;
+
         // console.log('st build');
         var added;
         if (curr == 0) {
@@ -2851,14 +2871,17 @@ function countProgMostFreq(prog,tot) {
 
 }
 
-function countProgMostFreqWithStages(stage,prog,tot) {
+function countProgMostFreqWithStages(stage,prog,tot,task,extraInfo) {
     var now = Date.now();
     var diff = (now - startTime) / 1000;
     var mins = Math.floor(diff / 60);
     var secs = Math.round(diff -  (mins * 60));
+    if (secs < 10) {
+        secs = '0' + secs;
+    }
     var formattedTime = mins + "'" + secs + '"';
 
-    self.postMessage({'task': 'mostFrequentKmers','msgType' : 'prog', 'stage':stage,'soFar' : prog, 'total' :tot, 'elapsed':formattedTime});
+    self.postMessage({'task': task ? task : 'mostFrequentKmers','msgType' : 'prog', 'stage':stage,'soFar' : prog, 'total' :tot, 'elapsed':formattedTime, 'extraInfo' :extraInfo});
 
 }
 
@@ -2886,17 +2909,20 @@ self.addEventListener('message', function(e) {
 
     startTime = Date.now();
 
+
+    var dna,inclRevCompl,maxMismatch,indArray,txtArray,kmer,k,debug,res;
+
     switch (e.data.task) {
         case 'searchKmer' :
             //console.log('dist: ' + dist('ACGCGGTCGAGCGCGG','GCGCGGCGCGAGCGCGG'));
 
 
-            var dna = e.data.dna;
-            var kmer = e.data.kmer;
-            var inclRevCompl = e.data.inclRevCompl;
-            var maxMismatch = e.data.maxMismatch;
-            var indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
-            var txtArray = '';
+            dna = e.data.dna;
+            mer = e.data.kmer;
+           inclRevCompl = e.data.inclRevCompl;
+            maxMismatch = e.data.maxMismatch;
+            indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
+            txtArray = '';
             indArray.forEach(function(el) {
                 txtArray+=' ' + el;
             });
@@ -2904,12 +2930,12 @@ self.addEventListener('message', function(e) {
             break;
         case 'mostFrequentKmers':
 
-            var dna = e.data.dna;
-            var k = e.data.k;
-            var inclRevCompl = e.data.inclRevCompl;
+            dna = e.data.dna;
+            k = e.data.k;
+            inclRevCompl = e.data.inclRevCompl;
             var ltClumpThreshold = e.data.ltClumpThreshold;
-            var maxMismatch = e.data.maxMismatch;
-            var debug = e.data.debug;
+            maxMismatch = e.data.maxMismatch;
+            debug = e.data.debug;
 
             var freqCountArray = [];
             var debugInfo;
@@ -2919,7 +2945,7 @@ self.addEventListener('message', function(e) {
 
             if (e.data.method === 'brute') {
 
-                var res;
+
 
 
                 switch(e.data.variant) {
@@ -2979,16 +3005,16 @@ self.addEventListener('message', function(e) {
             break;
         case 'ltClump':
             var method = e.data.useTree ? 'tree' : 'brute';
-            var dna = e.data.dna;
-            var k = e.data.k;
+            dna = e.data.dna;
+            k = e.data.k;
             var ltClumpL = e.data.clumpL;
             if (ltClumpL > dna.length) { //clump  cannot be larger than DNA
                 ltClumpL = dna.length;
             }
 
             var ltClumpT = e.data.clumpT;
-            var inclRevCompl = e.data.inclRevCompl;
-            var maxMismatch = e.data.maxMismatch;
+            inclRevCompl = e.data.inclRevCompl;
+            maxMismatch = e.data.maxMismatch;
             mfk = [];
             allMFK = [];
             clumps = [];
@@ -3033,11 +3059,11 @@ self.addEventListener('message', function(e) {
 
             startTime = Date.now();
 
-            var k = e.data.k;
-            var inclRevCompl = e.data.inclRevCompl;
-            var maxMismatch = e.data.maxMismatch;
-            var indArray = motifSearch(dnaStrings,k,maxMismatch,inclRevCompl,countProgMostFreqWithStages);
-            var txtArray = '';
+            k = e.data.k;
+            inclRevCompl = e.data.inclRevCompl;
+            maxMismatch = e.data.maxMismatch;
+            indArray = motifSearch(dnaStrings,k,maxMismatch,inclRevCompl,countProgMostFreqWithStages);
+            txtArray = '';
             indArray.forEach(function(el) {
                 txtArray+=el[1] + '\n';
             });
@@ -3067,18 +3093,18 @@ self.addEventListener('message', function(e) {
 
             startTime = Date.now();
 
-            var k = e.data.k;
-            var inclRevCompl = e.data.inclRevCompl;
-            var maxMismatch = e.data.maxMismatch;
-            var res = medianString(dnaStrings,k,maxMismatch,inclRevCompl,countProgMostFreqWithStages);
-            var indArray = res[0];
+            k = e.data.k;
+            inclRevCompl = e.data.inclRevCompl;
+            maxMismatch = e.data.maxMismatch;
+            res = medianString(dnaStrings,k,maxMismatch,inclRevCompl,countProgMostFreqWithStages);
+            indArray = res[0];
             /* var indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
              var txtArray = '';
              indArray.forEach(function(el) {
              txtArray+=' ' + el;
              });
              */
-            var txtArray = 'Score: ' + res[1];
+            txtArray = 'Score: ' + res[1];
             self.postMessage({'task': 'medianString','msgType' : 'result','txtStuff' : txtArray,'indArray' : indArray});
             break;
 
@@ -3101,12 +3127,12 @@ self.addEventListener('message', function(e) {
 
             startTime = Date.now();
 
-            var k = e.data.k;
+            k = e.data.k;
             var laplace = e.data.laplace;
-            var maxMismatch = e.data.maxMismatch;
-            var res = greedyMotif(dnaStrings,k,maxMismatch,laplace,countProgMostFreqWithStages);
-            var indArray = res[0];
-            var txtArray = 'Score: ' + res[1];
+            maxMismatch = e.data.maxMismatch;
+            res = greedyMotif(dnaStrings,k,maxMismatch,laplace,countProgMostFreqWithStages);
+            indArray = res[0];
+            txtArray = 'Score: ' + res[1];
             /* var indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
              var txtArray = '';
              indArray.forEach(function(el) {
@@ -3118,22 +3144,71 @@ self.addEventListener('message', function(e) {
 
         case 'randomMotif' :
 
-            var res = randomMotif(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            res = randomMotif(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             self.postMessage({'task': 'randomMotif','msgType' : 'result','txtStuff' : 'Score: ' + res[1] + '\nEntropy: ' + res[2],'indArray' : res[0]});
             break;
 
         case 'gibbsSampler' :
 
-            var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             self.postMessage({'task': 'gibbsSampler','msgType' : 'result','txtStuff' : 'Score: ' + res[1],'indArray' : res[0]});
             break;
 
         case 'seqCyclopeptide' :
 
-            //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
-            var res = cycloPeptideSequencing(e.data.spectrum,countProgMostFreqWithStages);
+            //var res = gibbsSampler(e.ata.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
+            res = cyclopeptideSequencing(e.data.spectrum,cycFlag,countProgMostFreqWithStages);
             self.postMessage({'task': 'seqCyclopeptide','msgType' : 'result','txtStuff' : res});
             break;
+
+        case 'seqLeaderboardCyclopeptide' :
+
+            //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
+            var res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,false,cycFlag,null,countProgMostFreqWithStages);
+           
+
+            var txt = '';
+            /*
+            res.forEach(function(pep) {
+                txt += '\n' + pep.toShortString('') + '\n' + pep.toWeightString();
+            });
+            */
+            res.forEach(function(pep) {
+                txt += pep.toWeightString('-') + ' ';
+
+            });
+
+
+
+                self.postMessage({'task': 'seqLeaderboardCyclopeptide','msgType' : 'result','txtStuff' : txt});
+            break;
+
+        case 'seqLeaderboardConvCyclopeptide' :
+
+            //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
+            var res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,true,cycFlag,e.data.useTheseAminos,countProgMostFreqWithStages);
+
+
+            var txt = '';
+            /*
+             res.forEach(function(pep) {
+             txt += '\n' + pep.toShortString('') + '\n' + pep.toWeightString();
+             });
+             */
+            res.forEach(function(pep) {
+                txt += pep.toWeightString('-') + ' ';
+
+            });
+
+
+
+            self.postMessage({'task': 'seqLeaderboardConvCyclopeptide','msgType' : 'result','txtStuff' : txt});
+            break;
+
+
 
         default:
             break;

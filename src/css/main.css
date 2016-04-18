@@ -162,13 +162,22 @@ body {
 
 
 
+.expCollImg {
+    float: right;
+    width: 30px;
+    height: 30px;
+}
+
 
 
 #debugDiv {
     display: inline-block;
-    width: 35%;
+    width:  15%;/*35%;*/
     height: 100%;
+    vertical-align:top;
     margin-left: 0;
+    margin: 0;
+    padding: 0;
 }
 
 #debugText {
@@ -213,7 +222,7 @@ input[type=number] {
 
 #dnaView {
     word-wrap: break-word;
-    width: 100%
+    width: 100%;
 
     height: 100%;
     padding:5px;
@@ -239,6 +248,17 @@ input[type=number] {
     display:none;
 
 }
+
+#transViewer {
+    background-color:  beige;
+    width: 100%;
+    height: 25%;
+    overflow:auto;
+    display:none;
+    font-family: "Lucida Console", Monaco, monospace;
+
+}
+
 
 #graphDnaDiv {
     display: block;
@@ -291,6 +311,13 @@ input[type=number] {
     color: gold;
 }
 
+.oddCodon {
+    color: purple;
+}
+.evenCodon {
+    color: blue;
+}
+
 .dnaClumpHighlight {
     text-decoration: underline;
 }
@@ -320,7 +347,7 @@ input[type=number] {
 
 
 #leftMainDiv {
-    background-color: green;
+    background-color: grey;
     width: 55%;
     height: 100%;
     display: inline-block;
@@ -366,6 +393,18 @@ input[type=number] {
     height: 100px;
 }
 
+#transTools {
+
+    display:none;
+    height: 100px;
+}
+
+#pepTools {
+
+    display:none;
+    height: 100px;
+}
+
 
 #motifsInput {
     vertical-align: baseline;
@@ -381,8 +420,7 @@ input[type=number] {
     display:  inline-block; /*inline-block;*/
     margin: 0;
     padding: 0;
-    margin-left: 0px;
-    margin-top:0px;
+
 
     vertical-align: top;
     /*text-align: center;*/
@@ -400,12 +438,14 @@ input[type=number] {
 
 #rightOne {
     border:ridge;
-    height: 90%;
-    width: 63%;
+    height: 100%;
+    width:  25%; /*63%;*/
     display: inline-block;
     text-align: center;
     vertical-align:top;
     overflow:auto;
+    margin: 0;
+    padding: 0;
 
 
 
@@ -511,10 +551,27 @@ input[type=number] {
 }
 
 #midSeq {
+     margin-left: 30px;
+     width: 15%;
+ }
+#rightSeq {
+    width: 30%;
+}
+
+#midPep {
     margin-left: 30px;
     width: 15%;
 }
-#rightSeq {
+#rightPep {
+    width: 30%;
+}
+
+#midTr {
+    margin-left: 30px;
+    width: 15%;
+}
+
+#rightTr {
     width: 30%;
 }
 
@@ -530,6 +587,21 @@ input[type=number] {
     float: right;
 
 }
+
+.alignLabRight {
+    display: inline-block;
+    float: right;
+    width: 150px;
+    text-align: right;
+}
+.alignElLeft {
+    display: inline-block;
+    clear: both;
+    float: left;
+
+}
+
+
 
 
 
