@@ -1656,8 +1656,8 @@ function NodePrinter(node,x,y,num) {
         }
         else {
             if( (this.linearNum == endPNode.linearNum - 1) && this.numForward == 0) {//adjacent forward
-                point1 = stY - (NodePrinter.pointInc * this.numForward);
-                point2 = endY - (NodePrinter.pointInc * this.numForward);
+                //point1 = stY - (NodePrinter.pointInc * this.numForward);
+                //point2 = endY - (NodePrinter.pointInc * this.numForward);
                 stX = stX  + this.radius;
                 endX = endX - this.radius;
                 stY = stY + this.radius;
@@ -2577,7 +2577,7 @@ function executeMisc(e) {
                 }
                 var reverseFound = false;
                 var testRevDNA = testDNA.reverseComplement();
-                var tst = testRevDNA.rnaTranscript();
+               // var tst = testRevDNA.rnaTranscript();
                 testRevRNA = new RNA(testRevDNA.rnaTranscript());
                 testRevProt = testRevRNA.translate(0,true);
                 if (testRevProt.toShortString('') == targetSeq) {
@@ -5258,9 +5258,10 @@ function colourPep() {
 
     if (progExtraInfo) {
         var tab = 34;
-        var padStr = '----------------------------------';;
+        var padStr = '----------------------------------';
         trans.innerHTML += 'Top 5 sub-candidates:';
 
+        /*
         var lenBit = '';
         if (progExtraInfo[0][0]) {
             lenBit = progExtraInfo[0][0].split(' ')[0].length;
@@ -5268,9 +5269,11 @@ function colourPep() {
                 lenBit = '0' + lenBit;
             }
         }
+        */
+        
        // trans.innerHTML += ' (rnd ' + lenBit + ')';
 
-        for (var i = 0;i < 14;++i) {
+        for (i = 0;i < 14;++i) {
             trans.innerHTML += '&nbsp';
         }
         trans.innerHTML += 'Best 5 complete matches:' + '<BR>';
@@ -5333,13 +5336,7 @@ function colourPep() {
         if (sequencedWeights) {
             var sw = sequencedWeights.split(' ');
             sw = sw.filter(function(el) {
-                if (el.length == 0) {
-                    return false;
-
-                }
-                else {
-                    return true;
-                }
+                return el.length != 0;
 
             });
             var cycNums = [];
@@ -5427,6 +5424,7 @@ function colourDNA(dna,mark,inclRevCompl) {
             break;
         case 5:
             inclRevCompl = document.getElementById("revComplTT").checked;
+            break;
         default:
             break;
     }
@@ -5460,7 +5458,7 @@ function colourDNA(dna,mark,inclRevCompl) {
 
     };
 
-    var numKmer = document.getElementById('numKmers');
+    //var numKmer = document.getElementById('numKmers');
 
    /// console.log('colour start loop');
 
@@ -7792,14 +7790,4 @@ function getCaretCharacterOffsetWithin(element) {
     return caretOffset;
 }
 
-function arrayMax(arr) {
-    return arr.reduce(function (p, v) {
-        return ( p > v ? p : v );
-    });
-}
 
-function arrayMin(arr) {
-    return arr.reduce(function(p,v) {
-        return (p < v  ? p : v);
-    });
-}

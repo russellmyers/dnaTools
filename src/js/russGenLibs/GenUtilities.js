@@ -1,6 +1,9 @@
 /**
  * Created by RussellM on 12/08/2015.
  */
+/* 19/4/16: Added ArrayMax and ArrayMin routines
+
+ */
 
 function addObserver(subject, property, callbackHandler) {
     subject['_' + property] = subject[property];
@@ -652,3 +655,15 @@ makeTextFile = function (text) {
 
     return textFile;
 };
+
+function arrayMax(arr) {
+    return arr.reduce(function (p, v) {
+        return ( p > v ? p : v );
+    });
+}
+
+function arrayMin(arr) {
+    return arr.reduce(function(p,v) {
+        return (p < v  ? p : v);
+    });
+}
