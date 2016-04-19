@@ -306,8 +306,8 @@ function setUpWorkerListeners() {
 
                     //});
 
-                    document.getElementById('kMerOccurrences').innerHTML = tot;//mfk[0].length;
-                    document.getElementById('kMerNumEqualMostFreq').innerHTML = mfk.length;
+                    document.getElementById('kMerOccurrences').innerHTML = '' + tot;//mfk[0].length;
+                    document.getElementById('kMerNumEqualMostFreq').innerHTML = '' + mfk.length;
 
                     ///console.log('mfk: ' + mfk + ' len: ' + mfk.length);
                     /*
@@ -381,8 +381,8 @@ function setUpWorkerListeners() {
 
                     //});
 
-                    document.getElementById('kMerOccurrences').innerHTML = tot;//mfk[0].length;
-                    document.getElementById('kMerNumEqualMostFreq').innerHTML = mfk.length;
+                    document.getElementById('kMerOccurrences').innerHTML = '' + tot;//mfk[0].length;
+                    document.getElementById('kMerNumEqualMostFreq').innerHTML = '' + mfk.length;
 
                     console.log('mfk: ' + mfk + ' len: ' + mfk.length);
                     mfk.forEach(function (m) {
@@ -533,8 +533,8 @@ function processReturnedMotif(e) {
     }
 
 
-    document.getElementById('kMerOccurrences').innerHTML = tot;//mfk[0].length;
-    document.getElementById('kMerNumEqualMostFreq').innerHTML = mfMotif.length;
+    document.getElementById('kMerOccurrences').innerHTML = '' + tot;//mfk[0].length;
+    document.getElementById('kMerNumEqualMostFreq').innerHTML = '' + mfMotif.length;
 
 
     var numKmer = document.getElementById('numKmers');
@@ -643,18 +643,11 @@ function readSingleSequencesFile(e) {
 
         var parts = contents.split(/\r\n|\r|\n/g);
         parts = parts.filter(function(e) {
-            if (e.substring(0,1) === '>') {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return e.substring(0, 1) !== '>';
         });
 
-        var joined = parts.join('\n');
 
-
-        document.getElementById('dnaStrings').value = joined;
+        document.getElementById('dnaStrings').value = parts.join('\n');
         motifsInput();
     };
     reader.readAsText(file);
@@ -1197,10 +1190,7 @@ function skTimeoutLoop(dna,numAtATime) {
     var basesDone = sk[2].length - 1;
     if (basesDone >= dna.length) {
         //return sk;
-         var stats = collectStats(dna,sk);
-         document.getElementById('rightTwo').innerHTML = stats;
-
-
+        document.getElementById('rightTwo').innerHTML = collectStats(dna,sk);
     }
     else {
         setTimeout(function() {
@@ -1556,21 +1546,21 @@ function EdgePrinter(edge,nodePSt,nodePEnd,backNum,forwardNum) {
     this.numBackward = backNum;
     this.numForward = forwardNum;
 
-    if (nodePSt.linearNum > nodePEnd.linearNum) {
-        this.stY += nodePSt.radius * 2;
-        this.endY  += nodePEnd.radius * 2;
+    if (this.nodePSt.linearNum > this.nodePEnd.linearNum) {
+        this.stY += this.nodePSt.radius * 2;
+        this.endY  += this.nodePEnd.radius * 2;
         this.point1 = this.stY + (NodePrinter.pointInc * this.numBackward);
         this.point2 = this.endY + (NodePrinter.pointInc * this.numBackward);
 
     }
     else {
-        if( (nodePSt.linearNum == nodePEnd.linearNum - 1) && this.numForward == 0) {//adjacent forward
+        if( (this.nodePSt.linearNum == this.nodePEnd.linearNum - 1) && this.numForward == 0) {//adjacent forward
             this.point1 = this.stY - (NodePrinter.pointInc * this.numForward);
             this.point2 = this.endY - (NodePrinter.pointInc * this.numForward);
-            this.stX = this.stX  + nodePSt.radius;
-            this.endX = this.endX - nodePEnd.radius;
-            this.stY = this.stY + nodePSt.radius;
-            this.endY = this.endY + nodePEnd.radius;
+            this.stX = this.stX  + this.nodePSt.radius;
+            this.endX = this.endX - this.nodePEnd.radius;
+            this.stY = this.stY + this.nodePSt.radius;
+            this.endY = this.endY + this.nodePEnd.radius;
             this.point1 = this.stY;
             this.point2 = this.endY;
 
@@ -1695,8 +1685,8 @@ function NodePrinter(node,x,y,num) {
     this.joinEdges = function(ctx,walkNum) {
         var stX = this.x;
         var stY = this.y - 15;
-        var endX = endPNode.x;
-        var endY = endPNode.y - 15;
+        var endX; // = endPNode.x;
+        var endY; // = endPNode.y - 15;
         var point1,point2;
 
         if (this.linearNum > endPNode.linearNum) {
@@ -1708,8 +1698,8 @@ function NodePrinter(node,x,y,num) {
         }
         else {
             if( (this.linearNum == endPNode.linearNum - 1) && this.numForward == 0) {//adjacent forward
-                point1 = stY - (NodePrinter.pointInc * this.numForward);
-                point2 = endY - (NodePrinter.pointInc * this.numForward);
+                //point1 = stY - (NodePrinter.pointInc * this.numForward);
+               // point2 = endY - (NodePrinter.pointInc * this.numForward);
                 stX = stX  + this.radius;
                 endX = endX - this.radius;
                 stY = stY + this.radius;
@@ -1753,8 +1743,8 @@ function NodePrinter(node,x,y,num) {
         }
         else {
             if( (this.linearNum == endPNode.linearNum - 1) && edgeNum == 0) {//adjacent forward
-                point1 = stY - (NodePrinter.pointInc * edgeNum);
-                point2 = endY - (NodePrinter.pointInc * edgeNum);
+                //point1 = stY - (NodePrinter.pointInc * edgeNum);
+                //point2 = endY - (NodePrinter.pointInc * edgeNum);
                 stX = stX  + this.radius;
                 endX = endX - this.radius;
                 stY = stY + this.radius;
@@ -1798,7 +1788,8 @@ function executeMisc(e) {
     var grp = document.getElementsByName('miscRadio');
 
     var val = '';
-    for (var i = 0;i < grp.length; ++i) {
+    var i;
+    for (i = 0;i < grp.length; ++i) {
         if (grp[i].checked) {
             val = grp[i].value;
         }
@@ -1810,7 +1801,7 @@ function executeMisc(e) {
     var par2El = document.getElementById('miscParam2');
     var par3El = document.getElementById('miscParam3');
 
-    var dna,k,res,nodes,resArray,eqCount,neButSameLengthCount, splFloat, dist, resStr, debGraph, pairDist;
+    var dna,rna, pep, k,res,nodes,resArray,eqCount,neButSameLengthCount, path, splFloat, dist, resStr, adjList, spec, expSpec, N, debGraph, pairDist;
 
     switch (val) {
         case '1' :
@@ -1857,7 +1848,7 @@ function executeMisc(e) {
 
            // hamiltonCanvas(nodes);
 
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 resArray.push(hamPath(nodes));
 
             }
@@ -1921,7 +1912,7 @@ function executeMisc(e) {
 
 
             resArray = [];
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
              //   resArray.push(debGraph.debPath());
                 debGraph.debCycle();
@@ -2005,7 +1996,7 @@ function executeMisc(e) {
 
 
             resArray = [];
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
                 debGraph.debPath();
@@ -2076,7 +2067,7 @@ function executeMisc(e) {
             resEl.value = 'results\n';
 
             resArray = [];
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
                 debGraph.debPath();
@@ -2130,7 +2121,7 @@ function executeMisc(e) {
         resEl.value+= debGraph.sumInfo();
 
           resArray = [];
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
 
@@ -2218,9 +2209,7 @@ function executeMisc(e) {
             reads = par1El.value.split('\n');
 
             reads = reads.map(function(el) {
-                var pair = el.split('|');
-
-                return pair;
+               return el.split('|');
             });
 
             pairDist = parseInt(par3El.value);
@@ -2229,7 +2218,7 @@ function executeMisc(e) {
 
 
             resArray = [];
-            for (var i = 0;i < 1;++i) {
+            for (i = 0;i < 1;++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
                 debGraph.debPath();
@@ -2280,7 +2269,7 @@ function executeMisc(e) {
             // var dna =         par1El.value;
             resEl.value = 'results\n';
             res = kMersWithMaxDist(par1El.value,d);
-            var resStr = '';
+            resStr = '';
             res.forEach(function(el) {
                 resStr+=el + '\n';
             });
@@ -2309,11 +2298,11 @@ function executeMisc(e) {
             k = parseInt(par2El.value);
             par1El.value = cleanContents(par1El.value);
             dna = par1El.value;
-            var dist = parseInt(par3El.value);
+            dist = parseInt(par3El.value);
             res = kmerComposition(dna,k);
 
             resEl.value = 'results: ';
-            var resStr = '';
+            resStr = '';
             res.forEach(function(el) {
                 resStr += '\n' + el;
             });
@@ -2323,7 +2312,7 @@ function executeMisc(e) {
             break;
 
         case '15': //str from genome path
-            var path = par1El.value.split('\n');
+            path = par1El.value.split('\n');
 
             res = stringFromGenomePath(path);
 
@@ -2362,10 +2351,10 @@ function executeMisc(e) {
             eqCount = 0;
             neButSameLengthCount = 0;
 
-            var el = res;
+            //var el = res;
 
             if (nodes.length < 30) {
-                hamiltonCanvas(nodes, el[2]);
+                hamiltonCanvas(nodes, res[2]);
             }
 
             break;
@@ -2373,14 +2362,14 @@ function executeMisc(e) {
             k = parseInt(par2El.value);
             //par1El.value = cleanContents(par1El.value);
             // var dna = par1El.value;
-            var adjList = par1El.value.split('\n');
+            adjList = par1El.value.split('\n');
 
             //var nodes = createDebNodes(dna,k);
             debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
             resEl.value = 'results\n';
 
             resArray = [];
-            for (var i = 0;i < 1;++i) {
+            for (i = 0;i < 1;++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
                 debGraph.debCycle();
@@ -2425,13 +2414,13 @@ function executeMisc(e) {
 
         case '18':
             k = parseInt(par2El.value);
-            var adjList = par1El.value.split('\n');
+            adjList = par1El.value.split('\n');
 
             debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
             resEl.value = 'results\n';
 
             resArray = [];
-            for (var i = 0;i < 1;++i) {
+            for (i = 0;i < 1;++i) {
                debGraph.debPath();
                 resEl.value += debGraph.edgePathToText();
 
@@ -2451,7 +2440,7 @@ function executeMisc(e) {
             var pad = "00000000000000";
 
             reads = [];
-            for (var i = 0;i < Math.pow(2,k);++i) {
+            for (i = 0;i < Math.pow(2,k);++i) {
                 var binStr = (i >>> 0).toString(2);
                 binStr = pad + binStr;
                 binStr = binStr.substr(binStr.length - k);
@@ -2472,7 +2461,7 @@ function executeMisc(e) {
                 lim = 1;
             }
 
-            for (var i = 0;i < parseInt(par3El.value);++i) {
+            for (i = 0;i < parseInt(par3El.value);++i) {
                 //resArray.push(debPath(nodes));
                 //   resArray.push(debGraph.debPath());
                 debGraph.debPath();
@@ -2514,7 +2503,7 @@ function executeMisc(e) {
 
         case '20': //Genome path to string
 
-            var path = par1El.value.split('\n');
+            path = par1El.value.split('\n');
 
             str = '';
             path.forEach(function(el,i) {
@@ -2538,9 +2527,9 @@ function executeMisc(e) {
 
             dna = new DNA(par1El.value);
 
-            var rna = new RNA(dna.rnaTranscript());
+            rna = new RNA(dna.rnaTranscript());
 
-            var pep = rna.translate(0,true);
+            pep = rna.translate(0,true);
 
             resEl.value = 'results\n';
 
@@ -2553,9 +2542,9 @@ function executeMisc(e) {
 
         case '22': //RNA to amino string
 
-            var rna = new RNA(par1El.value);
+            rna = new RNA(par1El.value);
 
-            var pep = rna.translate(0,true);
+            pep = rna.translate(0,true);
 
             resEl.value = 'results\n';
 
@@ -2574,7 +2563,7 @@ function executeMisc(e) {
 
 
 
-            for (var i = 0;i < dna.length - targetDNALen; ++i) {
+            for (i = 0;i < dna.length - targetDNALen; ++i) {
 
                 var forwardFound = false;
                 var testDNA = new DNA(dna.substring(i,i + targetDNALen));
@@ -2612,8 +2601,8 @@ function executeMisc(e) {
         case '24': //Spectrum
 
 
-            var pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
-            var cyc = (par2El.value == 1 ? true : false);
+            pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
+            var cyc = (par2El.value == 1);
 
             resEl.value = 'results\n';
 
@@ -2621,7 +2610,7 @@ function executeMisc(e) {
 
 
 
-            var spec = pep.spectrum(cyc);
+            spec = pep.spectrum(cyc);
 
             resEl.value += 'Spectrum len: ' + spec.length + '\n';
 
@@ -2631,7 +2620,7 @@ function executeMisc(e) {
             });
 
 
-            break
+            break;
 
         case '25': //Num peptides with mass
 
@@ -2670,14 +2659,14 @@ function executeMisc(e) {
 
         case '27': //Cyclopeptide scoring
 
-            var pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
+            pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
 
-            var expSpec = par2El.value.split(' ');
+            expSpec = par2El.value.split(' ');
             expSpec = expSpec.map(function(el) {
                 return parseInt(el);
             });
 
-            useLinear = parseInt(par3El.value);
+            var useLinear = parseInt(par3El.value);
 
             resEl.value = 'results\n';
 
@@ -2688,9 +2677,9 @@ function executeMisc(e) {
 
         case '28': //Leaderboard Cyclopeptide sequencing
 
-            var expSpec = par1El.value; //.split(' ');
+            expSpec = par1El.value; //.split(' ');
 
-            var N = parseInt(par2El.value);
+            N = parseInt(par2El.value);
 
             var M = parseInt(par3El.value);
 
@@ -2721,12 +2710,12 @@ function executeMisc(e) {
                 return new Peptide(Peptide.AminoArrFromStr(el));
 
             });
-            var spec = par2El.value.split(' ');
+            spec = par2El.value.split(' ');
             spec = spec.map(function(el) {
                 return parseInt(el);
             });
 
-            var N = parseInt(par3El.value);
+            N = parseInt(par3El.value);
 
             res =  trimLeaderboard(leaders,spec,N);
 
@@ -2747,7 +2736,7 @@ function executeMisc(e) {
 
         case '30': //Convolution
 
-            var spec = new Spectrum(par1El.value);
+            spec = new Spectrum(par1El.value);
             res =  spec.convolutionStr();
 
             resEl.value = 'results\n';
@@ -2786,12 +2775,7 @@ function initialiseMotifParams() {
     var dnaStrings = document.getElementById('dnaStrings').value.split('\n');
 
     dnaStrings = dnaStrings.filter(function(el) {
-        if (el.length == 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return el.length != 0;
     });
     dnaStrings = dnaStrings.map(function(el) {
         return el.trim().toUpperCase();
@@ -2882,7 +2866,7 @@ function motifCompare(e) {
                     res[0]
                 ]
               ];
-    dnaMasterStrings.forEach(function(el) {
+    dnaMasterStrings.forEach(function() {
         mfMotif[0][0].push([[0],[]]);
 
     });
@@ -3011,12 +2995,7 @@ function greedyMotif(e) {
     var dnaStrings = document.getElementById('dnaStrings').value.split('\n');
 
     dnaStrings = dnaStrings.filter(function(el) {
-        if (el.length == 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return el.length != 0;
     });
     dnaStrings = dnaStrings.map(function(el) {
         return el.trim().toUpperCase();
@@ -3131,8 +3110,9 @@ function initialiseSequencingParams() {
     var rads = document.getElementsByName('seqMethod');
 
     var methodSelected;
+    var i;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             methodSelected = rads[i];
             break;
@@ -3161,7 +3141,7 @@ function initialiseSequencingParams() {
 
     var inputSelected;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             inputSelected = rads[i];
             break;
@@ -3193,7 +3173,7 @@ function initialiseSequencingParams() {
 
     }
 
-    ;
+
 
 
     // paramObj.seqInput = inputSelected.id;
@@ -3203,7 +3183,7 @@ function initialiseSequencingParams() {
 
     var typeSelected;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             typeSelected = rads[i];
             break;
@@ -3246,9 +3226,11 @@ function initialiseTransParams() {
 
     var rads = document.getElementsByName('trMethod');
 
+    var i;
+
     var methodSelected;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             methodSelected = rads[i];
             break;
@@ -3276,7 +3258,7 @@ function initialiseTransParams() {
 
     var inputSelected;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             inputSelected = rads[i];
             break;
@@ -3325,8 +3307,9 @@ function initialisePeptideParams() {
     var rads = document.getElementsByName('pepMethod');
 
     var methodSelected;
+    var i;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             methodSelected = rads[i];
             break;
@@ -3359,7 +3342,7 @@ function initialisePeptideParams() {
 
     var inputSelected;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             inputSelected = rads[i];
             break;
@@ -3385,7 +3368,7 @@ function initialisePeptideParams() {
 
     var peptideType;
 
-    for (var i = 0;i < rads.length;++i) {
+    for (i = 0;i < rads.length;++i) {
         if (rads[i].checked) {
             peptideType = rads[i];
             break;
@@ -3469,7 +3452,7 @@ function runSequencing(e) {
 
     initialiseResults();
 
-    paramObj = initialiseSequencingParams();
+    var paramObj = initialiseSequencingParams();
 
    // var rads = document.getElementsByName('seqMethod');
 
@@ -3582,8 +3565,8 @@ function runSequencing(e) {
     if (paramObj.seqInput == DGraph.fromDna) {
 
         readsToMfk(grph);
-        dna = dnaMaster; // document.getElementById('dnaInput').value;
-        colourDNA(dna, null, false);
+        //var dna = dnaMaster; // document.getElementById('dnaInput').value;
+        colourDNA(dnaMaster, null, false);
     }
     else {
 
@@ -3632,9 +3615,11 @@ function readBreak(e) {
          return;
     }
 
-    strArr =  dnaMasterStrings.split('\n');
-    brokenArr = [];
-    brokenDict = {};
+    var strArr =  dnaMasterStrings.split('\n');
+    var brokenArr = [];
+    var brokenDict = {};
+
+    var dictEntry;
 
     strArr.forEach(function(el,i) {
         var pref = el.substring(0,el.length - 1);
@@ -3643,7 +3628,7 @@ function readBreak(e) {
             brokenDict[pref][0].push(i);
         }
         else {
-            var dictEntry = [];
+            dictEntry = [];
             dictEntry.push([i]);
             dictEntry.push([]);
             brokenDict[pref] = dictEntry;
@@ -3652,7 +3637,7 @@ function readBreak(e) {
             brokenDict[suf][1].push(i);
         }
         else {
-            var dictEntry = [];
+            dictEntry = [];
             dictEntry.push([]);
             dictEntry.push([i]);
             brokenDict[suf] = dictEntry;
@@ -3668,10 +3653,12 @@ function readBreak(e) {
     var key;
 
     var removeDupArr = [];
+    var ind;
 
     for (key in brokenDict) {
-        var dupCount = 0;
-        var sameCount = 0; //pref and suf same in single item. need to retain
+
+        //var dupCount = 0;
+       // var sameCount = 0; //pref and suf same in single item. need to retain
         var curr = brokenDict[key];
 
         var count = 0;
@@ -3681,7 +3668,7 @@ function readBreak(e) {
         for (var p = 0;p < curr[0].length;++p) {
             var pref = curr[0][p];
             // curr[0].forEach(function(pref) {
-            var ind = curr[1].indexOf(pref);
+            ind = curr[1].indexOf(pref);
             if (ind > -1) {
                 // matchFound = true;
                 curr[0][p] = -1;
@@ -3711,7 +3698,7 @@ function readBreak(e) {
                 continue;
             }
 
-            var ind = curr[0].indexOf(suf);
+            ind = curr[0].indexOf(suf);
             if (ind > -1) {
                 // matchFound = true;
                 curr[0][ind] = -1;
@@ -3773,8 +3760,8 @@ function pairedToReads(e) {
         return;
     }
 
-    outArr = [];
-    strArr =  dnaMasterStrings.split('\n');
+    var outArr = [];
+    var strArr =  dnaMasterStrings.split('\n');
     strArr.forEach(function(el) {
         var split = el.split('|');
         outArr.push(split[0]);
@@ -3797,10 +3784,12 @@ function runTrans(e) {
 
     initialiseResults();
 
-    paramObj = initialiseTransParams();
+    var paramObj = initialiseTransParams();
 
 
     //var input = dnaMaster;
+
+    var prot;
 
 
     switch (paramObj.trMethod) {
@@ -3815,13 +3804,13 @@ function runTrans(e) {
 
             var r = dnaObj.rnaTranscript();
             rnaMaster = new RNA(r);
-            var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+            prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
             proteinMaster = prot;
             break;
         case DNA.TransMethodTranslate:
             //rnaMaster = new RNA(dnaMaster);
 
-            var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
+            prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
             proteinMaster = prot;
             break;
         case DNA.TransMethodRetro:
@@ -3859,12 +3848,12 @@ function runPeptide(e) {
 
     initialiseResults();
 
-    paramObj = initialisePeptideParams();
+    var paramObj = initialisePeptideParams();
 
 
     //var input = dnaMaster;
 
-    var spec;
+    //var spec;
 
     switch (paramObj.pepMethod) {
 
@@ -3953,8 +3942,8 @@ function kmerComp(e) {
 
     readsToMfk(grph);
 
-    dna = dnaMaster; // document.getElementById('dnaInput').value;
-    colourDNA(dna, null, false);
+     // document.getElementById('dnaInput').value;
+    colourDNA(dnaMaster, null, false);
 
     if (document.getElementById('debugSA').checked) {
         var resStr = '';
@@ -4103,8 +4092,8 @@ function pathFromReads(e) {
 
 
 
-    dna = dnaMaster; // document.getElementById('dnaInput').value;
-    colourDNA(dna, null, false);
+    //var dna = dnaMaster; // document.getElementById('dnaInput').value;
+    colourDNA(dnaMaster, null, false);
 
     if (document.getElementById('debugSA').checked) {
         var resStr = '';
@@ -4256,7 +4245,7 @@ function graphCanvas(grph) {
 
     stNode = null;
     endNode = null;
-    for (var j = 0;j < nodePrinters.length; ++j) {
+    for (j = 0;j < nodePrinters.length; ++j) {
         var backCount = 0;
         var forwardCount = 0;
 
@@ -4487,9 +4476,11 @@ function debruijnCanvas(deb) {
     //Build and Print nodes
 
     var nodePrinters = [];
-    deb.edgePath.forEach(function(edge,i) {
+    var j;
+
+    deb.edgePath.forEach(function(edge) {
         var nodeAlreadyThere = false;
-        for (var j = 0;j < nodePrinters.length;++j) {
+        for (j = 0;j < nodePrinters.length;++j) {
             if (nodePrinters[j].node == edge.sourceNode) {
                 nodeAlreadyThere = true;
                 break;
@@ -4512,7 +4503,7 @@ function debruijnCanvas(deb) {
         var edge = deb.edgePath[deb.edgePath.length - 1];
         //add target node of last edge
         var nodeAlreadyThere = false;
-        for (var j = 0;j < nodePrinters.length;++j) {
+        for (j = 0;j < nodePrinters.length;++j) {
             if (nodePrinters[j].node == edge.targetNode) {
                 nodeAlreadyThere = true;
                 break;
@@ -4549,7 +4540,7 @@ function debruijnCanvas(deb) {
 
         stNode = null;
         endNode = null;
-        for (var j = 0;j < nodePrinters.length; ++j) {
+        for (j = 0;j < nodePrinters.length; ++j) {
             if (nodePrinters[j].node == deb.edgePath[i].sourceNode) {
                 stNode = nodePrinters[j];
 
@@ -4602,7 +4593,7 @@ function logoCanvas(motifs) {
 
 
 
-    var start = 0;
+    //var start = 0;
 
     var startPixelHeight = 70;
 
@@ -4635,7 +4626,7 @@ function logoCanvas(motifs) {
         }
     }
 
-    var evenTot = maxWidth * consensus.length;
+    //var evenTot = maxWidth * consensus.length;
 
     var scale = 1.0;
 
@@ -4715,8 +4706,7 @@ function logoCanvas(motifs) {
             }
             else {
                 //var h = ctx.measureText(charHeightMatrix[r][c][0]).height;
-                var h = ctx.measureText('M').width;
-                currPixelHeights[c] += h;
+                currPixelHeights[c] += ctx.measureText('M').width;
 
 
             }
@@ -4881,7 +4871,7 @@ function colourDNATest(dna,mark) {
     view.innerHTML = dna;
 }
 
-function colourMotifs(dna,lowThisPage,highThisPage,inclRevCompl,view,bases,mark) {
+function colourMotifs(dna,view,bases,mark) {
 
     var numKmer = document.getElementById('numKmers');
 
@@ -5142,7 +5132,7 @@ function colourTrans() {
 
 
   // if (rnaMaster) {
-       for (var i = 1; i < len; ++i) {
+       for (i = 1; i < len; ++i) {
 
 
            var pos = i + 1;
@@ -5202,16 +5192,15 @@ function colourTrans() {
        // var rna = revCompl ?  rnaMaster.rna.split("").reverse().join("") : rnaMaster.rna;
         var rna = rnaMaster.rna;
         var rnaColouredStr = '';
-        for (var i = 0;i < rna.length;++i) {
+        for (i = 0;i < rna.length;++i) {
 
 
             if ((i < startPos) || i > endPos) {
                 rnaColouredStr += rna[i];
             }
             else {
-                var codonNum = Math.floor((i - startPos) / Codon.len);
-                var txt = createSpan(rna[i], codonNum % 2 == 0 ? 'evenCodon' : 'oddCodon');
-                rnaColouredStr += txt;
+                codonNum = Math.floor((i - startPos) / Codon.len);
+                rnaColouredStr += createSpan(rna[i], codonNum % 2 == 0 ? 'evenCodon' : 'oddCodon');
             }
         }
         //rnaStr = rnaMaster.rna;
@@ -5462,10 +5451,10 @@ function colourDNA(dna,mark,inclRevCompl) {
 
     if (motifView) {
         if ((mfMotif.length == 0) || (mfMotif[0][0].length == 0)) {
-            colourMotifs(dnaMasterStrings, lowThisPage, highThisPage, inclRevCompl, view, bases, mark);
+            colourMotifs(dnaMasterStrings, view, bases, mark);
         }
         else {
-            colourMotifs(dnaMasterStrings, lowThisPage, highThisPage, inclRevCompl, view, bases, mark);
+            colourMotifs(dnaMasterStrings, view, bases, mark);
         }
     }
     else {
@@ -5567,7 +5556,7 @@ function colourDNA(dna,mark,inclRevCompl) {
         }
         else {
             //var mpd = collapseMFK(dna,mfk,k);
-            tData = resolveMFK(dna, mfk, k, inclRevCompl); //[['ACCC','GGGG'],['GG','TT']];
+            tData = resolveMFK(mfk, k, inclRevCompl); //[['ACCC','GGGG'],['GG','TT']];
         }
     }
 
@@ -6145,7 +6134,7 @@ function graphChanged(grph) {
         document.getElementById('debugText').value += '\nMaximal Non Branching:';
 
         nbps.forEach(function(nbp) {
-            document.getElementById('debugText').value += '\n'
+            document.getElementById('debugText').value += '\n';
             nbp.forEach(function(el,i) {
 
                 document.getElementById('debugText').value += el;
@@ -6194,7 +6183,6 @@ function graphChanged(grph) {
 
 function cleanContents(contents,contentType) {
 
-    var newContents;
 
     var spl,parts,joined,newContents;
 
@@ -6237,12 +6225,7 @@ function cleanContents(contents,contentType) {
 
                 });
                 parts = parts.filter(function(el) {
-                    if (el.length == 0) {
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
+                    return el.length != 0;
 
                 });
                 newContents = parts.join('\n');
@@ -6253,13 +6236,7 @@ function cleanContents(contents,contentType) {
             case DGraph.fromPairedReads: //reads on multiple lines
                 parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
-                    if (el.substring(0, 1) === '>') {
-                        return false;
-                    }
-
-                    else {
-                        return true;
-                    }
+                    return el.substring(0, 1) !== '>';
                 });
                 parts = parts.map(function(el) {
                     var repl = el.replace(/[^ACGT|0123456789acgt]/gm, "");
@@ -6297,12 +6274,7 @@ function cleanContents(contents,contentType) {
 
                 });
                 parts = parts.filter(function(el) {
-                    if (el.length == 0) {
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
+                    return el.length != 0;
 
                 });
                 newContents = parts.join('\n');
@@ -6378,7 +6350,7 @@ function cleanContents(contents,contentType) {
             spl = contents.split(/\r\n|\r|\n/);
             parts = contents.split(/\r\n|\r|\n/g);
             parts.shift();
-            joined = parts.join('\n');
+            //joined = parts.join('\n');
             parts.shift(); // removes the first item from the array
             contents = parts.join('_');
         }
@@ -6415,12 +6387,7 @@ function motifsInput(e) {
     var dnaStrings = document.getElementById('dnaStrings').value.split('\n');
 
     dnaStrings = dnaStrings.filter(function(el) {
-        if (el.length == 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return el.length != 0;
     });
     dnaStrings = dnaStrings.map(function(el) {
         return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
@@ -7339,9 +7306,7 @@ function peptideRadClicked(id) {
 function updateExpColl(elId,newState) {
     var el = document.getElementById(elId);
 
-    var imgSrc = newState ? 'img/toggle-collapse-alt_blue.png' : 'img/toggle-expand-alt_blue.png';
-
-    el.src = imgSrc;
+    el.src = newState ? 'img/toggle-collapse-alt_blue.png' : 'img/toggle-expand-alt_blue.png';
 
     switch (elId) {
         case 'expDebug':
@@ -7392,7 +7357,7 @@ function updateExpColl(elId,newState) {
     else if (expDebugState)  {
        // right.style.width = rightWithDeb;
         left.style.width = leftWithDeb;
-        debDiv.style.width = debMax
+        debDiv.style.width = debMax;
         rOneDiv.style.width = rOneMin;
     }
     else if (expMultiState) {
@@ -7413,7 +7378,7 @@ function updateExpColl(elId,newState) {
 }
 function expCollClicked(elId) {
    // alert('exp coll clicked: ' +  elId);
-        var el = document.getElementById(elId);
+       // var el = document.getElementById(elId);
 
 
     var newState;
@@ -7574,9 +7539,9 @@ function tabClickDone(tabNum) {
 
 function resolveMotif(dna,mfMotif,k,inclRevCompl) {
 
-    var resolved = [];
+    //var resolved = [];
 
-    var mapped = mfMotif.map(function(el) {
+    return mfMotif.map(function(el) {
         var rEntry = [];
 
         var tmp;
@@ -7627,12 +7592,12 @@ function resolveMotif(dna,mfMotif,k,inclRevCompl) {
     return mapped2;
 
     */
-    return mapped;
+   // return mapped;
 
 }
 
 
-function resolveMFK(dna,mfk,k,inclRevCompl) {
+function resolveMFK(mfk,k,inclRevCompl) {
 
     var resolved = [];
 
@@ -7736,7 +7701,7 @@ function resolveMFK(dna,mfk,k,inclRevCompl) {
 
     var mapped2 = [];
 
-    var alreadyFound = [];
+   // var alreadyFound = [];
     for (var i = 0;i < mapped.length;++i) {
         /*
         var spl = mapped[i][0].split('/');
@@ -7767,7 +7732,7 @@ function collapseMFK(dna,mfk,k) {
     var resolved = [];
 
     var alreadyHandled = [];
-    var mapped = mfk.map(function(el,i) {
+    return mfk.map(function(el,i) {
         if (alreadyHandled.indexOf(i) > -1) {
 
         }
@@ -7799,7 +7764,7 @@ function collapseMFK(dna,mfk,k) {
     });
 
 
-    return mapped;
+    //return mapped;
 
 
 

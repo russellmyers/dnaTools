@@ -13,14 +13,14 @@ var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
 //Directed Graph routines
 
-function DEdge(sourceNode,targetNode,artificial) {
+function DEdge(sourceNode,targetNode) {
     this.sourceNode = sourceNode;
     this.targetNode = targetNode;
     this.visited = false;
 
     this.walkNum = 0;
 
-    this.artificial = artificial; // indicates added to make cycle
+   // this.artificial = artificial; // indicates added to make cycle
 
     this.edgeLabel = function() {
         if (this.sourceNode.pairedDna) {
@@ -143,6 +143,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
             break;
         case DGraph.fromAdjList:
             this.adjList = source; // array of adjacencies
+            break;
         default:
             break;
     }
@@ -476,7 +477,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
 
         });
 
-        var totLen = origStr.length + this.k + this.pairDist;
+       // var totLen = origStr.length + this.k + this.pairDist;
 
         var extra =  this.k + this.pairDist;
 
@@ -571,12 +572,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
 
         return vis.filter(function(node) {
                 var r = node.getRandomNonVisitedEdge();
-                if (r == -1) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                return r != -1;
         });
 
 
@@ -589,9 +585,11 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
 
        // if (f || l) {
 
+        /*
         if (this.pairedDist) {
             return; //already added to dna to make enough
         }
+        */
 
         var kmers;
         if (this.pairDist)  {
@@ -925,7 +923,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
                 });
             }
             else {
-                svdThis = this;
+                var svdThis = this;
                 newEdgePath.forEach(function (el, i) {
                     svdThis.edgePath.splice(i + edgePathInsert, 0, el);
                 });
@@ -1332,8 +1330,10 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist) {
 
         */
 
+        /*
         var balBefore = this.isBalanced();
         var balLinearBefore = this.isBalancedLinear();
+        */
 
         if (this.makeCycle) {
             this.makeCyclical(); // make graph into cycle if not already
@@ -1886,7 +1886,7 @@ function Peptide(aminoArr,startPosInRNA) {
         
         if (reverse) {
             str = '';
-            for (i = pepStrAr.length - 1;i >=0;--i) {
+            for (var i = pepStrAr.length - 1;i >=0;--i) {
                 str += pepStrAr[i];
             }
        }
@@ -1937,7 +1937,8 @@ function Peptide(aminoArr,startPosInRNA) {
 
     this.toStringArray = function () {
 
-        var arr = this.peptide.map(function (am) {
+        var arr;
+        arr = this.peptide.map(function (am) {
             return am.short;
         });
 
@@ -2058,7 +2059,7 @@ function Peptide(aminoArr,startPosInRNA) {
 
         if (isFloatSpectrum) {
             for (var tm = 0;tm < theor.length; ++tm) {
-                theorMass = theor[tm];
+                var theorMass = theor[tm];
 
                 for (var i = 0; i < exp.length; ++i) {
                     if ((theorMass + 1 >= exp[i] - floatErr) && (theorMass + 1 <= exp[i] + floatErr)) {
@@ -2128,11 +2129,11 @@ Peptide.AminoArrFromStr = function(str) {
 
 Peptide.AminoArrFromArr = function(arr) {
 
-    var amAr = [];
+    var amAr;
 
     amAr = arr.map(function(el) {
-        var am = new Amino(el);
-        return am;
+        return new Amino(el);
+        
     });
   
     return amAr;
@@ -2142,7 +2143,9 @@ Peptide.AminoArrFromArr = function(arr) {
 
 Peptide.AminoArrFromWeights = function(weights) {
 
-    var amArr = weights.map(function(w) {
+    var amArr;
+    
+    amArr = weights.map(function(w) {
         for (var amEntry in Amino.transTable) {
             if (Amino.transTable.hasOwnProperty(amEntry)) {
                 if (Amino.transTable[amEntry][2] == w) {
@@ -2179,19 +2182,20 @@ function RNA(rna) {
             frameOffset = 0;
         }
         var arr = [];
+        var cod,i;
 
         if (rev) {
             var strRev = this.rna.split('').reverse().join('');
-            for (var i = frameOffset; i < this.rna.length - Codon.len + 1; i = i + Codon.len) {
-                var cod = new Codon(strRev.substring(i, i + Codon.len));
+            for (i = frameOffset; i < this.rna.length - Codon.len + 1; i = i + Codon.len) {
+                cod = new Codon(strRev.substring(i, i + Codon.len));
                 arr.push(cod);
 
             }
 
         }
         else {
-            for (var i = frameOffset; i < this.rna.length - Codon.len + 1; i = i + Codon.len) {
-                var cod = new Codon(this.rna.substring(i, i + Codon.len));
+            for (i = frameOffset; i < this.rna.length - Codon.len + 1; i = i + Codon.len) {
+                cod = new Codon(this.rna.substring(i, i + Codon.len));
                 arr.push(cod);
 
             }
@@ -2531,7 +2535,7 @@ function allPossiblePeptidesWithWeight(w) {
         ++round;
         console.log('round: ' + round);
        // var wMatrixThisLen  = [];
-        var weightsMatchedThisLen = 0;
+      //  var weightsMatchedThisLen = 0;
 
         var wNewMatrix = [];
         for (i = 0;i <= w;++i) {
@@ -2665,12 +2669,7 @@ function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback) {
 
     candidates = candidates.filter(function (el) {
        // if (expSpectrumAr.indexOf(el) > -1) {
-        if (expMatrix[el] == 1) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (expMatrix[el] == 1);
 
     });
 
@@ -2763,7 +2762,7 @@ function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback) {
 
             //allAminoWeights.forEach(function (amW) {
             for (var am = 0; am < allAminoWeights.length; ++am) {
-                amW = allAminoWeights[am];
+                var amW = allAminoWeights[am];
                 var newCandW = 0;
 
                 var newCand = new Array(cand.length);
@@ -2883,7 +2882,7 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
     var linearFlag = !cyclicFlag;
 
     var isFloatFlag;
-    var floatErr = 0;
+    var floatErr = 0.0;
 
     if (expSpectrum.indexOf('.') > -1) {
         isFloatFlag = true;
@@ -2922,12 +2921,7 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
         allAms = allAms.filter(function (am) {
 
             var w = new Amino(am).getIntegerWeight();
-            if (topEls.indexOf(w) > -1) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return (topEls.indexOf(w) > -1);
 
         });
     }
@@ -3180,10 +3174,10 @@ function kmerComposition(dna,k,includePositions) {
 
     //includePositions = flag to determine whether the positions of each kmer are also returned
 
-    kmers = [];
+    var kmers = [];
 
 
-    for (i = 0; i < dna.length - k + 1; ++i) {
+    for (var i = 0; i < dna.length - k + 1; ++i) {
         if (includePositions) {
             kmers.push([dna.substring(i, i + k),i]);
         }
@@ -3198,7 +3192,7 @@ function kmerComposition(dna,k,includePositions) {
 
 function kmerPairedComposition(dna,k,dist) {
     var kmers = [];
-    for (i = 0;i < dna.length - (k*2)  - dist + 1;++i) {
+    for (var i = 0;i < dna.length - (k*2)  - dist + 1;++i) {
         kmers.push([dna.substring(i,i+k),dna.substring(i+ k + dist,i+ k + dist+k)]);
     }
     return kmers.sort();
@@ -3609,7 +3603,7 @@ function scoreMotifs(motifs,laplace) {
 
     var countMatrix = [];
 
-    c_Bases.forEach(function(b) {
+    c_Bases.forEach(function() {
         var entry = [];
         for (var c = 0;c < motifs[0].length;++c) {
             entry.push(0);
@@ -3627,8 +3621,8 @@ function scoreMotifs(motifs,laplace) {
 
     });
 
-    var profileMatrix = countMatrix.map(function(el,r) {
-        return el.map(function(col,c) {
+    var profileMatrix = countMatrix.map(function(el) {
+        return el.map(function(col) {
             if (laplace) {
                 return col * 1.0 / (motifs.length + c_NumBases);
             }
@@ -3685,10 +3679,11 @@ function calcMotifLogo(motifs,laplace) {
     var colEnts = [];
 
     var c;
+    var r;
 
     for(c = 0;c < consensus.length;++c) {
         var colEnt = 0;
-        for (var r = 0;r < entropyMatrix.length; ++r) {
+        for (r = 0;r < entropyMatrix.length; ++r) {
             colEnt+=entropyMatrix[r][c];
 
         }
@@ -3710,7 +3705,7 @@ function calcMotifLogo(motifs,laplace) {
     var colMatrix = [];
     for (c = 0;c < consensus.length;++c) {
         var colRows = [];
-        for (var r = 0; r < profileMatrix.length;++r) {
+        for (r = 0; r < profileMatrix.length;++r) {
             colRows.push(charHeightMatrix[r][c]);
        }
         colRows.sort(function(a,b) {
@@ -3728,9 +3723,9 @@ function calcMotifLogo(motifs,laplace) {
         colMatrix.push(colRows);
     }
 
-    var tr = transpose(colMatrix);
+    return transpose(colMatrix);
 
-    return tr;
+   
 
 }
 
