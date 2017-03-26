@@ -13,6 +13,8 @@ var mfk = [];
 var allMFK = []; //used in ltclump
 var clumps = []; //used in ltclump
 
+var justAdded,baseNode; //used in ltclump
+
 var freqArray = []; //used in ltclump
 var bestFreqArray = []; //used in ltclump
 
@@ -813,9 +815,7 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
 
 function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback) {
 
-    if (kmer === 'GCACACAGAC') {
-        console.log('aha, processing: ' + kmer);
-    }
+
     var progThreshold = 10000;
 
     var k = kmer.length;
@@ -854,10 +854,8 @@ function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback) {
          }
          */
         // if (tester === kmer) {
-        if (hamDist(tester, kmer) <= maxMismatch) {
-            if (kmer === 'acctgggatc') {
-                console.log('gatcc...');
-            }
+        if (hamDist(tester, kmer,maxMismatch + 1) <= maxMismatch) {
+
             indexArray.push(j);
         }
         // else if (tester === revComplKmer) {
@@ -870,12 +868,7 @@ function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback) {
             else {
             */
                 if (hamDist(tester, revComplKmer) <= maxMismatch) {
-                    if (kmer === 'acctgggatc') {
-                        console.log('gatcc... rev');
-                    }
-                    if (tester === 'gatcccaggt') {
-                        console.log('gatcc..ggt rev');
-                    }
+
                     revIndexArray.push(j);
                 }
 
@@ -887,10 +880,6 @@ function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback) {
     }
 
 
-    if (kmer === 'acctgggatc') {
-        console.log('ind arr: ' + indexArray);
-        console.log('rev: ' + revIndexArray);
-    }
 
     if (totIndArrayLen([indexArray,revIndexArray]) >= 4) {
         //console.log('in count. at least 4. kmer is: ' + kmer);
@@ -1004,9 +993,9 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
 
         for (var j = 0;j < allDist.length;++j) {
 
-            var ind = kMerToInd(allDist[j]);
+            var ind = kMerToIndSmall(allDist[j]);
             if (inclRevCompl) {
-                var rInd = kMerToInd(reverseComplement(allDist[j]));
+                var rInd = kMerToIndSmall(reverseComplement(allDist[j]));
                 freqArray.push([Math.min(ind,rInd),i,ind]);
                 if (ind === rInd) { //palindrome
                     freqArray.push([Math.min(ind,rInd),i,-1]);
@@ -1188,49 +1177,80 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
 
 }
 
-function buildBestFreqArray(freqArray,progCallback) {
+function buildBestFreqArray(freqArray,progCallback,countOnly,ltClumpThreshold) {
+
+    if (countOnly == null) {
+        countOnly = false;
+    }
+    if (ltClumpThreshold == null) {
+        ltClumpThreshold = 0;
+    }
+    //if countonly => only counts are stored in freqarray, and then only clump positions are counts are stored in bestfreqarray
 
     var progThreshold = 1;
 
-    var bestFreqArray = freqArray.map(function(el,i) {
-        //console.log('i: ' + i);
-        if (progCallback) {
-            if ((i % progThreshold == 0) || i == freqArray.length - 1) {
-                progCallback('Build Best Freq',i,freqArray.length - 1);
+    var bestFreqArray;
+    if (countOnly) {
+        bestFreqArray = [];
+        freqArray.forEach(function(el,i) {
+            if (el >= ltClumpThreshold) {
+                bestFreqArray[i] = [el,0];
             }
-        }
-
-        var newEl0;
-       if (el.length == 0) {
-           return [];
-       }
-       if (el[0]) {
-           newEl0 = el[0].map(function (e) {
-               return e;
-
-           }) ;
-
-       }
-        else {
-           newEl0 = [];
-       }
+        });
+        /*
+        bestFreqArray = freqArray.filter(function(el,i) {
+            return (el >= ltClumpThreshold);
+        });
+        bestFreqArray = bestFreqArray.map(function(el) {
+            return [el,0]; // 0 clump position
+        });
+        */
 
 
-        if (el[1]) {
-            newEl1 = el[1].map(function (e) {
-                return e;
+    }
+    else {
 
-            }) ;
+        bestFreqArray = freqArray.map(function (el, i) {
+            //console.log('i: ' + i);
+            if (progCallback) {
+                if ((i % progThreshold == 0) || i == freqArray.length - 1) {
+                    progCallback('Build Best Freq', i, freqArray.length - 1);
+                }
+            }
+
+            var newEl0;
+            if (el.length == 0) {
+                return [];
+            }
+            if (el[0]) {
+                newEl0 = el[0].map(function (e) {
+                    return e;
+
+                });
+
+            }
+            else {
+                newEl0 = [];
+            }
 
 
-        }
-        else {
-            newEl1 = [];
-        }
+            if (el[1]) {
+                newEl1 = el[1].map(function (e) {
+                    return e;
 
-        return[newEl0,newEl1];
+                });
 
-    });
+
+            }
+            else {
+                newEl1 = [];
+            }
+
+
+            return [newEl0, newEl1];
+
+        });
+    }
 
     return bestFreqArray;
 
@@ -1238,8 +1258,25 @@ function buildBestFreqArray(freqArray,progCallback) {
 
 
 
-function deleteKmerFromFreqArray(kmer,pos,freqArray,inclRevCompl) {
-    var ind = kMerToInd(kmer);
+function deleteKmerFromFreqArray(kmer,pos,freqArray,inclRevCompl,countOnly) {
+
+    if (countOnly == null) {
+        countOnly = false;
+    }
+
+
+    var ind =  kMerToIndSmall(kmer);//kMerToInd(kmer);
+
+    if (countOnly) {
+        freqArray[ind] -=1;
+
+        if (inclRevCompl) {
+            var revInd = kMerToIndSmall(reverseComplement(kmer));// kMerToInd(reverseComplement(kmer));
+            freqArray[revInd] -=1;
+        }
+        return freqArray;
+    }
+
 
 
     var checkPos = freqArray[ind][0][0];
@@ -1249,7 +1286,7 @@ function deleteKmerFromFreqArray(kmer,pos,freqArray,inclRevCompl) {
     }
 
     if (inclRevCompl) {
-        var revInd = kMerToInd(reverseComplement(kmer));
+        var revInd =  kMerToIndSmall(reverseComplement(kmer));//kMerToInd(reverseComplement(kmer));
         var checkRevPos = freqArray[revInd][1][0];
         if (checkRevPos == pos) {
             freqArray[revInd][1].splice(0, 1);
@@ -1262,9 +1299,46 @@ function deleteKmerFromFreqArray(kmer,pos,freqArray,inclRevCompl) {
 
 }
 
-function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl) {
+function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl,countOnly,ltClumpThreshold) {
 
-    var ind = kMerToInd(kmer);
+    if (countOnly == null) {
+        countOnly = false;
+    }
+    if (ltClumpThreshold == null) {
+        ltClumpThreshold = 0;
+    }
+    
+    var ind =  kMerToIndSmall(kmer);//kMerToInd(kmer);
+    
+    if (countOnly) {
+        if (!freqArray[ind]) {
+            freqArray[ind] = 1;
+        }
+        else {
+            freqArray[ind] +=1;
+            
+        }
+        if (freqArray[ind] >= ltClumpThreshold) {
+            bestFreqArray[ind] = [freqArray[ind],pos];
+        }
+
+        if (inclRevCompl) {
+            var revInd =  kMerToIndSmall(reverseComplement(kmer)); // kMerToInd(reverseComplement(kmer));
+
+            if (!freqArray[revInd]) {
+                freqArray[revInd] = 1;
+            }
+            else {
+                freqArray[revInd] +=1;
+
+            }
+            if (freqArray[revInd] >= ltClumpThreshold) {
+                bestFreqArray[revInd] = [freqArray[revInd],pos];
+            }
+
+        }
+        return[freqArray,bestFreqArray];
+    }
 
     if (!freqArray[ind]) freqArray[ind] = [];
 
@@ -1304,7 +1378,7 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl) {
 
 
     if (inclRevCompl) {
-        var revInd = kMerToInd(reverseComplement(kmer));
+        var revInd =  kMerToIndSmall(reverseComplement(kmer)); //kMerToInd(reverseComplement(kmer));
         if (!freqArray[revInd]) freqArray[revInd] = [];
 
         if (!freqArray[revInd][1]) {
@@ -1353,7 +1427,11 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl) {
 
 
 
-function buildFreqArray(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,progCallback) {
+function buildFreqArray(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,progCallback,countOnly) {
+
+    if (countOnly == null) { //optional. If countonly then only counts per kmer are kept, not posns
+        countOnly = false;
+    }
 
     var progThreshold = 100;
 
@@ -1396,26 +1474,48 @@ function buildFreqArray(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,pr
 
         for (var j = 0;j < allDist.length;++j) {
 
-            var ind = kMerToInd(allDist[j]);
-            if (!freqArray[ind]) {
-                freqArray[ind] = [];
+            var ind =   kMerToIndSmall(allDist[j]);//kMerToInd(allDist[j]);
+
+            if (countOnly) {
+                if (!freqArray[ind]) {
+                    freqArray[ind] = 1;
+                }
+                else {
+                    freqArray[ind] +=1;
+                }
             }
-            if (!freqArray[ind][0]) {
-                freqArray[ind][0] = [];
+            else {
+                if (!freqArray[ind]) {
+                    freqArray[ind] = [];
+                }
+                if (!freqArray[ind][0]) {
+                    freqArray[ind][0] = [];
+                }
+                freqArray[ind][0].push(i);
             }
-            freqArray[ind][0].push(i);
 
 
             if (inclRevCompl) {
                 var revKM = reverseComplement(allDist[j]);
-                var revInd = kMerToInd(revKM);
-                if (!freqArray[revInd]) freqArray[revInd] = [];
+                var revInd =  kMerToIndSmall(revKM); //kMerToInd(revKM);
+                if (countOnly) {
+                    if (!freqArray[revInd]) {
+                        freqArray[revInd] = 1;
+                    }
+                    else {
+                        freqArray[revInd] +=1;
+                    }
 
-
-                if (!freqArray[revInd][1]) {
-                    freqArray[revInd][1] = [];
                 }
-                freqArray[revInd][1].push(i);
+                else {
+                    if (!freqArray[revInd]) freqArray[revInd] = [];
+
+
+                    if (!freqArray[revInd][1]) {
+                        freqArray[revInd][1] = [];
+                    }
+                    freqArray[revInd][1].push(i);
+                }
             }
 
         }
@@ -1473,7 +1573,7 @@ function buildFreqObject(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,p
 
         for (var j = 0;j < allDist.length;++j) {
 
-            var ind = kMerToInd(allDist[j]);
+            var ind = kMerToIndSmall(allDist[j]);
 
             if (!freqObject[ind]) {
                 freqObject[ind] = {};
@@ -1487,7 +1587,7 @@ function buildFreqObject(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,p
 
             if (inclRevCompl) {
                 var revKM = reverseComplement(allDist[j]);
-                var revInd = kMerToInd(revKM);
+                var revInd = kMerToIndSmall(revKM);
                 if (!freqObject[revInd]) {
                     freqObject[revInd] = {};
                     ++freqObjectKeyCount;
@@ -1768,7 +1868,7 @@ function mostFrequentKMersObject(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold
             }
             ++i;
 
-            var km = indToKmer(key, k);
+            var km = indToKmer(parseInt(key), k);
 
 
 
@@ -1854,7 +1954,7 @@ function mostFrequentKMers(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug
     //If ltClumpThreshold is blank: only return most frequent kmers
     //otherwise: return all kmers which occur >= ltClumpThreshold
 
-    var progThreshold = 1;
+    var progThreshold = 100;
 
 
    // var kMersDone = [];
@@ -2553,10 +2653,82 @@ function findSequenceInTree(node,seq) {
 
 }
 
-function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
+function seqAssembly(input,seqInputType,seqType,seqMethod,k,makeCycle,pairDist,progCallback) {
+
+
+    if (progCallback) {
+        progCallback('Creating Graph', 1, 10,'','');
+    }
+
+    var grph = new DGraph(input,seqInputType,seqType,k,makeCycle,pairDist);
+
+    if (progCallback) {
+        progCallback('Finding paths/cycles', 2, 10,'','');
+    }
+
+    switch (seqMethod) {
+
+        case DGraph.seqTypeComp:
+            break;
+
+        case DGraph.seqTypePath:
+
+            if (seqType == DGraph.hamGraph) {
+                grph.hamPath();
+            }
+            else {
+                grph.debPath();
+            }
+            break;
+        case DGraph.seqTypeCycle:
+            if (seqType == DGraph.hamGraph) {
+                // grph.hamCycle();
+            }
+            else {
+                grph.debCycle();
+            }
+            break;
+        default:
+            break;
+
+
+
+    }
+
+    if (progCallback) {
+        progCallback('Reconstructing edges', 3, 10,'','');
+    }
+
+    var recon =  grph.edgePathReconstructed();
+
+    if (progCallback) {
+        progCallback('Find contigs',4, 10,'','');
+    }
+
+    var nbps = grph.maximalNonBranchingPaths();
+
+    var sum = grph.sumInfo();
+
+    if (progCallback) {
+        progCallback('Done', 10, 10,'','');
+    }
+
+
+    if (progCallback) {
+        var nbps = grph.maximalNonBranchingPaths();
+    }
+
+
+}
+
+function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,countOnly) {
     // console.log('st timeout');
 
     //colourDNAProgressNew(dna, [curr], clumps,l);
+
+    if (countOnly == null) {
+        countOnly = false;
+    }
 
     if (curr % 1000 == 1) {
         console.log('curr start: ' + curr);
@@ -2581,7 +2753,7 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
 
     if (useTree) {
 
-        var baseNode,justAdded;
+        //var baseNode,justAdded; rbm 4/8/16
 
         // console.log('st build');
         var added;
@@ -2628,26 +2800,41 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
     else {
 
         if (curr == 0) {
-           freqArray = buildFreqArray(k,dna.substring(0,l),inclRevCompl,maxMismatch,ltClumpThresh,false,progCallback);
-           bestFreqArray = buildBestFreqArray(freqArray,progCallback);
+           freqArray = buildFreqArray(k,dna.substring(0,l),inclRevCompl,maxMismatch,ltClumpThresh,false,progCallback,countOnly);
+           bestFreqArray = buildBestFreqArray(freqArray,progCallback,true,ltClumpThresh);
             mf = [];
 
         }
         else {
             var oldestKmer = dna.substring(curr-1,curr-1 + k);
             var allOldDist = kMersWithMaxDist(oldestKmer,maxMismatch);
-            allOldDist.forEach(function(el) {
-                freqArray = deleteKmerFromFreqArray(el,curr-1,freqArray,inclRevCompl);
-                });
+            for (var ol = 0;ol < allOldDist.length;++ol) {
+                // allOldDist.forEach(function(el) {
+                var el = allOldDist[ol];
+
+                //freqArray = deleteKmerFromFreqArray(el, curr - 1, freqArray, inclRevCompl, countOnly);
+                deleteKmerFromFreqArray(el, curr - 1, freqArray, inclRevCompl, countOnly);
+                // });
+            }
 
             var newKmer = dna.substring(curr+l-k,curr+l);
-            var allNewDist = kMersWithMaxDist(newKmer,maxMismatch);
-            allNewDist.forEach(function(el) {
-                var res = addKmerToFreqArray(el,curr+l-k,freqArray,bestFreqArray,inclRevCompl);
-                freqArray = res[0];
-                bestFreqArray = res[1];
 
-            });
+            if (newKmer == 'AACAGCAAC') {
+                var kkk = 0;
+            }
+            var allNewDist = kMersWithMaxDist(newKmer,maxMismatch);
+
+            //allNewDist.forEach(function(el) {
+            for (var ne = 0;ne < allNewDist.length;++ne) {
+                el = allNewDist[ne];
+
+                //var res = addKmerToFreqArray(el, curr + l - k, freqArray, bestFreqArray, inclRevCompl, countOnly, ltClumpThresh);
+                addKmerToFreqArray(el, curr + l - k, freqArray, bestFreqArray, inclRevCompl, countOnly, ltClumpThresh);
+               // freqArray = res[0];
+               // bestFreqArray = res[1];
+
+                //});
+            }
 
             mf = [];
 
@@ -2730,6 +2917,9 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
             allMFK = [];
             progThreshold = 10;
             bestFreqArray.forEach(function(el,i) {
+                if (i == 4673) {
+                    var ggg = 0;
+                }
                 if (progCallback) {
                     if ((i % progThreshold == 0) || i == bestFreqArray.length - 1) {
                         progCallback('consol best',i,bestFreqArray.length - 1);
@@ -2779,6 +2969,17 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback) {
 function delKmerFromTree(node,seq) {
     //deletes one occurence of kmer and its subkmers from tree (eg kmer ACGTG - deletes one A, AC, ACG, ACGT, ACGTG)
     var currNode = node;
+    if (currNode) {
+        if (currNode.subNodes) {
+
+        }
+        else {
+            var aaa = 0;
+        }
+    }
+    else {
+        var bbb = 0;
+    }
     for (var i = 0;i < seq.length;++i) {
         for (var j = 0;j < currNode.subNodes.length;++j) {
             if (currNode.subNodes[j].letter === seq[i]) {
@@ -2857,6 +3058,382 @@ function addSingleBaseToTree(justAddedPrev,baseNode,letter,posn,k) {
 
 }
 
+function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback,fullPartialFlag,bestScorePrev) {
+
+//fullpartialflag - indicates whether this section of the alignment is fully or partially on the path
+
+    var progThreshold = 1;
+
+
+
+    if (progCallback) {
+
+       //  if ((i % progThreshold == 0) || (i == partEnd - 1)) {
+        progCallback('Aligning: ' + s.length + ' ' + t.length, 0, 0, 'align');
+
+
+
+     }
+
+
+    if ((s.length == 0) && (t.length == 0) ) {
+        return;
+    }
+    else if (s.length == 0) {
+        var gap = '';
+        for (var i = 0;i < t.length; ++i) gap += '-';
+        storeNodes.push([startTopOrder,[,,,,gap,t]]);
+        return;
+    }
+    else if (t.length == 0) {
+        var gap = '';
+        for (var i = 0;i < s.length; ++i) gap += '-';
+        storeNodes.push([startTopOrder,[,,,,s,gap]]);
+        return;
+    }
+
+    var g =  new DGAlignSpaceGraph(s,t,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
+
+    g.progressCallback = countProgMostFreqWithStages;
+
+
+   // var midNodeData = g.findMiddleEdgeAllInOne(fullPartialFlag);
+    var midNodeData = g.findMiddleEdgeAllInOneQuick(fullPartialFlag);
+ 
+    var mid = g.middleRow;
+
+
+    if (bestScorePrev == null) {
+        //not passed first time.
+        bestScorePrev = g.bestScoreThroughMid;
+    }
+
+
+    if ((g.bestScoreThroughMid == bestScorePrev) && g.midEdge) {
+        //on path
+
+        var absoluteMidNodeRow = g.getNodeRow(g.midNode) + startRow;
+        var absoluteMidNodeCol = g.getNodeCol(g.midNode) + startCol;
+        var absoluteTopOrderMidNode = absoluteMidNodeRow * (e.data.sAlign.length + 1) + absoluteMidNodeCol;
+
+        var absoluteMidNodeSuccRow = g.getNodeRow(g.midEdge.targetNode) + startRow;
+        var absoluteMidNodeSuccCol = g.getNodeCol(g.midEdge.targetNode) + startCol;
+        var absoluteTopOrderSuccNode = absoluteMidNodeSuccRow * (e.data.sAlign.length + 1) + absoluteMidNodeSuccCol;
+
+        if ((s === e.data.sAlign) && (t === e.data.tAlign) && storeNodes.length == 0) { //first time - full strings
+            storeNodes.push(midNodeData[6]); //score
+        }
+        storeNodes.push([absoluteTopOrderMidNode, [absoluteMidNodeRow, absoluteMidNodeCol, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, g.midEdge.edgeAction[0], g.midEdge.edgeAction[1]]]);
+
+
+        var newTopS = s.substring(0, midNodeData[1]);
+        var newTopT = t.substring(0, mid - 1);
+        
+        var newBottomS = s.substring(midNodeData[3]);
+        var newBottomT = t.substring(mid);
+
+        var topBestScore =  g.bestTopScore; // midNodeData[7]; // need to grab these properly
+        var botBestScore =  g.bestBotScore; //midNodeData[8]; //need to grab these properly
+
+            if ((g.midNode.longestPathToThisNode == 0) &&  (fullPartialFlag == 'P')) {
+            //found start of alignment. Just do bottom
+            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback,'F',botBestScore);
+
+        }
+        else {
+
+            alignHalf(newTopS, newTopT, startRow, startCol, startTopOrder, e, storeNodes, progCallback, fullPartialFlag == 'F' ? 'F' : 'P', topBestScore);
+            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback, 'F', botBestScore);
+        }
+    }
+
+
+    else {
+        //not on path. Try bottom half only
+
+        var newBottomS = s;
+        var newBottomT = t.substring(mid);
+
+        alignHalf(newBottomS, newBottomT, startRow + mid, startCol, startTopOrder, e, storeNodes, progCallback,'P',bestScorePrev);
+
+
+    }
+
+
+
+}
+
+function convertStoreNodesToAlignment(g,e,storeNodes) {
+    var score = storeNodes.shift();
+
+    storeNodes.sort(function(a,b) {
+        return a[0] - b[0];
+    });
+
+    var sAligned = '';
+    var tAligned = '';
+    storeNodes.forEach(function(el) {
+        //sAligned
+        sAligned += el[1][4];
+        tAligned += el[1][5];
+
+    });
+
+    var startAlignedCoord;
+    var endAlignedCoord;
+
+    if (g) {
+        var testScore = g.scoreAlignment(sAligned, tAligned);
+        startAlignedCoord  = g.getNodeRowCol(storeNodes[0][0]);
+        endAlignedCoord = g.getNodeRowCol(storeNodes[storeNodes.length-1][0]);
+
+
+    }
+    else {
+        startAlignedCoord = [0,0];
+        endAlignedCoord = [e.data.tAlign.length - 1,e.data.sAlign.length - 1];
+
+    }
+
+
+
+    return [score,sAligned,tAligned,'',startAlignedCoord[1],endAlignedCoord[1],startAlignedCoord[0],endAlignedCoord[0],''];
+
+
+
+}
+
+function alignGlobalSpace(e,progCallback) {
+    var storeNodes = [];
+    alignHalf(e.data.sAlign,e.data.tAlign,0,0,0,e,storeNodes,progCallback,'F');
+
+    return convertStoreNodesToAlignment(null,e,storeNodes);
+
+
+
+}
+
+function alignLocalSpace(e,progCallback) {
+
+    var storeNodes = [];
+
+    var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
+
+    g.progressCallback = countProgMostFreqWithStages;
+
+
+    g.initGraph();
+    //g.longestPathsDynamicCreateRows();
+    g.quickScore('P');
+
+    var bestScore = g.bestNode.longestPathToThisNode;
+    var bestCoord = g.getNodeRowCol(parseInt(g.bestNode.label));
+
+    storeNodes.push(bestScore);
+
+    var sAdj = e.data.sAlign.substring(0,bestCoord[1]);
+    var tAdj = e.data.tAlign.substring(0,bestCoord[0]);
+
+    var foundMiddleOnPath = false;
+
+    var absAdjRow = 0;
+
+    while (!foundMiddleOnPath) {
+
+        var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+
+        newG.progressCallback = countProgMostFreqWithStages;
+
+        var mid = newG.middleRow;
+
+        var tBottom = tAdj.substring(mid);
+
+        var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+
+        if (newG.bestScoreThroughMid == bestScore) {
+            foundMiddleOnPath = true;
+
+           // storeNodes.push([topG.getAbsTopOrderNode(topG.midNode,absAdjRow,0,g.cols), [topG.getNodeRow(topG.midNode) + absAdjRow, topG.getNodeCol(topG.midNode) + 0, topG.getNodeRow(topG.midEdge.targetNode) + absAdjRow,topG.getNodeCol(topG.midEdge.targetNode), topG.midEdge.edgeAction[0],topG.midEdge.edgeAction[1]]]);
+        }
+        else {
+            tAdj = tBottom;
+            absAdjRow += mid;
+        }
+
+    }
+
+
+    alignHalf(sAdj,tAdj,absAdjRow,0,newG.getAbsTopOrderNode(newG.midNode,absAdjRow,0,g.cols),e,storeNodes,progCallback,'P',bestScore);
+
+    return convertStoreNodesToAlignment(g,e,storeNodes);
+
+}
+
+function alignFittingSpace(e,progCallback) {
+
+    var storeNodes = [];
+
+    var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
+
+    g.progressCallback = countProgMostFreqWithStages;
+
+
+    g.initGraph();
+
+   // g.longestPathsDynamicCreateRows();
+   g.quickScore('P');
+
+   var bestScore = g.bestNodeLastRow.longestPathToThisNode;
+   var bestCoord = g.getNodeRowCol(parseInt(g.bestNodeLastRow.label));
+   // var bestScore = g.overallBestScoreLastRow;
+   // var bestCoord = g.overallBestLastRow;
+
+    storeNodes.push(bestScore);
+
+    var sAdj = e.data.sAlign.substring(0,bestCoord[1]);
+    //var tAdj = e.data.tAlign.substring(0,bestCoord[0]);
+    var tAdj = e.data.tAlign;
+
+
+    var absAdjRow = 0;
+
+    var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+
+    newG.progressCallback = countProgMostFreqWithStages;
+
+    newG.middleRow = 1; //first row
+
+    var mid =  newG.middleRow;
+    var tBottom = tAdj.substring(mid);
+
+   // var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+    var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+
+    // should write out mid edge here (ie first edge)
+    storeNodes.push([newG.midNode.getTopOrder(), [newG.getNodeRow(newG.midNode),newG.getNodeCol(newG.midNode),newG.getNodeRow(newG.midEdge.targetNode), newG.getNodeCol(newG.midEdge.targetNode), newG.midEdge.edgeAction[0], newG.midEdge.edgeAction[1]]]);
+
+
+
+    tAdj = tBottom;
+    sAdj = sAdj.substring(newG.getNodeCol(newG.midEdge.targetNode));
+    absAdjRow += mid;
+
+
+    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore);
+
+
+    return convertStoreNodesToAlignment(g,e,storeNodes);
+
+
+}
+
+function alignOverlapSpace(e,progCallback) {
+
+    var storeNodes = [];
+
+    var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
+
+    g.progressCallback = countProgMostFreqWithStages;
+
+
+    g.initGraph();
+    //g.longestPathsDynamicCreateRows();
+    g.quickScore('P');
+
+    var bestScore = g.bestNodeLastCol.longestPathToThisNode;
+    var bestCoord = g.getNodeRowCol(parseInt(g.bestNodeLastCol.label));
+
+    storeNodes.push(bestScore);
+
+    //var sAdj = e.data.sAlign.substring(0,bestCoord[1]);
+    var sAdj = e.data.sAlign;
+    var tAdj = e.data.tAlign.substring(0,bestCoord[0]);
+
+    var absAdjRow = 0;
+
+    var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+
+    newG.progressCallback = countProgMostFreqWithStages;
+
+    newG.middleRow = 1;
+
+    var mid =  newG.middleRow; //first row //newG.middleRow;
+    var tBottom = tAdj.substring(mid);
+
+   
+    var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+
+    // should write out mid edge here (ie first edge)
+    storeNodes.push([newG.midNode.getTopOrder(), [newG.getNodeRow(newG.midNode),newG.getNodeCol(newG.midNode),newG.getNodeRow(newG.midEdge.targetNode), newG.getNodeCol(newG.midEdge.targetNode), newG.midEdge.edgeAction[0], newG.midEdge.edgeAction[1]]]);
+
+    tAdj = tBottom;
+    sAdj = sAdj.substring(newG.getNodeCol(newG.midEdge.targetNode));
+    absAdjRow += mid;
+
+
+    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore);
+
+    return convertStoreNodesToAlignment(g,e,storeNodes);
+
+
+}
+
+
+
+function alignSpace(e,progCallback) {
+
+    var ret;
+
+    if (e.data.alignType == DGraph.alignTypeGlobal) {
+        ret = alignGlobalSpace(e,progCallback);
+
+    }
+    else if (e.data.alignType == DGraph.alignTypeLocal) {
+        ret = alignLocalSpace(e,progCallback);
+
+    }
+    else if (e.data.alignType == DGraph.alignTypeFitting) {
+        ret = alignFittingSpace(e,progCallback);
+
+    }
+    else if (e.data.alignType == DGraph.alignTypeOverlap) {
+        ret = alignOverlapSpace(e,progCallback);
+
+    }
+    return ret;
+
+}
+
+function sharedKmers(e,progCallback) {
+
+ 
+    var s = e.data.sbS;
+    var t = e.data.sbT;
+    var k = e.data.k;
+
+
+    var tNumAtATime;
+    if (t.length < 3000000) {
+        tNumAtATime = t.length; //do whole thing at once
+    }
+    else {
+        tNumAtATime = 3000000;
+    }
+
+    var sharedAr = [];
+    var tOffset = 0;
+    while (tOffset < t.length) {
+        var shared = partSharedKmers(k,tOffset,tNumAtATime,s,t,progCallback);
+        sharedAr = sharedAr.concat(shared);
+        tOffset += tNumAtATime;
+    }
+
+
+    return sharedAr;
+
+}
+
+
 
 /*
 function countProgMostFreqTree(stage,prog,tot) {
@@ -2902,10 +3479,11 @@ function countProg(prog,tot) {
 }
 
 self.addEventListener('message', function(e) {
-
+    
     console.log('Worker starting. Task: ' + e.data.task);
     importScripts('russGenLibs/BioUtilities.js');
     importScripts('russGenLibs/GenUtilities.js');
+    importScripts('vendor/biginteger.js');
 
     startTime = Date.now();
 
@@ -2918,7 +3496,7 @@ self.addEventListener('message', function(e) {
 
 
             dna = e.data.dna;
-            mer = e.data.kmer;
+            kmer = e.data.kmer;
            inclRevCompl = e.data.inclRevCompl;
             maxMismatch = e.data.maxMismatch;
             indArray = countKMer(kmer,dna,inclRevCompl,maxMismatch,countProg);
@@ -3027,7 +3605,7 @@ self.addEventListener('message', function(e) {
             startTime = Date.now();
 
             for (var curr = 0;curr <= dna.length - ltClumpL;++curr) {
-                ltClump(dna, ltClumpL,ltClumpT, k, curr, e.data.useTree, inclRevCompl,maxMismatch,countProgltClump);
+                ltClump(dna, ltClumpL,ltClumpT, k, curr, e.data.useTree, inclRevCompl,maxMismatch,countProgltClump,false);
             }
             if (method  === 'brute') {
                console.log('worker commencing ltClump brute: ' + e.data);
@@ -3206,6 +3784,115 @@ self.addEventListener('message', function(e) {
 
 
             self.postMessage({'task': 'seqLeaderboardConvCyclopeptide','msgType' : 'result','txtStuff' : txt});
+            break;
+
+
+        case 'seqAssembly' :
+
+            var res = seqAssembly(e.data.input,e.data.seqInputType,e.data.seqType,e.data.seqMethod,e.data.k,e.data.makeCycle,e.data.pairDist,countProgMostFreqWithStages);
+            //var grph = new DGraph(e.data.input,e.data.seqInputType,e.data.seqType,e.data.k,e.data.makeCycle,e.data.pairDist);
+            break;
+
+        case 'align':
+            //  var gg = e.data.graph;
+
+            var sizeOfProblem = e.data.sAlign.length * e.data.tAlign.length;
+            var thresh = e.data.linSpaceThresh;
+
+            if (e.data.uAlign.length > 0) {
+                //3 way sequence align - only simple, no linear space or affine
+                var g = new DG3DAlignGraph(e.data.sAlign, e.data.tAlign,e.data.uAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+
+                g.progressCallback = countProgMostFreqWithStages;
+                g.initGraph();
+
+                g.longestPathsDynamic();
+
+                var alignData = g.alignStrings();
+                var longest = alignData[0];
+                var sStr = alignData[1];
+                var tStr = alignData[2];
+                var lcsStr = alignData[3];
+                var uStr = alignData[9];
+
+                self.postMessage({
+                    'task': 'align',
+                    'msgType': 'result',
+                    'alignType': e.data.alignType,
+                    'txtStuff': alignData
+                });
+
+            }
+            else
+            if (e.data.useAffine) {
+                var g = new DGAffineAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore,e.data.affineOpenGap);
+
+                g.progressCallback = countProgMostFreqWithStages;
+                g.initGraph();
+
+                g.longestPathsDynamic();
+
+                var alignData = g.alignStrings();
+                var longest = alignData[0];
+                var sStr = alignData[1];
+                var tStr = alignData[2];
+                var lcsStr = alignData[3];
+
+                self.postMessage({
+                    'task': 'align',
+                    'msgType': 'result',
+                    'alignType': e.data.alignType,
+                    'txtStuff': alignData
+                });
+
+
+
+            }
+
+            else if (sizeOfProblem  > thresh) {
+                var res = alignSpace(e,countProgMostFreqWithStages);
+
+                self.postMessage({'task': 'align','msgType' : 'result', 'alignType':e.data.alignType,'txtStuff' : res});
+
+            }
+
+            else {
+                var g = new DGAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+
+                g.progressCallback = countProgMostFreqWithStages;
+                g.initGraph();
+
+                g.longestPathsDynamic();
+
+                var alignData = g.alignStrings();
+                var longest = alignData[0];
+                var sStr = alignData[1];
+                var tStr = alignData[2];
+                var lcsStr = alignData[3];
+
+                self.postMessage({
+                    'task': 'align',
+                    'msgType': 'result',
+                    'alignType': e.data.alignType,
+                    'txtStuff': alignData
+                });
+            }
+
+
+            break;
+
+        case 'synteny':
+            //  var gg = e.data.graph;
+
+            var sizeOfProblem = e.data.sbS.length * e.data.sbT.length;
+            var thresh = 1;
+
+            var res = sharedKmers(e,countProgMostFreqWithStages);
+
+            self.postMessage({'task': 'synteny','msgType' : 'result', 'txtStuff' : res});
+
+
+
             break;
 
 

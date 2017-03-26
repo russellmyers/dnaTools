@@ -82,6 +82,9 @@
             <button type = "button" onclick="pagePressed(1000)">&gt|</button>
             <button type ="button" onclick="jumpToPressed()">Jump to:</button>
             <input type = "number"  name = "jumpToBase" id = "jumpToBase"  min=0 value=0>
+            <button type = "button" onclick="trimPressed()">Trim to:</button>
+            <input type = "number"  name = "trimToBase" id = "trimToBase"  min=0 value=0>
+
 
         </div>
 
@@ -110,8 +113,21 @@
                 <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
                 <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
                 <input type = "number"  name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
+                <a href = "" id="downloadSeq" download="contigs.txt" onclick="downloadSeq()">Downl</a>
             </div>
         </div>
+        <div id = "phylogenyTools">
+            <div id = "phylogenyInputTools">
+                <textarea name = "phylogenyStrings" placeholder = "Enter or paste DNA alignments / dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
+                <button type = "button" id="phylogenyInput" onclick="phylogenyInput(event)">Apply</button>
+                <label for="fileSequencingInput">Load Input :</label>
+                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
+                <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number"  name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
+                <a href = "" id="downloadSeq" download="contigs.txt" onclick="downloadSeq()">Downl</a>
+            </div>
+        </div>
+
         <div id = "transTools">
             <div id = "transInputTools">
                 <label for = "transInput">Enter DNA/RNA/Protein:</label>
@@ -121,6 +137,7 @@
                 <input type = "file" name="fileTransInput" onclick = "clearFileName(event)" id = "fileTransInput">
                 <button type = "button" onclick="randPressed(event)" class="spacedBut">Random</button>
                 <input type = "number"  name = "numRand" id = "numRandTT"  min=1 max=1000000 value=50000>
+
                 <!--span id = "dnaLengthText">DNA Sequence Len: </span>
                 <span id = "dnaLength"></span-->
 
@@ -146,19 +163,71 @@
             </div>
 
 
+
+
+
+        </div>
+
+        <div id = "alignTools">
+            <div id = "alignInputTools">
+                <div id = "alignInputManual">
+                <textarea name = "alignStrings" placeholder = "Enter or paste DNA sequences to align (one per line)" rows = "4" cols = "30"  id = "alignStrings" ></textarea>
+                <button type = "button" id="alignInput" onclick="alignInput(event)">Apply</button>
+                </div>
+                <!--label for sequencesInput>Enter sequences:</label-->
+                <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
+                <button type = "button" onclick="sequencesInput(event)">Apply</button-->
+                <div id = "alignInputFileArea">
+                <label for="fileAlignInput">Load Sequence 1:</label>
+                <input type = "file" onclick = "clearFileName(event)" name="fileAlignInput" id = "fileAlignInput">
+                <br>
+                <label for="fileAlignInput2">Load Sequence 2:</label>
+                <input type = "file" onclick = "clearFileName(event)" name="fileAlignInput2" id = "fileAlignInput2">
+                </div>
+                <div id = "alignInputOther">
+                <button type = "button" onclick="randAlignPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number"  name = "numAlignRand" id = "numAlignRand"  min=1 max=1000 value=20>
+                <!--span id = "dnaLengthText">DNA Sequence Len: </span>
+                <span id = "dnaLength"></span-->
+                </div>
+
+            </div>
+        </div>
+
+        <div id = "sbTools">
+            <div id = "sbInputTools">
+                <div id = "sbInputManual">
+                <textarea name = "sbStrings" placeholder = "Enter or paste DNA sequences to compare (one per line)" rows = "4" cols = "30"  id = "sbStrings" ></textarea>
+                <button type = "button" id="sbInput" onclick="sbInput(event)">Apply</button>
+                </div>
+                <div id = "sbInputFileArea">
+                  <label for="fileSBInput">Load Sequence 1:</label>
+                  <input type = "file" onclick = "clearFileName(event)" name="fileSBInput" id = "fileSBInput">
+                  <br>
+                  <label for="fileSBInput2">Load Sequence 2:</label>
+                  <input type = "file" onclick = "clearFileName(event)" name="fileSBInput2" id = "fileSBInput2">
+
+                </div>
+                <div id = "sbInputOther">
+                <button type = "button" onclick="randSBPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number"  name = "numSBRand" id = "numSBRand"  min=1 max=1000 value=20>
+                </div>
+            </div>
         </div>
 
 
-
         <div id="tabs">
-            <a href="#"  onclick="tab_click(0,tabClickDone);">Most Frequent k-mers</a>
+            <a href="#"  onclick="tab_click(0,tabClickDone);">Most Freq k-mers</a>
             <a href="#"  onclick="tab_click(1,tabClickDone);">LT Clumps</a>
-            <a href="#"  onclick="tab_click(2,tabClickDone);">Search for k-mer</a>
+            <a href="#"  onclick="tab_click(2,tabClickDone);">Find k-mer</a>
             <a href="#" onclick="tab_click(3,tabClickDone);">Motifs</a>
             <a href="#" onclick="tab_click(4,tabClickDone);">Genome Assembly</a>
-            <a href="#" onclick="tab_click(5,tabClickDone);">Transcription/Translation</a>
-            <a href="#" onclick="tab_click(6,tabClickDone);">Peptide Sequencing</a>
-            <a href="#" onclick="tab_click(7,tabClickDone);">Misc</a>
+            <a href="#" onclick="tab_click(5,tabClickDone);">Transcr/Transl</a>
+            <a href="#" onclick="tab_click(6,tabClickDone);">Peptide Seq</a>
+            <a href="#" onclick="tab_click(7,tabClickDone);">Align</a>
+            <a href="#" onclick="tab_click(8,tabClickDone);">Synteny Blocks</a>
+            <a href="#" onclick="tab_click(9,tabClickDone);">Phylog</a>
+            <a href="#" onclick="tab_click(10,tabClickDone);">Misc</a>
             <!--a href="#tabs" onclick="tab_click(2);">tab 3</a-->
         </div>
         <div id="tabDataPlusCanvas">
@@ -404,9 +473,9 @@
                     <label for ="numItersSA" id="numItersLabSA" class="alignLab">Num Iterations:</label>
                     <input type = "number" class = "sensibleNum alignEl" name = "numItersSA"   id = "numItersSA" value = 1 min = 1>
                     <label for ="seqGraphTypeHam" id = "seqGraphTypeHamLab" class="alignLab">Hamilton Graph</label>
-                    <input type="radio" name="seqGraphType"   class = "alignEl"  id ="seqGraphTypeHam" value="seqGraphTypeHam" checked >
+                    <input type="radio" name="seqGraphType"   class = "alignEl"  id ="seqGraphTypeHam" value="seqGraphTypeHam"  >
                     <label for ="seqGraphTypeDeb"  id = "seqGraphTypeDebLab" class="alignLab">DeBruijn Graph</label>
-                    <input type="radio" name="seqGraphType"  class = "alignEl"  id ="seqGraphTypeDeb" value="seqGraphTypeDeb"  >
+                    <input type="radio" name="seqGraphType"  class = "alignEl"  id ="seqGraphTypeDeb" value="seqGraphTypeDeb"  checked >
 
                     <label for ="debugSA" class="alignLab">Debug</label>
                     <input type = "checkbox" class="alignEl" name = "debugSA" id = "debugSA">
@@ -438,9 +507,9 @@
                     <input type="radio" name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqPath" value="seqPath" checked >Path
                     <br>
                     <input type="radio" name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqCycle" value="seqCycle" >Cycle                            <br>
-                    <button type = "button" class="fixedBut" id="readBreak" onclick="readBreak(event)">Read Break</button>
-                    <button type = "button" class="fixedBut" id="pairedToReads" onclick="pairedToReads(event)">Pair To Reads</button>
-
+                    <button type = "button" class="smallBut" id="readBreak" onclick="readBreak(event)">Brk</button>
+                    <button type = "button" class="smallBut" id="pairedToReads" onclick="pairedToReads(event)">PrToRd</button>
+                    <button type = "button" class="smallBut" id="removeDups" onclick="removeDups(event)">RDup</button>
                     <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->
                 </div>
 
@@ -643,12 +712,177 @@
 
             </section>
             <section class="tabFieldset">
+                <h3 id="tabFieldsetHead9">Align</h3>
+
+                <article id="art11">
+                    <div class="leftClump">
+
+                        <label for ="indelPenAL"  id="indelPenLab" class="alignLab">Indel Penalty</label>
+                        <input type = "number" class = "sensibleNum alignEl" name = "indelPenAL" id = "indelPenAL" min = 0 value = 0>
+                        <label for ="mismatchPenAL"  id="mismatchPenLab" class="alignLab">Mismatch Penalty</label>
+                        <input type = "number" class = "sensibleNum alignEl" name = "mismatchPenAL" id = "mismatchPenAL" min = 0 value = 0>
+                        <label for ="alignPamScore" id = "alignPamScoreLab" class="alignLab">Use PAM250 Matrix</label>
+                        <input type="radio" name="alignScore"   class = "alignEl"  onclick = "alignRadClicked(event.target.id)" id ="alignPamScore" value="alignPamScore" checked  >
+                        <label for ="alignBloScore" id = "alignBloScoreLab" class="alignLab">Use Blosum62 Matrix</label>
+                        <input type="radio" name="alignScore"   class = "alignEl"  onclick = "alignRadClicked(event.target.id)" id ="alignBloScore" value="alignBloScore"  >
+                        <label for ="alignNoScore"  id = "alignNoScoreLab" class="alignLab">No Scoring Matrix</label>
+                        <input type="radio" name="alignScore"  class = "alignEl"  onclick = "alignRadClicked(event.target.id)" id ="alignNoScore" value="alignNoScore" >
+
+
+
+                        <label for ="debugAL" class="alignLab">Debug</label>
+                        <input type = "checkbox" class="alignEl" name = "debugAL" id = "debugAL">
+
+                    </div>
+                    <div class="midClump" id="midMotif">
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLCS" value="alignLCS" checked>LCS
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignEditDist" value="alignEditDist">Edit Distance
+                        <br>
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignGlobal" value="alignGlobal">Global Align
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLocal" value="alignLocal">Local Align
+                        <BR>
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignFitting" value="alignFitting">Fitting Align
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignOverlap" value="alignOverlap">Overlap Align
+                        <br>
+
+                    </div>
+                    <div class="rightClump" id="rightMotif">
+                        <button type = "button" class="fixedBut" onclick="runAlignBackground(event)">Run</button>
+                        <br>
+                        <label for ="spaceThreshAL"  id="spaceThreshLab" class="alignLab">Linear Space Thresh</label>
+                        <input type = "number" class = "sensibleNum alignEl" name = "spaceThreshAL" id = "spaceThreshAL" value = 10000>
+                        <br>
+                        <label for ="affineAL" class="alignLab">Affine</label>
+                        <input type = "checkbox" class="alignEl" name = "affineAL" id = "affineAL">
+                        <label for ="affineOpenGapAL"  id="affineOpenGapLab" class="alignLab">Open gap pen</label>
+                        <input type = "number" class = "sensibleNum alignEl" name = "affineOpenGapAL" id = "affineOpenGapAL" min = 0 value = 11>
+
+
+
+                    </div>
+             </article>
+
+            </section>
+            <section class="tabFieldset">
+                <h3 id="tabFieldsetHead10">Synteny Block Construction</h3>
+
+                <article id="art12">
+                    <div class="leftClump">
+
+                        <label for ="kmerLenSB"  class="alignLab">k-mer Len</label>
+                        <input type = "number" class="alignEl"  name = "kmerLenSB"  id = "kmerLenSB" value = 3 min = 1 max = 100>
+                        <label for ="debugSB" class="alignLab">Debug</label>
+                        <input type = "checkbox" class="alignEl" name = "debugAL" id = "debugSB">
+
+                    </div>
+                    <div class="midClump" id="midMotif">
+                        <input type="radio" name="sbMethod"  onclick = "sbRadClicked(event.target.id)" id ="sbSharedKmers" value="sbSharedKmers" checked>Shared k-mers<br>
+
+                    </div>
+                    <div class="rightClump" id="rightMotif">
+                        <button type = "button" class="fixedBut" onclick="runSBBackground(event)">Run</button>
+                        <br>
+
+
+
+                    </div>
+                </article>
+
+            </section>
+
+            <section class="tabFieldset">
+                <h3 id="tabFieldsetHead12">Phylogeny</h3>
+
+                <article id="art13">
+                    <!--label for kmer>DNA strings:</label-->
+                    <div class="leftClump">
+                        <!--textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
+                        <button type = "button" onclick="motifsInput(event)">Apply</button-->
+
+                        <!--label for ="numItersPH" id="numItersLabPH" class="alignLab">Num Iterations:</label>
+                        <input type = "number" class = "sensibleNum alignEl" name = "numItersPH"   id = "numItersPH" value = 1 min = 1-->
+
+                        <label for ="debugPH" class="alignLab">Debug</label>
+                        <input type = "checkbox" class="alignEl" name = "debugPH" id = "debugPH">
+                        <label for = "allowStepPH"  class="alignLab">Allow Stepping</label>
+                        <input type = "checkbox" onclick = "phylRadClicked(event.target.id)" class="alignEl" name = "allowStepPH" id = "allowStepPH">
+
+
+
+                    </div>
+                    <div class="midClump" id = "midPhyl"> <!--id = "midMotif"-->
+
+                        <input type="radio" name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDistMat" value="phylDistMat" checked >Distance Matrix                            <br>
+                         <input type="radio"  name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDNA" value="phylDNA"  >DNA alignments
+                        <br>
+                        <input type="radio" name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylAdjList" value="phylAdjList" >Adjacency List
+                        <br>
+
+
+                    </div>
+                    <div class="rightClump" id = "rightPhyl"> <!-- id="rightMotif"-->
+
+
+
+                        <button type = "button" class="fixedBut" id="runPhylogeny" onclick="runPhylogeny(event)">Run</button>
+
+                        <button type = "button" class="fixedBut" id="stepPhylogeny" onclick="stepPhylogeny(event)">Step</button>
+                        <br>
+                        <label for ="phylAdd" id="phylAddLab">Additive</label>
+                        <input type="radio"  name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylAdd" value="phylAdd" checked  >
+                        <label for ="phylUltra" id="phylUltraLab">Ultramet</label>
+                        <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylUltra" value="phylUltra"  >
+                        <label for ="phylNeighbour" id="phylNeighbourLab">N/b join</label>
+                        <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylNeighbour" value="phylNeighbour" >
+                        <br>
+                        <label for ="phylDisplayTree" id="phylDisplayTreeLab">Display</label>
+                        <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylDisplayTree" value="phylDisplayTree" checked>
+                        <label for ="phylSmallParsimony" id="phylSmallParsimonyLab">Small Pars</label>
+
+                        <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylSmallParsimony" value="phylSmallParsimony">
+                        <label for ="phylLargeParsimony" id="phylLargeParsimonyLab">Large Pars</label>
+                        <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylLargeParsimony" value="phylLargeParsimony">
+
+                        <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->
+                    </div>
+
+
+
+
+
+
+
+
+
+
+                    <!--button type = "button" class="fixedBut" onclick="motifSearch(event)">k d Motifs</button>
+                    <br>
+                    <button type = "button" class="fixedBut" onclick="bruteMotifSearch(event)">Brute</button>
+                    <button type = "button" class="fixedBut" onclick="medianString(event)">Median String</button>
+                    <button type = "button" class="fixedBut" onclick="greedyMotif(event)">Greedy Motif</button>
+                    <button type = "button" class="fixedBut" onclick = "randomMotif(event)">Random Motif</button>
+                    <button type = "button" class = "fixedBut" onclick = "gibbsSampler(event)">Gibbs Sampler</button-->
+
+
+
+
+
+
+
+
+
+
+
+                </article>
+
+            </section>
+            <section class="tabFieldset">
                 <h3 id="tabFieldsetHead6">Misc</h3>
 
                 <article id="art7">
                     <!--label for kmer>DNA strings:</label-->
                     <textarea name = "miscParam1" contenteditable="true"  placeholder = "Enter  param 1" rows = "6" cols = "14"  id = "miscParam1" ></textarea>
-                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" ></textarea>
+                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" spellcheck="false" autocomplete = "off"></textarea>
                     <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "12"  id = "miscParam3" ></textarea>
                     <div id = "miscRadioBox">
                     <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Comp
@@ -680,7 +914,7 @@
                     <input type="radio" name="miscRadio" id = "miscFunc15"  value="15">string from genome path
                         <br>
 
-                    <input type="radio" name="miscRadio" id = "miscFunc16"  value="16">Overlap graph
+                    <!--input type="radio" name="miscRadio" id = "miscFunc16"  value="16">Overlap graph-->
                     <!--input type="radio" name="miscRadio" id = "miscFunc17"  value="17">debCycle from adj list
                         <br>
                     <input type="radio" name="miscRadio" id = "miscFunc18"  value="18">debPath from adj list-->
@@ -697,14 +931,61 @@
                     <input type="radio" name="miscRadio" id = "miscFunc28"  value="28">Leaderboard Cyclopeptide seq
                     <input type="radio" name="miscRadio" id = "miscFunc29"  value="29">Trim Leaderboard
                     <input type="radio" name="miscRadio" id = "miscFunc30"  value="30">Spectrum Convolution
-
-
-
-
+                    <input type="radio" name="miscRadio" id = "miscFunc31"  value="31">Edit Dist badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc32"  value="32">Lowest Coins
+                    <input type="radio" name="miscRadio" id = "miscFunc33"  value="33">Align DNA badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc34"  value="34">Align  Blosum badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc35"  value="35">Align  LCS badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc36"  value="36">Longest Path DAG
+                    <input type="radio" name="miscRadio" id = "miscFunc37"  value="37">Longest Path Manhattan Grid
+                    <input type="radio" name="miscRadio" id = "miscFunc38"  value="38">Topological ordering
+                    <input type="radio" name="miscRadio" id = "miscFunc39"  value="39">Greedy Rev Dist
+                    <input type="radio" name="miscRadio" id = "miscFunc40"  value="40">Num Breakpoints
+                    <input type="radio" name="miscRadio" id = "miscFunc41"  value="41">Breakpoint Graph
+                    <input type="radio" name="miscRadio" id = "miscFunc42"  value="42">Shared kmers
+                    <input type="radio" name="miscRadio" id = "miscFunc43"  value="43">Synteny construction
+                    <input type="radio" name="miscRadio" id = "miscFunc44"  value="44">Turnpike
+                    <input type="radio" name="miscRadio" id = "miscFunc45"  value="45">Dist Mat from Tree
+                    <input type="radio" name="miscRadio" id = "miscFunc46"  value="46">Limb Length
+                    <input type="radio" name="miscRadio" id = "miscFunc47"  value="47">Additive Phylogeny from dist mat
+                    <input type="radio" name="miscRadio" id = "miscFunc48"  value="48">Additive Phylogeny from alignments
+                    <input type="radio" name="miscRadio" id = "miscFunc49"  value="49">Ultrametric tree from dist mat
+                    <input type="radio" name="miscRadio" id = "miscFunc50"  value="50">Test graph printing
+                    <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc51"  value="51">Alg - Fibonacci
+                    <input type="radio" name="miscRadio" id = "miscFunc52"  value="52">Alg - Binary search
+                     <br>
+                    <input type="radio" name="miscRadio" id = "miscFunc53"  value="53">Alg - Insertion Sort
+                    <input type="radio" name="miscRadio" id = "miscFunc54"  value="54">Alg - Majority Element
+                    <input type="radio" name="miscRadio" id = "miscFunc55"  value="55">Alg - Merge Sorted Arrays
+                    <input type="radio" name="miscRadio" id = "miscFunc56"  value="56">Alg - Merge Sort
+                    <input type="radio" name="miscRadio" id = "miscFunc57"  value="57">Alg - Count inversions
+                    <input type="radio" name="miscRadio" id = "miscFunc58"  value="58">Alg - 2Sum
+                    <input type="radio" name="miscRadio" id = "miscFunc59"  value="59">Alg - 3Sum
+                    <input type="radio" name="miscRadio" id = "miscFunc60"  value="60">Alg - Binary Heap
+                    <input type="radio" name="miscRadio" id = "miscFunc61"  value="61">Alg - Heap sort
+                    <input type="radio" name="miscRadio" id = "miscFunc62"  value="62">Alg - Heap sort partial
+                    <input type="radio" name="miscRadio" id = "miscFunc63"  value="63">Alg - Degree
+                    <input type="radio" name="miscRadio" id = "miscFunc64"  value="64">Alg - Double Degree
+                    <input type="radio" name="miscRadio" id = "miscFunc65"  value="65">Alg - Two way partition
+                    <input type="radio" name="miscRadio" id = "miscFunc66"  value="66">Alg - Three way partition
+                    <input type="radio" name="miscRadio" id = "miscFunc67"  value="67">Alg - Median
+                    <input type="radio" name="miscRadio" id = "miscFunc68"  value="68">Alg - Quick Sort
+                    <input type="radio" name="miscRadio" id = "miscFunc69"  value="69">Top order DAG
+                    <input type="radio" name="miscRadio" id = "miscFunc70"  value="70">Turnpike
+                    <input type="radio" name="miscRadio" id = "miscFunc71"  value="71">Alg - Depth-first search
+                    <input type="radio" name="miscRadio" id = "miscFunc72"  value="72">Alg - Breadth-first search
+                    <input type="radio" name="miscRadio" id = "miscFunc73"  value="73">Alg - Nearest Neighbours
 
                     </div>
+                    <div id = "executeMiscDiv">
+                       <button type = "button" onclick = "readTextFileFromServer('par1.txt','loadedMiscPar1',miscParLoadedFromServer)" >Load P1</button>
+                       <br>
+                        <button type = "button" onclick = "readTextFileFromServer('par2.txt','loadedMiscPar2',miscParLoadedFromServer)" >Load P2</button>
+                        <br>
 
-                    <button type = "button" onclick="executeMisc(event)">Execute</button>
+                        <button type = "button" onclick="executeMisc(event)">Execute</button>
+                    </div>
                     <textarea name = "miscQuickResult" placeholder = "Result" rows = "6" cols = "20"  id = "miscQuickResult" ></textarea>
 
 
@@ -769,7 +1050,42 @@
 
 
                 </div>
+                <div id = "phylogenyViewer">
+                    <div id = "phylogenyGraphDiv">
+                        <span id = 'phylGraphErr'></span>
+                        <canvas id = "phylCanvas" >
+                            hhh
+                        </canvas>
+
+                    </div>
+
+
+                </div>
                 <div id = "transViewer">
+
+                </div>
+
+                <div id = "alignViewer">
+                    <div id = "alignStringDiv">
+                    </div>
+                    <div id = "alignGridDiv">
+
+                    </div>
+
+
+                </div>
+
+                <div id = "sbViewer">
+                    <div id = "sbStringDiv">
+                    </div>
+                    <canvas id = "sbCanvas">
+
+                    </canvas>
+                    <div id = "sbCoordDiv">
+
+                    </div>
+
+
 
                 </div>
 
@@ -792,9 +1108,9 @@
         <div id = "moreDetailDiv">
             <!--textarea id = "debugText"></textarea-->
             <textArea id = "moreDetailText"></textArea>
-            <!--canvas id = "moreCanvas">
+            <canvas id = "evenMoreCanvas">
                 hhh
-            </canvas-->
+            </canvas>
         </div>
 
 

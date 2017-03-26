@@ -19,8 +19,28 @@ var spectrumMaster = '';
 var sequencedWeights = '';
 var convMaster = '';
 
+var alignS = ''; //used for alignment
+var alignT = '';
+var alignU = ''; //only used for 3 way alignment
+
+var alignGraph = null;
+var alignReturned = null; //returned from background
+
+var sbS = ''; //used for synteny block construction
+var sbT = '';
+
+var sbReturned = null; //returned from background
+
+
+var pamScoringMatrix = null;
+var bloScoringMatrix = null;
+
+var loadedMiscPar1 = ''; //used for execute misc for loading from server
+var loadedMiscPar2 = ''; //used for execute misc for loading from server
+
 var progExtraInfo; // extra info during background processing
 
+var phylGraphMaster = null; //current phylogeny graph
 
 var basesPerPage = 20000;
 
@@ -29,9 +49,14 @@ var stop = false;
 var myParams = Params.getInstance();
 
 
+var paramObj;
+
+
 //used for expanding/collapsing divs
 var expDebugState = true;
 var expMultiState = true;
+
+var pGraphView = null; 
 
 var w = new Worker('js/worker.js');
 
@@ -42,6 +67,95 @@ testStuff();
 
 
 function testStuff() {
+
+
+    //default for testing
+    tab_click(9,tabClickDone); //Phylog
+    document.getElementById('phylogenyStrings').value = 'I J K L\n0 3 4 3\n3 0 4 5\n4 4 0 2\n3 5 2 0';
+
+    //var tst = autoDetectContents('\nA G  Chimp   \n 0   1 3\n1 2 3\n4 5 6  ');
+    //var xx = 1;
+
+    phylogenyInput();
+    /*
+   var builder = new DGraphBuilder('A->B,C:1\nB->D,E:2\nE->H,I:4\nC->F,G:7',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+  //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
+    var xx = 1;
+    var gr = new DBTreeGraph(builder);
+    var dir = gr.isDirected;
+    var leaves = gr.leaves();
+    var leaf1 = leaves[0];
+    var leaf2 = leaves[3];
+    var pathLen = gr.findPathBetweenNodes(leaf1,leaf2,leaf1,0,null);
+    var distMat = gr.distanceMatrixFromTree();
+    xx = 2;
+*/
+/*
+    var builderTst = new DGraphBuilder('0->4:11\n4->0:11',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+    //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
+    var xx = 1;
+    var grTst = new DBTreeGraph(builderTst);
+    var distMatTst = grTst.distanceMatrixFromTree();
+    xx = 2;
+
+    var builderRos = new DGraphBuilder('0->4:11\n1->4:2\n2->5:6\n3->5:7\n4->0:11\n4->1:2\n4->5:4\n5->4:4\n5->3:7\n5->2:6',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+    //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
+    var xx = 1;
+    var grRos = new DBTreeGraph(builderRos);
+    var distMat = grRos.distanceMatrixFromTree();
+    xx = 2;
+
+    var builder = new DGraphBuilder('I1<->I2:3\nI1<->Chimp;ACGTAGGCCT:1\nI1<->Human:2\nI2<->Seal:2\nI2<->Whale:0',new DTreeNodeBuilder(),new DTreeEdgeBuilder());
+    var gr2 = new DBTreeGraph(builder);
+    var pLen = gr2.findPathBetweenNodes(gr2.nodes[2],gr2.nodes[5],gr2.nodes[2],null);
+    var distMat2 = gr2.distanceMatrixFromTree();
+
+    var builder = new DGraphTreeFromDistBuilder('i j k l\n0 13 21 22\n13 0 12 13\n21 12 0 13\n22 13 13 0');
+    var limbLen = builder.limbLength('k');
+    xx = 3;
+
+*/
+    /*
+    var n = new DGNode("1");
+    var n2 = new DGNode("2");
+    //var e = new DGEdge(n,n2);
+    var e = new DGFancyEdge(n,n2,"ooh la");
+    var e2 = new DGEdge(n2,n);
+
+
+    alert(e.edgeLabel());
+    alert(e2.edgeLabel());
+    n.successors.push(e);
+    n.successors.push(e2);
+    alert (n.outDegree());
+
+    var adjList = ['0->1:7',
+    '0->2:4',
+    '2->3:2',
+    '1->4:1',
+    '3->4:3'];
+
+    var g = new DGGraph(adjList,DGraph.fromAdjList);
+
+    g.initGraph();
+
+    g.longestPathsDynamic();
+
+    var path = g.longestPathBacktrack('4','0');
+    */
+
+
+
+    /*
+    var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
+    alert('naive mm: ' + al.matchString(al.naiveWithMismatch(1)));
+
+    alert('naive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime);
+
+    alert('bm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime);
+
+    alert('bad chars: ' + JSON.stringify(al.badChars));
+    */
 
     //var d = patternMotifsDist('ACG',['ACT','GGG','TCG']);
 
@@ -191,6 +305,11 @@ function testStuff() {
 function initialisePage() {
 
     myParams.tabActive = 5;
+
+    tab_click(8);
+    tab_click(10);
+    tab_click(9);
+
     tab_click(7);
     tab_click(6); //tab stuff
     tab_click(5);
@@ -199,6 +318,8 @@ function initialisePage() {
     tab_click(2);
     tab_click(1);
     tab_click(0);
+
+    
 
     processHTMLParams();
     setUpWorkerListeners();
@@ -213,6 +334,17 @@ function initialisePage() {
     document.getElementById('fileSequencingInput')
         .addEventListener('change',readSingleSequencingFile,false);
 
+    document.getElementById('fileAlignInput')
+        .addEventListener('change',readAlignFile,false);
+
+    document.getElementById('fileAlignInput2')
+        .addEventListener('change',readAlignFile,false);
+
+    document.getElementById('fileSBInput')
+        .addEventListener('change',readSBFile,false);
+
+    document.getElementById('fileSBInput2')
+        .addEventListener('change',readSBFile,false);
 
 //  document.getElementById('motifBrute').checked = true;
     motifRadClicked('motifBrute');
@@ -225,11 +357,27 @@ function initialisePage() {
     document.getElementById('pepIdealSpectrum').checked = true;
     peptideRadClicked('pepIdealSpectrum');
 
+    document.getElementById('alignLCS').checked = true;
+    alignRadClicked('alignLCS');
+
+    document.getElementById('phylDistMat').checked = true;
+    phylInputRadClicked('phylDistMat');
+    phylRadClicked('phylAdd');
+
+    phylRadClicked('allowStepPH');
+
+    document.getElementById('sbSharedKmers').checked = true;
+    sbRadClicked('sbSharedKmers');
+
 
     expDebugState = false;
     expStateChanged('expDebug',false);
     expMultiState = true;
     expStateChanged('expMulti',true);
+
+    readPamScoringMatrix();
+    readBlosum62ScoringMatrix();
+
 
 
 }
@@ -485,6 +633,14 @@ function setUpWorkerListeners() {
                     break;
 
 
+                case 'align':
+                    processReturnedAlign(e);
+                    break;
+
+                case 'synteny':
+                    processReturnedSB(e);
+                    break;
+
                 default:
                      break;
             }
@@ -613,7 +769,187 @@ function processReturnedPeptide(e) {
 
 }
 
+function processReturnedAlign(e) {
 
+
+    var ret =  e.data.txtStuff;
+    alignReturned = {};
+    alignReturned.sAligned = ret[1];
+    alignReturned.tAligned = ret[2];
+    if (alignU.length > 0) {
+        alignReturned.uAligned = ret[9];
+    }
+
+    //colourDNA(null,null,false);
+
+    //if (document.getElementById('debugPS').checked) {
+    //    document.getElementById('debugText').value = e.data.txtStuff;
+
+    //}
+
+    alignReturned.longest = ret[0];
+    alignReturned.lcsStr = ret[3];
+
+    alignReturned.startPosS = ret[4];
+    alignReturned.endPosS = ret[5];
+    alignReturned.startPosT = ret[6];
+    alignReturned.endPosT = ret[7];
+    if (alignU.length > 0) {
+        alignReturned.startPosU = ret[10];
+        alignReturned.endPosU = ret[11];
+
+    }
+
+    alignReturned.formattedGrid = ret[8];
+
+    alignReturned.alignType = e.data.alignType;
+
+    alignReturned.inProgress = false;
+
+   // alignGraph = g;
+   // alignMasterChanged();
+
+    if (document.getElementById('debugAL').checked) {
+        var resStr = '';
+        resStr += '\nDebug pressed';
+        resStr += '\nScore: ' + alignReturned.longest;
+        resStr += '\nSequence: : ' + alignReturned.lcsStr;
+
+        document.getElementById('debugText').value = resStr;
+    }
+
+    alignMasterChanged();
+
+
+}
+
+function processReturnedSB(e) {
+
+
+    var ret =  e.data.txtStuff;
+    sbReturned = {};
+    sbReturned.sharedAr = ret;
+
+    sbReturned.inProgress = false;
+
+
+    if (document.getElementById('debugSB').checked) {
+        var resStr = '';
+        resStr += '\nDebug pressed';
+        resStr += '\nNum shared: ' + sbReturned.sharedAr.length;
+
+        document.getElementById('debugText').value = resStr;
+    }
+
+    sbMasterChanged();
+
+
+}
+
+
+function readTextFileFromServer(fileName,fileId,onFinish) {
+    //read from server
+    var client = new XMLHttpRequest();
+    client.open('GET', fileName);
+    client.setRequestHeader('Cache-Control', 'no-cache');
+    client.onreadystatechange = function() {
+       
+        if (client.readyState == 4 && client.status == 200) {
+
+            onFinish(fileName,fileId,client.responseText);
+
+        }
+    };
+    client.send();
+
+
+};
+
+
+
+function readPamScoringMatrix() {
+    //read from server
+    var client = new XMLHttpRequest();
+    client.open('GET', './pam250.txt');
+    client.onreadystatechange = function() {
+        var scoringArray = [];
+        if (client.readyState == 4 && client.status == 200) {
+
+            scoringArray = client.responseText.split('\n');
+
+            scoringArray = scoringArray.map(function(el,i) {
+
+                var cols = el.trim().split(' ');
+                cols = cols.map(function(col,j) {
+                    if ((i > 0) && (j > 0)) {
+                        return parseInt(col);
+                    }
+                    else {
+                        return col;
+                    }
+                });
+                return cols;
+
+            });
+            pamScoringMatrix = {};
+
+            for (var r = 1;r < scoringArray.length;++r) {
+                pamColDict = {};
+                for (var c = 1;c < scoringArray[0].length;++c) {
+                    pamColDict[scoringArray[0][c]] = scoringArray[r][c];
+                }
+                pamScoringMatrix[scoringArray[r][0]] = pamColDict;
+
+            }
+
+
+        }
+    }
+    client.send();
+
+}
+
+function readBlosum62ScoringMatrix() {
+    //read from server
+    var client = new XMLHttpRequest();
+    client.open('GET', './blosum62.txt');
+    client.onreadystatechange = function() {
+        var scoringArray = [];
+        if (client.readyState == 4 && client.status == 200) {
+
+            scoringArray = client.responseText.split('\n');
+
+            scoringArray = scoringArray.map(function(el,i) {
+
+                var cols = el.trim().split(' ');
+                cols = cols.map(function(col,j) {
+                    if ((i > 0) && (j > 0)) {
+                        return parseInt(col);
+                    }
+                    else {
+                        return col;
+                    }
+                });
+                return cols;
+
+            });
+            blosum62ScoringMatrix = {};
+
+            for (var r = 1;r < scoringArray.length;++r) {
+                bloColDict = {};
+                for (var c = 1;c < scoringArray[0].length;++c) {
+                    bloColDict[scoringArray[0][c]] = scoringArray[r][c];
+                }
+                blosum62ScoringMatrix[scoringArray[r][0]] = bloColDict;
+
+            }
+
+
+        }
+    }
+    client.send();
+
+}
 
 function readSingleFile(e) {
     var file = e.target.files[0];
@@ -665,6 +1001,86 @@ function readSingleSequencingFile(e) {
     reader.onload = function(e) {
         var contents = e.target.result;
         sequencingInput(e,contents);
+    };
+    reader.readAsText(file);
+
+}
+
+function readAlignFile(e) {
+    //for sequence alignment
+    var file = e.target.files[0];
+
+    var seqNum;
+    if (e.target.id == 'fileAlignInput2') {
+        seqNum = 2;
+    }
+    else {
+        seqNum = 1;
+    }
+
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var tst = contents.split('\n');
+        var newContents = '';
+        if (tst[0].substring(0,1) == '>') { //fasta
+            for (var i = 1;i < tst.length;++i) {
+                if (tst[i].substring(0,1) == '>') {
+
+                }
+                else {
+                    newContents += tst[i].trim();
+                }
+            }
+
+        }
+        else {
+            newContents = contents;
+        }
+        alignInput(e,newContents,seqNum);
+    };
+    reader.readAsText(file);
+
+}
+
+function readSBFile(e) {
+    //for Synteny block construction
+    var file = e.target.files[0];
+
+    var seqNum;
+    if (e.target.id == 'fileSBInput2') {
+        seqNum = 2;
+    }
+    else {
+        seqNum = 1;
+    }
+
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var tst = contents.split('\n');
+        var newContents = '';
+        if (tst[0].substring(0,1) == '>') { //fasta
+            for (var i = 1;i < tst.length;++i) {
+                if (tst[i].substring(0,1) == '>') {
+                    
+                }
+                else {
+                    newContents += tst[i].trim();
+                }
+            }
+
+        }
+        else {
+            newContents = contents;
+        }
+        sbInput(e,newContents,seqNum);
     };
     reader.readAsText(file);
 
@@ -1172,6 +1588,33 @@ function buildTree(dna,k,ltClumpThresh,includeRevCompl) {
 
 //Execute stuff in gui
 
+
+function sbPlotTimeoutLoop(c,sharedAr,cur,numAtATime,params) {
+
+
+    if (cur >= sharedAr.length) {
+        return;
+    }
+
+    if (params) {
+
+    }
+    else {
+        params = initPlot(c,sharedAr);
+
+    }
+
+    plot(c,sharedAr.slice(cur,cur+numAtATime),params);
+
+
+     setTimeout(function() {
+        sbPlotTimeoutLoop(c,sharedAr,numAtATime,cur+numAtATime,params);
+     },0);
+
+
+}
+
+
 function skTimeoutLoop(dna,numAtATime) {
     //var basesDone = 0;
     //if (sk) {
@@ -1633,9 +2076,12 @@ function NodePrinter(node,x,y,num) {
         ctx.moveTo(this.x + this.radius,this.y);
 
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-        ctx.fillText(this.node.dna,this.x - 15,this.y+5);
+        var dna = squishString(this.node.dna,6);
+
+        ctx.fillText(dna,this.x - 15,this.y+5);
         if (this.node.pairedDna) {
-            ctx.fillText(this.node.pairedDna,this.x - 15,this.y+15);
+            var pairedDna = squishString(this.node.pairedDna,6);
+            ctx.fillText(pairedDna,this.x - 15,this.y+15);
         }
 
     };
@@ -1782,6 +2228,19 @@ NodePrinter.startY = 80;
 NodePrinter.startX = 20;
 NodePrinter.xInc = 45;
 NodePrinter.pointInc = 15;
+
+function miscParLoadedFromServer(fileName,parId,text) {
+    //document.getElementById(parId).value = text;
+    alert('file loaded from server: ' + fileName);
+    if (parId == 'loadedMiscPar1') {
+        loadedMiscPar1 = text;
+    }
+    else if (parId == 'loadedMiscPar2') {
+        loadedMiscPar2 = text;
+    }
+    
+};
+
 
 
 function executeMisc(e) {
@@ -2326,6 +2785,7 @@ function executeMisc(e) {
 
             break;
 
+        /*
         case '16': //overlap graph
 
             //par1El.value = cleanContents(par1El.value);
@@ -2361,6 +2821,7 @@ function executeMisc(e) {
             }
 
             break;
+            */
         case '17':
             k = parseInt(par2El.value);
             //par1El.value = cleanContents(par1El.value);
@@ -2749,6 +3210,2135 @@ function executeMisc(e) {
 
 
             break;
+
+        case '31': //Edit Dist using bad/good
+
+            var p = par1El.value;
+            var t = par2El.value;
+            var loc = par3El.value;
+            var al = new Aligner(p,t,2);
+
+            resEl.value = 'results\n';
+
+
+            if (loc == 'Y') {
+                var res = al.align(true,1);
+                resEl.value += '\nLocal edit dist: ' + res[0];
+                res[1].forEach(function(el) {
+                    resEl.value += '\n' + el[0];
+                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                });
+            }
+            else {
+                var res = al.align(false,1);
+                resEl.value += '\nGlobal edit dist: ' + res[0];
+                resEl.value += '\n' + res[1];
+                resEl.value += '\n' + res[2];
+
+
+
+            }
+
+
+
+
+            break;
+            
+            if (loc == 'Y') {
+                var res = al.align(true,1,-1);
+                resEl.value += '\nLocal edit dist: ' + res[0];
+                res[1].forEach(function(el) {
+                    resEl.value += '\n' + el[0];
+                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                });
+            }
+            else {
+                var res = al.align(false,1,-1);
+                resEl.value += '\nGlobal edit dist: ' + res[0];
+                resEl.value += '\n' + res[1];
+                resEl.value += '\n' + res[2];
+
+
+
+            }
+
+
+            /*
+                        if (loc == 'Y') {
+                            var res = al.editDist(true);
+                            resEl.value += '\nLocal edit dist: ' + res[0];
+                            res[1].forEach(function(el) {
+                                resEl.value += '\n' + el[0];
+                                resEl.value += '\n' + el[1] + ' ' + el[2];
+                            });
+                        }
+                        else {
+                            var res = al.editDist(false);
+                            resEl.value += '\nGlobal edit dist: ' + res[0];
+                            resEl.value += '\n' + res[1];
+                            resEl.value += '\n' + res[2];
+
+
+
+                        }
+            */
+
+           // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
+            resEl.value +='\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
+
+
+
+
+            break;
+
+        case '32': //Lowest coins
+
+            var amt = parseInt(par1El.value);
+            var coins = par2El.value.split(',');
+            coins = coins.map(function(el) {
+                return parseInt(el);
+            });
+            
+            var l = lowestCoins(amt,coins);
+            
+ 
+            resEl.value = 'results\n';
+
+            resEl.value += '\nLowest coins: ' + l;
+            break;
+
+        case '33': //Align DNA using bad/good
+
+            var p = par1El.value;
+            var t = par2El.value;
+            var loc = par3El.value;
+            var al = new Aligner(p,t,2);
+
+
+            resEl.value = 'results\n';
+
+            if (loc == 'Y') {
+                var res = al.align(true,3,-6);
+                resEl.value += '\nLocal align: ' + res[0];
+                res[1].forEach(function(el) {
+                    resEl.value += '\n' + el[0];
+                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                });
+            }
+            else {
+                var res = al.align(false,3,-8);
+                resEl.value += '\nGlobal align: ' + res[0];
+                resEl.value += '\n' + res[1];
+                resEl.value += '\n' + res[2];
+
+
+
+            }
+
+     
+            break;
+
+
+            /*
+             if (loc == 'Y') {
+             var res = al.editDist(true);
+             resEl.value += '\nLocal edit dist: ' + res[0];
+             res[1].forEach(function(el) {
+             resEl.value += '\n' + el[0];
+             resEl.value += '\n' + el[1] + ' ' + el[2];
+             });
+             }
+             else {
+             var res = al.editDist(false);
+             resEl.value += '\nGlobal edit dist: ' + res[0];
+             resEl.value += '\n' + res[1];
+             resEl.value += '\n' + res[2];
+
+
+
+             }
+             */
+
+            // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
+            resEl.value +='\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+            resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
+
+
+            break;
+
+        case '34': //Align Blosum using bad/good
+
+            var p = par1El.value;
+            var t = par2El.value;
+            var loc = par3El.value;
+            var al = new Aligner(p,t,2);
+
+
+            resEl.value = 'results\n';
+
+            if (loc == 'Y') {
+                var res = al.align(true,2,-5);
+                resEl.value += '\nLocal align: ' + res[0];
+                res[1].forEach(function(el) {
+                    resEl.value += '\n' + el[0];
+                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                });
+            }
+            else {
+                var res = al.align(false,2,-5);
+                resEl.value += '\nGlobal align: ' + res[0];
+                resEl.value += '\n' + res[1];
+                resEl.value += '\n' + res[2];
+
+
+
+            }
+
+
+            break;
+
+        case '35': //Align LCS using bad/good
+
+            var p = par1El.value;
+            var t = par2El.value;
+            var loc = par3El.value;
+            var al = new Aligner(p,t,2);
+
+
+            resEl.value = 'results\n';
+
+            if (loc == 'Y') {
+                var res = al.align(true,4,0);
+                resEl.value += '\nLocal LCS: ' + res[0];
+                res[1].forEach(function(el) {
+                    resEl.value += '\n' + el[0];
+                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                });
+            }
+            else {
+                var lcs = '';
+                var res = al.align(false,4,0);
+                resEl.value += '\nGlobal LCS: ' + res[0];
+                resEl.value += '\n' + res[1];
+                resEl.value += '\n' + res[2];
+                for (var i = 0;((i < res[1].length) && (i < res[2].length));++i) {
+                    if (res[1][i] == res[2][i]) {
+                        lcs+=res[1][i];
+                    }
+                }
+                resEl.value += '\nlcs: ' + lcs;
+
+
+
+
+
+
+            }
+
+
+            break;
+
+        case '36': //Longest Path DAG
+
+            var source = par1El.value;
+            var sink = par2El.value;
+            adjList = par3El.value.split('\n');
+
+
+
+            var g = new DGGraph(adjList,DGraph.fromAdjList,DGraph.alignTypeGlobal);
+
+            g.initGraph();
+
+
+            g.longestPathsDynamic(source,sink);
+
+
+             var pathData = g.longestPathBacktrack(sink,source);
+             var path = pathData[1];
+             var longest = pathData[0];
+
+             var pathStr = '';
+             for (var i = path.length - 1;i >=0;--i) {
+             pathStr += path[i];
+             if (i > 0)  {
+             pathStr += '->';
+             }
+
+             }
+
+             resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
+
+
+            break;
+
+
+
+
+        case '37': //Longest Path Manhattan Grid
+
+            //var source = par1El.value;
+            //var sink = par2El.value;
+            // adjList = par3El.value.split('\n');
+
+            var rows = parseInt(par1El.value.split('x')[0]);
+            var cols = parseInt(par1El.value.split('x')[1]);
+
+            var downWeights = par2El.value.split('\n');
+            downWeights = downWeights.map(function(el) {
+                var spl = el.split(' ');
+                return spl.map(function(el) {
+                    return parseInt(el);
+                });
+
+            });
+
+            var rightWeights = par3El.value.split('\n');
+            rightWeights = rightWeights.map(function(el) {
+                var spl = el.split(' ');
+                return spl.map(function(el) {
+                    return parseInt(el);
+                });
+            });
+
+            //var diagWeights = [[1,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,1],[0,0,0,1,1]];
+
+            var g = new DGGridGraph(rows,cols,DGraph.alignTypeGlobal,downWeights,rightWeights);
+
+            g.initGraph();
+
+            var sourceNum  = 0;
+            var source = sourceNum.toString();
+            var sinkNum  =  rows * cols - 1;
+            var sink = sinkNum.toString();
+            
+            g.longestPathsDynamic(source,sink);
+
+            var pathData = g.longestPathBacktrack(sink,source);
+            var path = pathData[1];
+            var longest = pathData[0];
+
+            var pathStr = '';
+            for (var i = path.length - 1;i >=0;--i) {
+                pathStr += path[i];
+                if (i > 0)  {
+                    pathStr += '->';
+                }
+
+            }
+
+            resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
+
+
+
+            /*
+
+            var pathData = g.longestPathBacktrack(sink,source);
+            var path = pathData[1];
+            var longest = pathData[0];
+
+            var pathStr = '';
+            for (var i = path.length - 1;i >=0;--i) {
+                pathStr += path[i];
+                if (i > 0)  {
+                    pathStr += '->';
+                }
+
+            }
+
+            resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
+            */
+
+            break;
+
+
+
+        case '38': //Topological ordering from adj list
+
+            adjList = par1El.value.split('\n');
+
+            var topList = [];
+
+            adjList.forEach(function(el) {
+                var spl = el.split(' -> ');
+                var source = spl[0];
+                var target = spl[1].split(',');
+                target.forEach(function(t) {
+                    if (topList.indexOf(t) == -1) {
+                        topList.push(t);
+                    }
+                });
+                if (topList.indexOf(source) == -1) {
+                    topList.unshift(source);
+                }
+
+           });
+           
+           var earliestTarget = 99999;
+            target.forEach(function(t) {
+                var pos = topList.indexOf(t);
+                if (pos > -1) {
+                    if (pos < earliestTarget) {
+                        pos = earliestTarget;
+                    }
+                }
+                
+            });
+            
+            
+            break;
+
+
+        case '39': //Greedy Rev Dist
+
+            var genomeStr = par1El.value;
+            genomeStr = genomeStr.replace('(','');
+            genomeStr = genomeStr.replace(')','');
+            var genome = genomeStr.split(' ');
+
+            var steps = greedyReversal(genome);
+
+            steps = steps.map(function(el) {
+                var str = '(';
+                el.forEach(function(el2,i) {
+                    str += el2;
+                    if (i == el.length - 1) {
+                        str += ')';
+                    }
+                    else {
+                        str += ' ';
+                    }
+                });
+
+                return str;
+
+            });
+
+            resEl.value += '\nrev: ';
+
+            steps.forEach(function(el) {
+                resEl.value += '\n' + el;
+            });
+
+
+
+            break;
+
+        case '40': //Num breakpoints
+
+            var genomeStr = par1El.value;
+            genomeStr = genomeStr.replace('(','');
+            genomeStr = genomeStr.replace(')','');
+            var genome = genomeStr.split(' ');
+
+            var bp = numBreakpointsGenome(genome);
+
+
+
+            resEl.value += '\nBreakpoints: ' + bp;
+
+           break;
+
+        case '41': //Breakpoint graph
+
+            var source = par1El.value;
+
+            var bpGraph = new DBasicGraph(source,DGraph.fromBreakpoint);
+
+            bpGraph.initGraph();
+            
+            var numBlocks = bpGraph.numBlocks();
+            var numCycles = bpGraph.numCycles();
+
+            var twoBreakDist  =  bpGraph.twoBreakDistance();
+
+           // bpGraph.graphToGenome('red');
+
+            var genomeStages = [];
+
+
+
+           genomeStages = bpGraph.findEdgeInNonTrivialCycle();
+
+           var resStr = '';
+
+            genomeStages.forEach(function(el) {
+               resStr += '\n' + el;
+           }) ;
+
+
+
+            resEl.value += '\nStages: ' + resStr;
+
+            break;
+
+        case '42': //Shared kmers
+
+            var par1 = '';
+            var par2 = '';
+
+            par1 = par1El.value;
+            par2 = par2El.value;
+
+            if (par1  == '') {
+                if (loadedMiscPar1 ==  '') {
+
+                }
+                else {
+                    par1 = loadedMiscPar1;
+
+                }
+            }
+            if (par2  == '') {
+                if (loadedMiscPar2 ==  '') {
+
+                }
+                else {
+                    par2 = loadedMiscPar2;
+
+                }
+            }
+
+/*
+            var pars = par1.split('\n');
+            var s = pars[1];
+            var t = pars[2];
+            var k = parseInt(pars[0]);
+*/
+
+            var s = par1;
+            var t = par2;
+            var k = parseInt(par3El.value);
+
+
+            var tNumAtATime;
+            if (t.length < 1000000) {
+                tNumAtATime = t.length; //do whole thing at once
+            }
+            else {
+                tNumAtATime = 500000;
+            }
+
+            var sharedAr = [];
+            var tOffset = 0;
+            while (tOffset < t.length) {
+                var shared = partSharedKmers(k,tOffset,tNumAtATime,s,t);
+                sharedAr = sharedAr.concat(shared);
+                tOffset += tNumAtATime;
+            }
+
+            /*
+
+            var sharedAr = [];
+
+            var tDict = {};
+
+            for (var i = 0;i <  t.length - k + 1;++i) {
+                var kmer = t.substring(i,i+k);
+                if (kmer in tDict) {
+                    tDict[kmer].push(i);
+                }
+                else {
+                    tDict[kmer] = [i];
+                }
+            }
+
+            var numShared = 0;
+
+            for (i = 0;i < s.length - k + 1;++i) {
+                if (i % 500000 == 0) {
+                    j = 0;
+                }
+                kmer = s.substring(i, i + k);
+                var kmerRev = reverseComplement(kmer);
+
+                if (kmer in tDict) {
+                    for (var j = 0;j < tDict[kmer].length; ++j) {
+                        var el = tDict[kmer][j];
+                   // tDict[kmer].forEach(function (el) {
+                        sharedAr.push('(' + i + ', ' + el + ')');
+                        ++numShared;
+                    }
+                }
+
+
+                if (kmer == kmerRev) {
+                }
+                else {
+                    if (kmerRev in tDict) {
+                        for (var j = 0;j < tDict[kmerRev].length;++j) {
+                            var el = tDict[kmerRev][j];
+                      //  tDict[kmerRev].forEach(function (el) {
+                            sharedAr.push('(' + i + ', ' + el + ')');
+                            ++numShared;
+                        }
+                    }
+                }
+
+            }
+            */
+
+
+
+
+            var resStr = '';
+
+
+            sharedAr.forEach(function(el) {
+               resStr += '\n' + el;
+            });
+
+            resEl.value += '\nShared: ' + resStr;
+
+            break;
+
+        case '43': //Synteny block construction
+
+            var par1 = '';
+            var par2 = '';
+
+            par1 = par1El.value;
+            par2 = par2El.value;
+
+            if (par1  == '') {
+                if (loadedMiscPar1 ==  '') {
+
+                }
+                else {
+                    par1 = loadedMiscPar1;
+
+                }
+            }
+            if (par2  == '') {
+                if (loadedMiscPar2 ==  '') {
+
+                }
+                else {
+                    par2 = loadedMiscPar2;
+
+                }
+            }
+
+
+
+            var anchorsList = par1.split('\n');
+            anchorsList.shift();
+
+            anchorsList = anchorsList.filter(function(el) {
+                if (el == '') {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+
+            anchorsList = anchorsList.map(function(el) {
+                el = el.replace(/\r/g,'');
+                var spl = el.split('\t');
+                var d = {};
+                d['id'] = spl[0];
+                d['chr1'] = spl[1];
+                d['start1'] = parseInt(spl[2]);
+                d['end1'] = parseInt(spl[3]);
+                d['chr2'] = spl[4];
+                d['start2'] = parseInt(spl[5]);
+                d['end2'] = parseInt(spl[6]);
+                d['sign'] = spl[7];
+                return d;
+            });
+
+            anchorsList.sort(function(a,b) {
+
+                return (a['start1'] - b['start1']);
+            });
+
+
+            var points = anchorsList.map(function(el) {
+                var xMid = el['end1'] - el['start1'] / 2;
+                var yMid = el['end2'] - el['start2'] / 2;
+                return[xMid,yMid,'C:W'];
+            });
+
+            plot(document.getElementById('skewCanvas'),points);
+
+
+
+
+            var par2Split = par2.split('\n');
+            var maxDist = parseInt(par2Split[0]);
+            var maxDistBetweenCycles = parseInt(par2Split[1]);
+            var zoomStart = -1;
+            var zoomEnd = -1;
+            if (par2Split.length > 2) {
+                zoomStart = parseInt(par2Split[2]);
+                zoomEnd = parseInt(par2Split[3]);
+            }
+
+            var minSize = parseInt(par3El.value);
+
+            var gr = new DBasicGraph(null,null);
+
+
+            anchorsList.forEach(function(anch,i) {
+                var st = anch['end1'];
+                var lim = st + maxDist;
+                for (var j = i+1;j < anchorsList.length;++j) {
+                    var comp = anchorsList[j];
+
+                    /*
+                    if (comp['sign'] != anch['sign']) {
+                        break;
+                    }
+                    */
+                    var dist1,dist2;
+                    dist1 = comp['start1'] - anch['end1'];
+
+                    if (comp['sign'] == '-') {
+
+                        dist2 = anch['start2'] - comp['end2'];
+                    }
+                    else {
+
+                        dist2 = comp['start2'] - anch['end2'];
+                    }
+
+                    var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
+                    var grad = Math.abs(dist2 / dist1);
+                    var tempMaxDist;
+
+                    if ((grad >= 1) && (grad <= 0)) {
+                        tempMaxDist = maxDist*10;
+                    }
+                    else {
+                        tempMaxDist = maxDist;
+                    }
+
+                    if (comp['start1'] > st + tempMaxDist) {
+                        break;
+                    }
+
+                    if (dist > tempMaxDist) {
+                        //
+                    }
+                    else {
+
+                        if (anch['id'] in gr.nodes) {
+
+                        }
+                        else {
+                            gr.nodes[anch['id']] = new DGNode(anch['id']);
+
+                        }
+                        if (comp['id'] in gr.nodes) {
+
+                        }
+                        else {
+                            gr.nodes[comp['id']] = new DGNode(comp['id']);
+                        }
+
+                        gr.connectNodesUndirected(gr.nodes[anch['id']], gr.nodes[comp['id']]);
+
+
+                        var k = 0;
+                    }
+                }
+
+            });
+
+            var numCycles = gr.numCycles(minSize);
+
+
+            var anchorsList = anchorsList.map(function(el) {
+                if (el['id'] in gr.nodes) {
+                    var node = gr.nodes[el['id']];
+                    el['cycleNum'] = node.cycleNum;
+                }
+                else {
+                    el['cycleNum'] = 0;
+                }
+                return el;
+
+
+            });
+
+
+
+            var synPoints = anchorsList.filter(function(el,ii) {
+
+                if (el['id'] in gr.nodes) {
+                    var node = gr.nodes[el['id']];
+                    return (node.cycleNum > 0);
+                }
+                else {
+                    return false;
+                }
+
+            });
+
+
+            var stX, stY, endX, endY;
+            stX = -1;
+            stY = -1;
+            endX = -1;
+            endY = -1;
+            var currCycNum = 1;
+
+
+            var cycSummary = [];
+
+            var currCycEntries = [];
+
+
+            maxDistBetweenCycles = 0; // disabled
+
+            synPoints.forEach(function(el,ii) {
+               el['xNum'] = ii;
+               var cyc = el.cycleNum;
+               if (cyc == 0) {
+
+               }
+                else {
+                   if (cyc == currCycNum)  {
+                       currCycEntries.push(el);
+
+                   }
+                   else {
+
+
+                       var dist1,dist2;
+                       var comp = el;
+                       var anch = currCycEntries[currCycEntries.length -1 ];
+                       dist1 = comp['start1'] - anch['end1'];
+                       dist2 = comp['start2'] - anch['end2'];
+                       var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
+                       var grad = Math.abs(dist2/dist1);
+
+                       var tempMaxDistBetweenCycles;
+                       if ((grad >= 0.5) && (grad <= 2.0)) {
+                           tempMaxDistBetweenCycles = maxDistBetweenCycles * 10;
+                       }
+                       else {
+                           tempMaxDistBetweenCycles = maxDistBetweenCycles;
+                       }
+
+                       if (dist < tempMaxDistBetweenCycles) {
+                           currCycEntries.forEach(function(currEntry) {
+                               currEntry['cycleNum'] = cyc; // make previous cyc mum = curr one
+                           });
+                           currCycEntries.push(el);
+                       }
+                       else {
+
+                           cycSummary.push([currCycEntries[0],currCycEntries[currCycEntries.length -1]]);
+
+                           currCycEntries = [el];
+                       }
+
+                   currCycNum = cyc;
+
+                   }
+
+               }
+            });
+            cycSummary.push([currCycEntries[0],currCycEntries[currCycEntries.length -1]]);
+
+
+
+            synPoints = synPoints.map(function(el) {
+                var xMid = el['end1'] - el['start1'] / 2;
+                var yMid = el['end2'] - el['start2'] / 2;
+
+                /*
+                var node = gr.nodes[el['id']];
+                var num = node.cycleNum % 7;
+                */
+                var num = el['cycleNum'] % 7;
+                var col = 'W';
+                switch (num) {
+                    case 0:
+                        col = 'W';
+                        break;
+                    case 1:
+                        col = 'B';
+                        break;
+                    case 2:
+                        col = 'G';
+                        break;
+                    case 3:
+                        col = 'R';
+                        break;
+                    case 4:
+                        col = 'U';
+                        break;
+                    case 5:
+                        col = 'Y';
+                        break;
+                    case 6:
+                        col = 'O';
+                        break;
+                    default:
+                        col = 'W';
+                        
+                }
+                return[xMid,yMid,'C:' + col,el['id']];
+
+            });
+
+
+
+            if (zoomStart == -1) {
+
+            }
+            else {
+                var synPoints = synPoints.filter(function (el, ii) {
+
+                    if ((ii < zoomStart) || (ii > zoomEnd)) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                });
+            }
+
+
+
+
+
+
+
+                plot(document.getElementById('skewCanvas'),synPoints);
+
+
+
+            var resStr = '';
+
+
+            resStr += '\nanchors length: ' + anchorsList.length + ' num cycles: ' + numCycles;
+
+            resEl.value = resStr;
+
+            resEl.value+='\n' + 'amalgamated cycles: ' + cycSummary.length;
+
+            var cycSummStr = '';
+            cycSummary.forEach(function(el) {
+                cycSummStr += '\n' + el[0]['xNum'] + '-' + el[1]['xNum'] + '..' +  el[0]['start1'] + '-' + el[1]['end1'];
+
+            });
+
+            resEl.value += '\n' + cycSummStr;
+
+
+
+
+            break;
+
+        case '44': //Turnpike problem
+
+            var turnAr = par1El.value.split(' ');
+
+            var numZeros = 0;
+
+            turnAr = turnAr.map(function(el) {
+                if (el == "0") {
+                    ++numZeros;
+                }
+                return parseInt(el);
+            });
+
+            turnAr = turnAr.filter(function(el) {
+                    return (el >= 0);
+            });
+
+            var prev = 0;
+            var count = 0;
+
+            var turnDict = {};
+            var maxCount = 0;
+
+            turnAr.forEach(function(el,i) {
+                if (el == prev) {
+                    ++count;
+                    ++maxCount;
+                }
+                else {
+                    turnDict[prev] = count;
+                    prev = el;
+                    count = 1;
+                    ++maxCount;
+                }
+            });
+            turnDict[prev] = count;
+
+            prev = -1;
+
+
+            var highest = turnAr[turnAr.length - 1];
+
+            var uniqueNums = [];
+
+            turnAr.forEach(function(el) {
+                if (el == prev) {
+
+                }
+                else {
+                    uniqueNums.push(el);
+                    prev = el;
+
+                }
+            });
+
+            var valid = [];
+            var validDict = {};
+
+            for (var i = 0;i < uniqueNums.length;++i) {
+                for (var j = 0;j < uniqueNums.length;++j) {
+
+                        if (i == j) {
+
+                        }
+                    else {
+
+
+                            if (uniqueNums[i] + uniqueNums[j] == highest) {
+                                valid.push(uniqueNums[i]);
+
+                                break;
+                            }
+                        }
+                    
+                }
+            }
+
+            valid.forEach(function(el,i) {
+                validDict[el] = {'ind':i,'numRem':valid.length - i - 1}; //excludes last element, as this is put in first
+            });
+
+            var finished = false;
+
+            var candidates = [];
+            var ind = 0;
+
+
+
+            var newCandidates = [];
+            var popSize = 20;
+            for (var i = 0;i < popSize;++i) {
+                newCandidates.push(turnpikeGenerateRandomCand(valid,numZeros));
+            }
+
+            var res = turnpikeScore(newCandidates,turnDict);
+            var scores = res[0];
+            var maxScore = res[1];
+            var maxInd = res[2];
+
+            for (var i = 0;i < scores.length;++i) {
+                if (scores[i] == maxCount) {
+                    resEl.value = '\nValid turnpike nat sel: ' + newCandidates[i];
+                    break;
+                }
+            }
+
+            var numGens = 50000;
+
+            for (var g = 0;g < numGens;++g) {
+
+                if (g % 100 == 0) {
+                    console.log('gen turnpike: ' + g + ' score: ' + maxScore + ' ' + newCandidates[maxInd][0] + ' ' + newCandidates[maxInd][1] + ' ' + newCandidates[maxInd][2] + ' '  +   newCandidates[maxInd][3] + ' ' + newCandidates[maxInd][4] + ' ' + newCandidates[maxInd][5]  +  ' ' + newCandidates[maxInd][6] + ' ' + newCandidates[maxInd][7] + ' ' + newCandidates[maxInd][8] + ' ' +  newCandidates[maxInd][9] + ' ' + newCandidates[maxInd][10] + ' ' + newCandidates[maxInd][11] );
+                }
+
+                candidates = [];
+                newCandidates.forEach(function (el) {
+                    candidates.push(el);
+                });
+                newCandidates = [];
+                newCandidates.push(candidates[maxInd]); // best goes into next pop as is
+                for (var p = 1;p < popSize;++p) {
+                    var r = getRandomInt(0,8);
+                    var numMutes = getRandomInt(0,12);
+                    //var mutated = candidates[scores[r][1]].map(function(el) {
+                    //    return el;
+
+                   // });
+                    var mutated = [];
+                    for (var m = 0;m < candidates[scores[r][1]].length;++m) {
+                        mutated.push(candidates[scores[r][1]][m]);
+                    }
+
+                    for (var m = 0;m < numMutes;++m) {
+                        mutated = turnpikeMutateOne(mutated, valid);
+                    }
+                    newCandidates.push(mutated);
+                }
+
+                res = turnpikeScore(newCandidates,turnDict);
+                scores = res[0];
+                maxScore = res[1];
+                maxInd = res[2];
+
+
+
+            }
+
+            resEl.value = '\nValid turnpike nat sel. Score: ' + maxScore + '\n' +  newCandidates[maxInd].sort(function(a,b) {
+                    return  parseInt(a) - parseInt(b);
+                });
+
+
+
+
+            //var good = boundTurnpike(turnAr,[[0,2,4,7,10],[0,2,6,7,10]]);
+
+
+            
+
+            /* branch and bound
+
+            var newCandidates = [[highest,0]];
+            while (!finished) {
+                candidates = [];
+                newCandidates.forEach(function(el) {
+                    candidates.push(el);
+
+                });
+
+                newCandidates = [];
+
+                for (var i = 0;i < candidates.length;++i) {
+                    if (i % 10000 == 0) {
+                        console.log('turnpike branch. i = ' + i);
+                    }
+                    var currInd = validDict[candidates[i][candidates[i].length - 1]]['ind'];
+                    for (var j = currInd + 1;j < valid.length;++j) {
+                        var nextRem = validDict[valid[j]]['numRem'];
+                        if (nextRem + candidates[i].length < numZeros) {
+                            break;
+                        }
+                        var newEntry = candidates[i].concat([valid[j]]);
+                        newCandidates.push(newEntry);
+                    }
+                }
+
+                var scores = turnpikeScore(newCandidates,turnDict);
+
+                newCandidates = boundTurnpikeDict(turnAr,newCandidates,turnDict);
+
+                for (var nc = 0;nc < newCandidates.length;++nc) {
+                    if (newCandidates[nc].length == numZeros) {
+                        finished = true;
+                        resEl.value = '\nValid turnpike: ' + newCandidates[nc]
+                        break;
+                    }
+                }
+
+            }
+            //end branch and bound
+            */
+
+
+
+                break;
+
+        case '45': //Dist matrix from tree
+
+            var adjList = par1El.value;
+
+            //var builderRos = new DGraphBuilder('0->4:11\n1->4:2\n2->5:6\n3->5:7\n4->0:11\n4->1:2\n4->5:4\n5->4:4\n5->3:7\n5->2:6',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+            var builderRos = new DGraphBuilder(adjList,new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+            //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
+            var xx = 1;
+            var grRos = new DBTreeGraph(builderRos);
+            var distMat = grRos.distanceMatrixFromTree();
+            xx = 2;
+
+            var numZeros = 0;
+
+            var res = '';
+            distMat.forEach(function(row) {
+                row.forEach(function(el) {
+                   res += el;
+                   res += ' ';
+                });
+                res+='\n';
+            });
+            resEl.value = res;
+
+            break;
+
+        case '46': //Limb Lengths
+
+            var leafNum = par2El.value;
+            var distMat = par1El.value;
+
+
+            var builder = new DGraphTreeFromDistBuilder(distMat);
+            var gr = new DBTreeGraph(builder);
+            var limbLen = builder.limbLength(leafNum);
+
+            resEl.value = limbLen;
+
+            break;
+
+
+        case '47': //Additive Phylogeny from dist matrix
+
+            var mat = par1El.value;
+
+
+            var builder = new DGraphTreeFromDistBuilder(mat);
+
+            var gr = new DBTreeGraph(builder);
+
+            resEl.value = gr.toAdjacencyList();
+
+
+
+            break;
+        case '48': //Additive Phylogeny from alignments
+
+            var alignments = par1El.value;
+
+
+            var builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(alignments));
+            
+            var gr = new DBTreeGraph(builder);
+
+            resEl.value = gr.toAdjacencyList();
+
+
+
+            break;
+
+        case '49': //Ultrametric tree from dist mat
+
+            var mat = par1El.value;
+
+
+            var builder = new DGraphUltraTreeFromDistBuilder(mat);
+
+            var minD = builder.minDistInMatrix(builder.matrix);
+
+            var gr = new DBTreeGraph(builder);
+
+            var nd = gr.centralNode();
+
+            resEl.value = gr.toAdjacencyList();
+
+            var canv = document.getElementById('evenMoreCanvas');
+            var ctx = canv.getContext('2d');
+            var r = new DBRect(30,30,30,30);
+            
+            
+            var gView = new DBGraphView(ctx,r,gr);
+            gView.display();
+
+
+
+            break;
+
+        case '50': //Test graph printing
+
+            var mat = par1El.value;
+            var builder = new DGraphTreeFromDistBuilder(mat);
+          // var adj = par1El.value;
+          // var builder = new DGraphBuilder(adj,new DTreeNodeBuilder(),new DTreeEdgeBuilder());
+
+            var gr = new DBTreeGraph(builder);
+
+            var central = gr.centralNode();
+
+            //var copiedGr = gr.copyGraph();
+
+            //copiedGr.stripLeaves();
+
+           // copiedGr.deleteNode(copiedGr.nodes[1]);
+
+            var canv = document.getElementById('evenMoreCanvas');
+
+
+            var gvCont = new DBGraphViewController(gr);
+            //var gvCont = new DBTestSimpleController();
+
+            pGraphView = new DBGraphView(canv,gvCont);
+            pGraphView.display();
+
+
+
+            break;
+
+        case '51': //Alg - fibonacci numbers
+
+            var n = parseInt(par1El.value);
+
+            var fibN = n + 1;
+            var fibAr = [];
+
+            fibAr.push(0);
+            fibAr.push(1);
+
+
+            for (var i = 2;i < n + 1;++i) {
+                var newFib = fibAr[i -2] + fibAr[i - 1];
+                fibAr.push(newFib);
+            }
+
+            resEl.value = fibAr;
+
+
+
+            break;
+
+
+
+        case '52': //Alg -  binary search
+
+            var sortedTxtAr = par1El.value.split(' ');
+            var sortedAr = sortedTxtAr.map(function(el) {
+                return parseInt(el);
+            });
+            var testingTxtAr = par2El.value.split(' ');
+            var testingAr = testingTxtAr.map(function(el) {
+                return parseInt(el);
+            });
+
+            var indAr = [];
+            testingAr.forEach(function(tstNum) {
+                var ind = binarySearch(tstNum,sortedAr);
+                indAr.push(ind);
+            });
+
+
+
+
+
+            resEl.value = arrayToString(indAr);
+
+
+
+            break;
+
+        case '53': //Alg -  insertion sort
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+            });
+
+
+
+            var ret = insertionSort(ar,true);
+
+            resEl.value = arrayToString(ret[0]) + '\n' + 'Num swaps: ' + ret[1];
+
+
+
+            break;
+
+        case '54': //Alg -  majority element
+
+            var resultAr = [];
+            var arArray = par1El.value.split('\n');
+
+            arArray.forEach(function(str) {
+                var txtAr  = str.split(' ');
+                var ar = txtAr.map(function(el) {
+                    return parseInt(el);
+
+                });
+
+                var res = majorityElement(ar);
+                resultAr.push(res);
+
+            });
+
+            var resString = '';
+
+            resultAr.forEach(function(el) {
+                if (el[0]) {
+                    resString+= el[1];
+                }
+                else {
+                    resString += -1;
+                }
+
+                resString += ' ';
+            });
+
+
+            resEl.value = resString;
+
+
+
+            break;
+
+        case '55': //Alg -  merge sorted arrays
+
+
+            var txtAr1 = par1El.value.split(' ');
+            var ar1 = txtAr1.map(function(el) {
+                return parseInt(el);
+
+            });
+
+            var txtAr2 = par2El.value.split(' ');
+            var ar2 = txtAr2.map(function(el) {
+                return parseInt(el);
+
+            });
+
+            var merged = mergeSorted(ar1,ar2);
+
+            resEl.value = arrayToString(merged);
+
+
+
+            break;
+
+        case '56': //Alg -  merge sort
+
+
+            var txtAr = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+
+            var sorted = mergeSort(ar);
+
+            resEl.value = arrayToString(sorted);
+
+
+
+            break;
+
+        case '57': //Alg -  count inversions
+
+
+            var txtAr = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+
+            var invs = countInversions(ar);
+
+            resEl.value = invs;
+
+
+
+            break;
+
+        case '58': //Alg -   2Sum
+
+
+            var resultAr = [];
+            var arArray = par1El.value.split('\n');
+
+            var pairs = [];
+            arArray.forEach(function(str) {
+                var txtAr  = str.split(' ');
+                var ar = txtAr.map(function(el) {
+                    return parseInt(el);
+
+                });
+
+                var uniqueDict = {};
+                var pair = [];
+                for (var i = 0;i < ar.length;++i) {
+                    if (ar[i] * -1 in uniqueDict) {
+                        pair = [uniqueDict[ar[i] * -1] + 1,i + 1]; //1 based index
+                        pairs.push(pair);
+                        break;
+
+                    }
+                    else if (ar[i] in uniqueDict) {
+
+                    }
+                    else {
+                        uniqueDict[ar[i]] = i;
+                    }
+
+                }
+                if (pair.length == 0) {
+                    pairs.push([]);
+                }
+
+
+            });
+
+            var res = '';
+
+            pairs.forEach(function(el) {
+                if (el.length == 0) {
+                    res += -1 + '\n';
+                }
+                else {
+                    res += el[0] + ' ' + el[1] + '\n';
+                }
+
+            });
+
+            resEl.value = res;
+
+
+
+            break;
+
+        case '59': //Alg -   3Sum
+
+
+            var resultAr = [];
+            var arArray = par1El.value.split('\n');
+
+            var trios = [];
+            arArray.forEach(function(str) {
+                var txtAr  = str.split(' ');
+                var ar = txtAr.map(function(el) {
+                    return parseInt(el);
+
+                });
+
+                var uniqueDict = {};
+                var trio = [];
+                for (var i = 0;i < ar.length;++i) {
+                    for (j = i+1; j < ar.length; ++j) {
+                        if ((ar[i] + ar[j]) in uniqueDict) {
+
+
+                        }
+
+                        else {
+                            uniqueDict[ar[i] + ar[j]] = [i, j];
+                        }
+
+                    }
+
+
+                }
+
+                var trio = [];
+
+                for (var i = 0;i < ar.length;++i) {
+                    if (ar[i] * -1  in uniqueDict) {
+                        if (i <= uniqueDict[ar[i] * -1][1]) {
+                        }
+                        else {
+                            trio = [uniqueDict[ar[i]*-1][0] + 1,uniqueDict[ar[i]*-1][1] + 1,i + 1]; // 1 based index
+                            break;
+                        }
+                    }
+                }
+                trios.push(trio);
+
+                var bb = 1;
+
+
+            });
+
+            var res = '';
+
+            trios.forEach(function(el) {
+                if (el.length == 0) {
+                    res += -1 + '\n';
+                }
+                else {
+                    res += el[0] + ' ' + el[1] + ' ' + el[2] +  '\n';
+                }
+
+            });
+
+            resEl.value = res;
+
+            break;
+
+        case '60': //Alg -   Binary Heap
+
+
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+            var h  = new Heap(ar);
+            h.init();
+
+
+            resEl.value = arrayToString(h.heapAr);
+
+            break;
+
+        case '61': //Alg -   Heap sort
+
+
+
+        var txtAr  = par1El.value.split(' ');
+        var ar = txtAr.map(function(el) {
+            return parseInt(el);
+
+        });
+
+        var h  = new Heap(ar);
+        h.init();
+
+
+
+        var sorted = h.sort();
+
+
+        resEl.value = arrayToString(sorted);
+
+
+
+
+        break;
+
+        case '62': //Alg -   Heap sort partial
+
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+            
+            var num = parseInt(par2El.value);
+
+            var h  = new MinHeap(ar);
+            h.init();
+
+
+
+            var sorted = h.sort(num);
+
+
+            resEl.value = arrayToString(sorted);
+
+
+
+
+            break;
+
+        case '63': //Alg -   Degree
+
+
+            var adjList = par1El.value;
+
+            var builder = new DGraphBuilder(adjList);
+      
+            var gr = new DBGraph(builder);
+
+            var nodeAr = gr.nodes.map(function(el) {
+               return 0;
+            });
+
+            gr.nodes.forEach(function(el) {
+                var ind = parseInt(el.label) - 1;
+                nodeAr[ind] = el.degree();
+            });
+
+            resEl.value = arrayToString(nodeAr);
+
+
+
+
+            break;
+
+        case '64': //Alg -   Double Degree
+
+
+            var adjList = par1El.value;
+
+            var builder = new DGraphBuilder(adjList);
+
+            var gr = new DBGraph(builder);
+
+            var nodeAr = gr.nodes.map(function(el) {
+                return 0;
+            });
+
+            gr.nodes.forEach(function(el) {
+                var ind = parseInt(el.label) - 1;
+                var totDeg = 0;
+                var sucs = el.getPredecessors();
+                sucs.forEach(function(suc) {
+                    totDeg += suc.degree();
+
+                    
+                });
+                nodeAr[ind] = totDeg;
+            });
+
+            resEl.value = arrayToString(nodeAr);
+
+
+
+
+            break;
+
+        case '65': //Alg - Two way partition
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+
+
+
+            twoWayPartition(ar);
+
+            resEl.value = arrayToString(ar);
+
+
+            break;
+
+        case '66': //Alg - Three way partition
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+            var vTxt = par2El.value;
+            if (vTxt == '') {
+                v = ar[0];
+            }
+            else {
+                v = parseInt(vTxt);
+            }
+
+
+
+            
+
+            var inds = threeWayPartitionNonInPlace(ar,v);
+
+            resEl.value = inds + '\n' + arrayToString(ar);
+
+
+            break;
+
+        case '67': //Alg - Median
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+            var kTxt = par2El.value;
+            if (kTxt == '') {
+                k = Math.floor(ar.length / 2);// ie look for median
+            }
+            else {
+                k = parseInt(kTxt);
+            }
+
+            var m = kthSmallest(ar,k);
+
+
+
+            resEl.value = m;
+
+
+            break;
+
+        case '68': //Alg - Quick Sort
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+
+            var sorted = quickSort(ar);
+
+
+
+            resEl.value = arrayToString(sorted);
+
+
+            break;
+
+        case '69': //Top order DAG
+
+
+            var adjList = par1El.value;
+
+            var builder = new DGraphBuilder(adjList);
+
+            var gr = new DBGraph(builder);
+
+
+            var done = false;
+
+            gr.resetNodesVisited();
+
+            var order = [];
+
+            while (!done) {
+
+                done = true;
+
+                gr.nodes.forEach(function (el) {
+
+
+
+                    if (el.visited) {
+
+                    }
+                    else {
+                        var preds = el.getPredecessors();
+                        if (preds.length == 0) {
+                            el.visited = true;
+                            order.push(el);
+                        }
+                        else {
+                            var allPredDone = true;
+                            preds.forEach(function(pred) {
+                               if (!(pred.visited)) {
+                                   allPredDone = false;
+                               }
+                            });
+                            if (allPredDone) {
+                                el.visited = true;
+                                order.push(el);
+                            }
+                            else {
+                                done = false;
+                            }
+                        }
+                    }
+
+                });
+            }
+
+            var resString = '';
+
+            order.forEach(function(ord,i) {
+                resString+=ord.label;
+                if (i < order.length - 1) {
+                    resString += ', ';
+                }
+
+            });
+
+            resEl.value =resString;
+
+
+
+
+            break;
+
+        case '70': //Turnpike
+
+
+            var txtAr  = par1El.value.split(' ');
+            var ar = txtAr.map(function(el) {
+                return parseInt(el);
+
+            });
+
+          //  var delta = deltaTurnpike([0,4,7,8,10]);
+          var delta = deltaTurnpike([0,4,7,8,10]);
+
+           // var tr = turnpikeBacktrack(ar);
+            var tr= turnpikeBacktrack(ar);
+
+            //var tr = turnpikeRecursive([0,0,2]);
+
+          //  turnpike(ar);
+
+
+            resEl.value =arrayToString(tr);
+
+            break;
+
+
+        case '71': //Alg - depth-first search
+
+           //check number of connected components
+           // Note: par2 can hold the  number of vertices/edges (separated by space)
+           // If so: need to check number of nodes. If less than vertices specified, there are
+           // more (isolated) connected components, ie extra vertices which have no connections
+
+            
+            var adjList = par1El.value;
+
+            var info = par2El.value;
+            var numVertices = -1;
+            var numEdges = -1;
+            if (info.length == 0) {
+
+            }
+            else {
+                var infoSplit = info.split(' ');
+                numVertices = parseInt(infoSplit[0]);
+                numEdges = parseInt(infoSplit[1]);
+            }
+
+            var builder = new DGraphBuilder(adjList);
+
+            var gr = new DBGraph(builder);
+
+
+            var done = false;
+
+            gr.resetNodesVisited();
+
+            var order = [];
+
+            var done = false;
+            var connectedComponents = 0;
+            while (!done) {
+
+                var foundNonVisited = false;
+                for (var i = 0;i < gr.nodes.length;++i) {
+                    if (gr.nodes[i].visited) {
+
+                    }
+                    else {
+                        foundNonVisited = true;
+                        ++connectedComponents;
+                        break;
+                    }
+                }
+                if (foundNonVisited) {
+                    var nd = gr.nodes[i];
+                    var conn = gr.getConnected(nd);
+                }
+                else {
+                    done = true;
+                }
+
+            }
+
+            var numNodes = gr.nodes.length;
+
+            if (numVertices == -1) {
+
+            }
+            else {
+                //check for extra non-used vertices
+                if (numVertices > numNodes) {
+                    connectedComponents += (numVertices - numNodes);
+                }
+            }
+
+
+
+
+
+
+            var resString = connectedComponents;
+
+
+            resEl.value =resString;
+
+
+
+
+            break;
+
+
+
+        case '72': //Alg - breadth-first search
+
+            //return list of path lengths from first node to all other nodes
+            // Note: par2 can hold the  number of vertices/edges (separated by space)
+            // If so: need to check number of nodes. If less than vertices specified, there are
+            // more (isolated) connected components, ie extra vertices which have no connections
+
+            var adjList = par1El.value;
+            //convert adjlist to directed adj list (assuming first named nodes are source and second are target
+            var workingAr = adjList.split('\n');
+            var workingString = '';
+            workingAr.forEach(function(el,i) {
+                var sourceTarg = el.split(' ');
+                workingString+=sourceTarg[0] + ' -> ' + sourceTarg[1];
+                if (i < workingAr.length - 1) {
+                    workingString+='\n';
+                }
+
+            });
+            adjList = workingString;
+
+
+            var info = par2El.value;
+
+            var pathList = [];
+
+            var numVertices = -1;
+            var numEdges = -1;
+            if (info.length == 0) {
+
+            }
+            else {
+                var infoSplit = info.split(' ');
+                numVertices = parseInt(infoSplit[0]);
+                numEdges = parseInt(infoSplit[1]);
+            }
+
+
+            for (var i = 0;i < numVertices;++i) {
+                pathList.push(-1);
+            }
+
+
+
+            var builder = new DGraphBuilder(adjList);
+
+            var gr = new DBGraph(builder);
+
+
+            var done = false;
+
+            gr.resetNodesVisited();
+
+            var order = [];
+
+            var done = false;
+
+            var first = gr.getNodeFromLabel('1');
+
+            first.visited = true;
+
+            var depthQueue = [first];
+            pathList[0] = 0;
+
+            var level = 0;
+
+            while (depthQueue.length > 0) {
+
+                var newQueue =[];
+
+                depthQueue.forEach(function(nd) {
+                    var succs = nd.getSuccessorNodes();
+                    succs.forEach(function(suc) {
+                        if (suc.visited) {
+
+                        }
+                        else {
+                            newQueue.push(suc);
+                            suc.visited = true;
+                        }
+                    });
+
+
+
+                });
+
+                ++level;
+                newQueue.forEach(function(el) {
+                    var ind = parseInt(el.label) - 1;
+                    pathList[ind] = level;
+
+                });
+
+                depthQueue = newQueue;
+
+            }
+
+
+            var resString = arrayToString(pathList);
+
+
+            resEl.value =resString;
+
+
+
+
+            break;
+
+        case '73': //Nearest Neighbours
+
+
+            var adjList = par1El.value;
+
+            var edgeToUse = par2El.value;
+            var edgeToUseLabFrom = edgeToUse.split(' ')[0];
+            var edgeToUseLabTo = edgeToUse.split(' ')[1];
+
+            var builder = new DGraphTreeBuilder(adjList);
+
+            var gr = new DBTreeGraph(builder);
+
+            var nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
+
+            var edge;
+
+            nd.edges.forEach(function(el) {
+
+                if ((el.sourceNode.label == edgeToUseLabTo) ||
+                   (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
+                    edge = el;
+                }
+
+            });
+
+            var neighb = edge.neighbouringEdges();
+            var fromNode1 = edge.sourceNode;
+            var fromNode2 = edge.targetNode;
+            gr.builder.swapEdges(neighb[0][1],neighb[1][0],fromNode1,fromNode2);
+
+
+            var str = gr.toAdjacencyList(0,false,true,true);
+
+            builder = new DGraphTreeBuilder(adjList);
+
+            gr = new DBTreeGraph(builder);
+
+            nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
+
+
+            nd.edges.forEach(function(el) {
+
+                if ((el.sourceNode.label == edgeToUseLabTo) ||
+                    (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
+                    edge = el;
+                }
+
+            });
+
+            neighb = edge.neighbouringEdges();
+            fromNode1 = edge.sourceNode;
+            fromNode2 = edge.targetNode;
+            gr.builder.swapEdges(neighb[0][1],neighb[1][1],fromNode1,fromNode2);
+
+
+
+            str += '\n ' + '\n' + gr.toAdjacencyList(0,false,true,true);
+
+
+           var resString = str;
+
+
+            resEl.value =resString;
+
+
+
+
+            break;
+
         default:
             break;
     }
@@ -2770,6 +5360,292 @@ function executeMisc(e) {
 */
 
 }
+
+
+function turnpikeMutateOne(cand,valid) {
+
+    var mutCand = cand.map(function(el) {
+        return el;
+    });
+
+    var pos = getRandomInt(2,cand.length - 1);
+    var newInd = getRandomInt(1,valid.length - 2);
+    var finished = false;
+    while (!finished) {
+        var newNum = valid[newInd];
+        if (cand.indexOf(newNum) > -1) {
+            //already there
+            newInd = getRandomInt(1,valid.length - 2);
+        }
+        else {
+            mutCand[pos] = valid[newInd];
+            finished = true;
+        }
+    }
+
+    return mutCand;
+}
+
+function turnpikeGenerateRandomCand(valid,numZeros) {
+
+    var candAr = [valid[0],valid[valid.length - 1]];
+    while (candAr.length < numZeros) {
+          var r = getRandomInt(1,valid.length - 2);
+          if (candAr.indexOf(valid[r]) > -1) {
+              //already there
+
+          }
+           else {
+              candAr.push(valid[r]);
+          }
+    }
+
+    return candAr;
+
+}
+
+function turnpikeScore(candidates,turnDict) {
+
+    var scoreAr = [];
+
+    var maxScore = -9999999;
+    var maxInd = -1;
+
+    for (var c = 0;c < candidates.length;++c) {
+
+       // if (c % 1000 == 0) {
+       //     console.log('c: ' + c);
+       // }
+        /*
+         turnArCopy = [];
+         turnAr.forEach(function(el) {
+         turnArCopy.push(el);
+         });
+         */
+
+        var diffAr = [];
+        var good = true;
+
+        var diffDict = {};
+
+        var score = 0;
+
+        for (var i = 0;i < candidates[c].length;++i ) {
+           // if (good == false) {
+           //     break;
+           // }
+
+            for (var j = i + 1;j < candidates[c].length;++j) {
+                var diff = Math.abs(candidates[c][i] - candidates[c][j]);
+
+                if (diff in turnDict) {
+                    if (diff in diffDict) {
+                        diffDict[diff] +=1;
+                        ++score;
+                        if (diffDict[diff] > turnDict[diff]) {
+                            //too many
+                            good = false;
+                            --score;
+                            //score = score - 50;
+                           // break;
+
+                        }
+                    }
+                    else {
+                        diffDict[diff] = 1;
+                        ++score;
+                    }
+
+                }
+                else {
+                    good = false;
+                    --score;
+                    //score = score - 50;
+                    //break;
+                }
+                // if (diff < 0) {
+
+                //}
+                //else {
+                diffAr.push(diff);
+
+                //  }
+            }
+        }
+
+    if (!good) {
+        //score = score - 50;
+    }
+
+        scoreAr.push([score,c]);
+
+        if (score > maxScore) {
+            maxScore = score;
+            maxInd = c;
+        }
+
+        /*
+        if (good) {
+            goodCandidates.push(candidates[c]);
+        }
+        */
+
+
+
+    }
+
+    scoreAr.sort(function(a,b) {
+        return parseInt(b[0]) - parseInt(a[0]);
+    });
+
+    return [scoreAr,maxScore,maxInd];
+
+}
+function boundTurnpikeDict(turnAr,candidates,turnDict) {
+
+    console.log('bounding turnpike. Len: ' + candidates.length);
+    /*
+    var turnArCopy = [];
+    turnAr.forEach(function(el) {
+        turnArCopy.push(el);
+    });
+    */
+
+    var goodCandidates = [];
+
+    for (var c = 0;c < candidates.length;++c) {
+
+        if (c % 1000 == 0) {
+            console.log('c: ' + c);
+        }
+        /*
+        turnArCopy = [];
+        turnAr.forEach(function(el) {
+            turnArCopy.push(el);
+        });
+        */
+
+        var diffAr = [];
+        var good = true;
+
+        var diffDict = {};
+
+        for (var i = 0;i < candidates[c].length;++i ) {
+            if (good == false) {
+                break;
+            }
+
+            for (var j = i + 1;j < candidates[c].length;++j) {
+                var diff = Math.abs(candidates[c][i] - candidates[c][j]);
+
+                if (diff in turnDict) {
+                    if (diff in diffDict) {
+                        diffDict[diff] +=1;
+                        if (diffDict[diff] > turnDict[diff]) {
+                            //too many
+                            good = false;
+                            break;
+                        }
+                    }
+                    else {
+                        diffDict[diff] = 1;
+                    }
+
+                }
+                else {
+                    good = false;
+                    break;
+                }
+                // if (diff < 0) {
+
+                //}
+                //else {
+                diffAr.push(diff);
+
+                //  }
+            }
+        }
+        /*
+        for (var d = 0;d < diffAr.length;++d) {
+            var ind = turnArCopy.indexOf(diffAr[d]);
+            if (ind > -1) {
+                turnArCopy.splice(ind,1);
+            }
+            else {
+                good = false;
+                break;
+
+            }
+        }
+        */
+
+        if (good) {
+            goodCandidates.push(candidates[c]);
+        }
+
+
+
+    }
+
+    return goodCandidates;
+
+}
+
+
+function boundTurnpike(turnAr,candidates) {
+
+    var turnArCopy = [];
+    turnAr.forEach(function(el) {
+        turnArCopy.push(el);
+    });
+
+    var goodCandidates = [];
+
+    for (var c = 0;c < candidates.length;++c) {
+        turnArCopy = [];
+        turnAr.forEach(function(el) {
+            turnArCopy.push(el);
+        });
+
+        var diffAr = [];
+        var good = true;
+        for (var i = 0;i < candidates[c].length;++i ) {
+
+            for (var j = i + 1;j < candidates[c].length;++j) {
+                var diff = Math.abs(candidates[c][i] - candidates[c][j]);
+               // if (diff < 0) {
+
+                //}
+                //else {
+                   diffAr.push(diff);
+
+              //  }
+            }
+        }
+        for (var d = 0;d < diffAr.length;++d) {
+            var ind = turnArCopy.indexOf(diffAr[d]);
+            if (ind > -1) {
+                turnArCopy.splice(ind,1);
+            }
+            else {
+                good = false;
+                break;
+
+            }
+        }
+
+        if (good) {
+            goodCandidates.push(candidates[c]);
+        }
+
+
+
+    }
+
+    return goodCandidates;
+
+}
+
 
 function initialiseMotifParams() {
 
@@ -2808,6 +5684,250 @@ function initialiseMotifParams() {
 
 
 }
+
+function runSBBackground(e) {
+
+    initialiseResults();
+
+    var paramObj = initialiseSBParams();
+
+
+    switch (paramObj.sbRadioMethodSel.id) {
+
+        case 'sbSharedKmers':
+
+            var g;
+
+            sbReturned = {};
+            sbReturned.inProgress = true;
+            sbMasterChanged();
+
+            w.postMessage({
+                'task': 'synteny',
+                'sbS': paramObj.sbS,
+                'sbT': paramObj.sbT,
+                'sbMethod':paramObj.sbRadioMethodSel.id,
+                'k': paramObj.k,
+                'debug':paramObj.debug
+
+            }); // Start the worker.
+
+
+
+
+
+            break;
+
+
+        default:
+            break;
+
+    }
+}
+
+
+function runAlignBackground(e) {
+
+    initialiseResults();
+
+    var paramObj = initialiseAlignParams();
+
+
+    switch (paramObj.alignRadioMethodSel.id) {
+
+        case 'alignLCS':
+        case 'alignGlobal':
+        case 'alignEditDist':
+        case 'alignLocal':
+        case 'alignFitting':
+        case 'alignOverlap':
+            
+
+            var g;
+
+            alignReturned = {};
+            alignReturned.inProgress = true;
+            alignMasterChanged();
+
+            w.postMessage({
+                'task': 'align',
+                'sAlign': paramObj.sAlign,
+                'tAlign': paramObj.tAlign,
+                'uAlign': paramObj.uAlign, //optional
+                'alignMethod':paramObj.alignRadioMethodSel.id,
+                'alignType':paramObj.alignType,
+                'scoreMatrix':paramObj.scoreMat,
+                'indelPen':paramObj.indelPen,
+                'mismatchPen':paramObj.mismatchPen,
+                'matchScore':paramObj.matchScore,
+                'linSpaceThresh': paramObj.linearSpaceThreshold,
+                'useAffine' : paramObj.useAffine,
+                'affineOpenGap' : paramObj.affineOpenGap,
+                'debug':paramObj.debug
+
+            }); // Start the worker.
+
+
+
+
+
+            break;
+
+
+        default:
+            break;
+
+    }
+}
+
+
+function runAlign(e) {
+
+    var alignRadioMethodSel = getSelectedRadioEl('alignMethod');
+
+    var indelPen = parseInt(document.getElementById('indelPenAL').value);
+    var mismatchPen = parseInt(document.getElementById('mismatchPenAL').value);
+
+
+    switch (alignRadioMethodSel.id) {
+
+        case 'alignLCS':
+        case 'alignGlobal':
+        case 'alignEditDist':
+        case 'alignLocal':
+
+            
+
+          
+            var g;
+
+            var scoreMatRadioSel = getSelectedRadioEl('alignScore');
+            var scoreMat;
+            switch (scoreMatRadioSel.id) {
+                case 'alignPamScore':
+                    scoreMat = pamScoringMatrix;
+                    break;
+                case 'alignBloScore':
+                    scoreMat = blosum62ScoringMatrix;
+                    break;
+
+                default:
+                    scoreMat = null;
+                    break;
+
+            }
+
+            //var scoreMat = document.getElementById('alignPamScore').checked ? pamScoringMatrix : null;
+            
+            if (alignRadioMethodSel.id === 'alignLCS') {
+                indelPen = 0;
+                mismatchPen = 0;
+                g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeGlobal,null,indelPen,mismatchPen);
+                
+            }
+            else if (alignRadioMethodSel.id === 'alignGlobal') {
+                g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeGlobal,scoreMat,indelPen,mismatchPen);
+                
+            }
+            else if (alignRadioMethodSel.id === 'alignEditDist') {
+                indelPen = 1;
+                mismatchPen = 1;
+                g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeGlobal,null,indelPen,mismatchPen,0);
+            }
+            else if (alignRadioMethodSel.id === 'alignLocal') {
+                g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeLocal,scoreMat,indelPen,mismatchPen);
+            }
+            
+
+          //  w.postMessage({'task' : 'alignLCS', 'graph': g, 'debug':document.getElementById('debugAL').checked }); // Start the worker.
+
+
+            g.initGraph();
+
+            /*
+            var sourceNum  = 0;
+            var source = sourceNum.toString();
+            var sinkNum  =  (alignS.length + 1) * (alignT.length + 1) - 1;
+            var sink = sinkNum.toString();
+            */
+
+           // g.longestPathsDynamic(source,sink);
+
+            
+
+            g.longestPathsDynamic();
+
+            alignGraph = g;
+            alignMasterChanged();
+
+
+
+            var alignData = g.alignStrings();
+            var longest = alignData[0];
+            var sStr = alignData[1];
+            var tStr = alignData[2];
+            var lcsStr = alignData[3];
+
+            alignGraph = g;
+            alignMasterChanged();
+
+            if (document.getElementById('debugAL').checked) {
+                var resStr = '';
+                resStr += '\nDebug pressed';
+                resStr += '\nScore: ' + longest;
+                resStr += '\nSequence: : ' + lcsStr;
+
+                document.getElementById('debugText').value = resStr;
+            }
+
+
+
+
+            break;
+
+
+
+
+
+            /*
+            var g = new DGAlignGraph(alignS,alignT,indelPen,mismatchPen);
+
+            g.initGraph();
+
+            var sourceNum  = 0;
+            var source = sourceNum.toString();
+            var sinkNum  =  (alignS.length + 1) * (alignT.length + 1) - 1;
+            var sink = sinkNum.toString();
+
+            g.longestPathsDynamic(source,sink);
+
+            var alignData = g.alignStrings();
+            var longest = alignData[0];
+            var sStr = alignData[1];
+            var tStr = alignData[2];
+            var lcsStr = alignData[3];
+
+            alignGraph = g;
+
+            alignMasterChanged();
+
+            if (document.getElementById('debugAL').checked) {
+                var resStr = '';
+                resStr += '\nDebug pressed';
+                resStr += '\nScore: ' + longest;
+                resStr += '\nSequence: : ' + lcsStr;
+
+                document.getElementById('debugText').value = resStr;
+            }
+            break;
+            */
+
+        default:
+            break;
+
+    }
+}
+
 
 
 function runMotif(e) {
@@ -3209,6 +6329,157 @@ function initialiseSequencingParams() {
 
 }
 
+function initialiseAlignParams() {
+
+    var paramObj = {};
+
+    //clean contents in case apply not pressed yet?
+    //....
+    //
+
+
+    //dnaMasterStrings =  dnaStrings;//document.getElementById('dnaStrings').value.split('\n');
+    //dnaMaster = document.getElementById('dnaStrings').value.replace(/ /g,'').toUpperCase();
+    //dnaMasterChanged();
+
+    var numKmer = document.getElementById('numKmers');
+    numKmer.value = 1;
+
+    paramObj.sAlign = alignS;
+    paramObj.tAlign = alignT;
+
+    paramObj.uAlign = alignU;
+
+    paramObj.alignRadioMethodSel = getSelectedRadioEl('alignMethod');
+
+    var scoreMat;
+    paramObj.scoreMatRadioSel = getSelectedRadioEl('alignScore');
+    switch (paramObj.scoreMatRadioSel.id) {
+        case 'alignPamScore':
+            paramObj.scoreMat = pamScoringMatrix;
+            break;
+        case 'alignBloScore':
+            paramObj.scoreMat = blosum62ScoringMatrix;
+            break;
+
+        default:
+            paramObj.scoreMat = null;
+            break;
+
+    }
+
+
+    paramObj.indelPen = parseInt(document.getElementById('indelPenAL').value);
+    paramObj.mismatchPen = parseInt(document.getElementById('mismatchPenAL').value);
+    
+    paramObj.linearSpaceThreshold = parseInt(document.getElementById('spaceThreshAL').value);
+
+    paramObj.matchScore = 1; //default (overriden if score matrix exists)
+
+    if (paramObj.alignRadioMethodSel.id === 'alignLCS') {
+        paramObj.indelPen = 0;
+        paramObj.mismatchPen = 0;
+        paramObj.scoreMat = null;
+        paramObj.alignType = DGraph.alignTypeGlobal;
+    }
+    else if (paramObj.alignRadioMethodSel.id === 'alignEditDist') {
+        paramObj.indelPen = 1;
+        paramObj.mismatchPen = 1;
+        paramObj.scoreMat = null;
+        paramObj.matchScore = 0; // 0 points for match in edit dist
+        paramObj.alignType = DGraph.alignTypeGlobal;
+    }
+    else if (paramObj.alignRadioMethodSel.id === 'alignGlobal') {
+        paramObj.alignType = DGraph.alignTypeGlobal;
+        
+    }
+    else if (paramObj.alignRadioMethodSel.id === 'alignLocal') {
+        paramObj.alignType = DGraph.alignTypeLocal;                
+        
+    }
+    else if (paramObj.alignRadioMethodSel.id === 'alignFitting') {
+        paramObj.alignType = DGraph.alignTypeFitting;
+    }
+    else if (paramObj.alignRadioMethodSel.id === 'alignOverlap') {
+        paramObj.alignType = DGraph.alignTypeOverlap;
+    }
+
+
+
+    paramObj.debug = document.getElementById('debugAL').checked;
+    
+    paramObj.useAffine = document.getElementById('affineAL').checked;
+    paramObj.affineOpenGap = parseInt(document.getElementById('affineOpenGapAL').value);
+
+
+    return paramObj;
+
+}
+
+function initialisePhylogenyParams() {
+
+    var paramObj = {};
+
+    //clean contents in case apply not pressed yet?
+    //....
+    //
+
+
+    //dnaMasterStrings =  dnaStrings;//document.getElementById('dnaStrings').value.split('\n');
+    //dnaMaster = document.getElementById('dnaStrings').value.replace(/ /g,'').toUpperCase();
+    //dnaMasterChanged();
+
+    var numKmer = document.getElementById('numKmers');
+    numKmer.value = 1;
+
+
+    paramObj.phylInputSel = getSelectedRadioEl('phylInput');
+
+
+    paramObj.phylMethodSel = getSelectedRadioEl('phylMethod');
+
+    paramObj.debug = document.getElementById('debugPH').checked;
+
+
+    return paramObj;
+
+}
+
+
+function initialiseSBParams() {
+
+    var paramObj = {};
+
+    //clean contents in case apply not pressed yet?
+    //....
+    //
+
+
+    //dnaMasterStrings =  dnaStrings;//document.getElementById('dnaStrings').value.split('\n');
+    //dnaMaster = document.getElementById('dnaStrings').value.replace(/ /g,'').toUpperCase();
+    //dnaMasterChanged();
+
+    var numKmer = document.getElementById('numKmers');
+    numKmer.value = 1;
+
+    paramObj.sbS = sbS;
+    paramObj.sbT = sbT;
+
+    paramObj.sbRadioMethodSel = getSelectedRadioEl('sbMethod');
+
+
+
+    paramObj.k = parseInt(document.getElementById('kmerLenSB').value);
+
+    paramObj.debug = document.getElementById('debugSB').checked;
+
+    return paramObj;
+
+}
+
+
+
+
 
 function initialiseTransParams() {
 
@@ -3448,6 +6719,117 @@ function readsToMfk(grph) {
     numKmerVal = parseInt(numKmer.value);
 }
 
+function runSequencingBackground(e) {
+
+    initialiseResults();
+
+    var paramObj = initialiseSequencingParams();
+
+    // var rads = document.getElementsByName('seqMethod');
+
+    /*
+     var methodSelected;
+
+     for (var i = 0;i < rads.length;++i) {
+     if (rads[i].checked) {
+     methodSelected = rads[i];
+     break;
+
+     }
+     }
+     */
+
+    var reads, input;
+
+    var grph;
+
+    var k;
+
+    var inputLen = 0;
+    var numInputs = 0;
+
+    if (( paramObj.seqInput == DGraph.fromDna) || (paramObj.seqInput == DGraph.fromPairedDna)) {
+        k = paramObj.k;
+        input = dnaMaster;
+        inputLen = input.length;
+        numInputs = 1;
+
+    }
+    else if ( paramObj.seqInput == DGraph.fromReads)   {
+
+        reads = dnaMasterStrings.split('\n');
+
+        input = reads;
+
+        if (reads[0]) {
+            k = reads[0].length;
+        }
+        else {
+            k = 1;
+        }
+
+        inputLen = k;
+        numInputs = reads.length;
+    }
+    else if ( paramObj.seqInput == DGraph.fromPairedReads)   {
+
+        reads = dnaMasterStrings.split('\n');
+
+
+        if (reads[0]) {
+            k = reads[0].split('|')[0].length;
+        }
+        else {
+            k = 1;
+        }
+        reads = reads.map(function(el) {
+            var spl = el.split('|');
+            return [spl[0],spl[1]];
+
+        });
+
+        input = reads;
+
+        inputLen = k;
+        numInputs = reads.length;
+
+    }
+    else if (paramObj.seqInput == DGraph.fromAdjList) {
+        reads = dnaMasterStrings.split('\n');
+
+        input = reads;
+
+        if (reads[0]) {
+            k = reads[0].split(' -> ')[0].length;
+        }
+        else {
+            k = 1;
+        }
+
+        inputLen = k;
+        numInputs = reads.length;
+
+    }
+
+    document.getElementById('debugText').value  = '';
+    document.getElementById('debugText').value += 'Inputs: ' + numInputs + '\n';
+    document.getElementById('debugText').value += 'Input length: ' + inputLen + '\n';
+
+    w.postMessage({
+        'task': 'seqAssembly',
+        'input': input,
+        'seqInputType': paramObj.seqInput,
+        'seqType': paramObj.seqType,
+        'seqMethod':paramObj.seqMethod,
+        'k': k,
+        'makeCycle': false,
+        'pairDist': paramObj.pairDist
+        
+    }); // Start the worker.
+
+   // grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
+    
+}
 
 function runSequencing(e) {
 
@@ -3477,9 +6859,14 @@ function runSequencing(e) {
 
     var k;
 
+    var inputLen = 0;
+    var numInputs = 0;
+
     if (( paramObj.seqInput == DGraph.fromDna) || (paramObj.seqInput == DGraph.fromPairedDna)) {
         k = paramObj.k;
         input = dnaMaster;
+        inputLen = input.length;
+        numInputs = 1;
 
     }
     else if ( paramObj.seqInput == DGraph.fromReads)   {
@@ -3494,6 +6881,9 @@ function runSequencing(e) {
         else {
             k = 1;
         }
+
+        inputLen = k;
+        numInputs = reads.length;
     }
     else if ( paramObj.seqInput == DGraph.fromPairedReads)   {
 
@@ -3514,6 +6904,9 @@ function runSequencing(e) {
 
         input = reads;
 
+        inputLen = k;
+        numInputs = reads.length;
+
     }
     else if (paramObj.seqInput == DGraph.fromAdjList) {
         reads = dnaMasterStrings.split('\n');
@@ -3527,7 +6920,15 @@ function runSequencing(e) {
             k = 1;
         }
 
+        inputLen = k;
+        numInputs = reads.length;
+
     }
+
+    document.getElementById('debugText').value  = '';
+    document.getElementById('debugText').value += 'Inputs: ' + numInputs + '\n';
+    document.getElementById('debugText').value += 'Input length: ' + inputLen + '\n';
+
 
     grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
 
@@ -3613,170 +7014,662 @@ function runSequencing(e) {
 
 }
 
-function readBreak(e) {
-    if (!dnaMasterStrings) {
-         return;
+
+function displayPhylogenyGraph(g,debug) {
+
+    var canv = document.getElementById('phylCanvas');
+    var parent = document.getElementById('phylogenyGraphDiv');
+    canv.width = parent.clientWidth * 2;
+    canv.height = parent.clientHeight * 2;
+    var ctx = canv.getContext("2d");
+    ctx.clearRect(0,0,canv.width,canv.height);
+    document.getElementById('phylGraphErr').innerHTML = '';
+
+
+
+    if (g) {
+        //  document.getElementById('graphGraphDiv').setAttribute("style","height:300px");
+        //  document.getElementById('graphGraphDiv').style.height = '400px';
+
+
+        var ssss = g.nodes[0].getSuccessors();
+        var pppp = g.nodes[0].getPredecessors();
+        // g.addRoot(g.nodes[4].getSuccessors()[0]);
+
+        // var tmp = g.nodes[2].getSuccessors()[2].neighbouringEdges();
+        //   var largeScore = g.largeParsimony();
+        // g.swapNeighbours(g.nodes[2].getSuccessors()[2]);
+        // g.unRoot();
+
+
+
+        if (debug) {
+
+            document.getElementById('debugText').value += 'Adjacency List: ' + '\n';
+
+            switch (paramObj.phylMethodSel.id) {
+                case 'phylSmallParsimony':
+
+                    document.getElementById('debugText').value += g.toAdjacencyList(0, 2, true);
+                    break;
+                case 'phylLargeParsimony':
+                    document.getElementById('debugText').value += g.toAdjacencyList(0, 2, true);
+                    break;
+                default:
+                    document.getElementById('debugText').value += g.toAdjacencyList(3, 3,true);
+                    break;
+            }
+        }
+
+
+
+
+        // g.deleteNode(g.nodes[g.nodes.length-1]);
+
+        // var ctx = initGraphCanvas();//('495px','112px');//('660px','150px');
+
+
+        var gvCont = new DBGraphViewController(g);
+        //var gvCont = new DBTestSimpleController();
+
+        var viewPort = new DBRect(0,0,parent.clientWidth,parent.clientHeight);
+
+        pGraphView = new DBGraphView(canv,viewPort, gvCont);
+        pGraphView.display();
     }
-
-    var strArr =  dnaMasterStrings.split('\n');
-    var brokenArr = [];
-    var brokenDict = {};
-
-    var dictEntry;
-
-    strArr.forEach(function(el,i) {
-        var pref = el.substring(0,el.length - 1);
-        var suf = el.substring(1,el.length);
-        if (pref in brokenDict) {
-            brokenDict[pref][0].push(i);
-        }
-        else {
-            dictEntry = [];
-            dictEntry.push([i]);
-            dictEntry.push([]);
-            brokenDict[pref] = dictEntry;
-        }
-        if (suf in brokenDict) {
-            brokenDict[suf][1].push(i);
-        }
-        else {
-            dictEntry = [];
-            dictEntry.push([]);
-            dictEntry.push([i]);
-            brokenDict[suf] = dictEntry;
-        }
-
-
-        brokenArr.push(el.substring(0,el.length - 1));
-        brokenArr.push(el.substring(1,el.length ));
-    });
-
-    brokenArr.sort();
-
-    var key;
-
-    var removeDupArr = [];
-    var ind;
-
-    for (key in brokenDict) {
-
-        //var dupCount = 0;
-       // var sameCount = 0; //pref and suf same in single item. need to retain
-        var curr = brokenDict[key];
-
-        var count = 0;
-
-       // var matchFound = false;
-       // var nonMatchFound = false;
-        for (var p = 0;p < curr[0].length;++p) {
-            var pref = curr[0][p];
-            // curr[0].forEach(function(pref) {
-            ind = curr[1].indexOf(pref);
-            if (ind > -1) {
-                // matchFound = true;
-                curr[0][p] = -1;
-                curr[1][ind] = -1;
-                ++count;
-
-            }
-            else {
-                for (var sufInd = 0; sufInd < curr[1].length; ++sufInd) {
-                    if (curr[1][sufInd] != pref) {
-                        curr[1][sufInd] = -1;
-                        curr[0][p] = -1;
-                        ++count;
-                        break;
-                    }
-
-                }
-            }
-
-        }
-
-       // curr[1].forEach(function(suf) {
-
-        for (var s = 0;s < curr[1].length;++s) {
-            var suf = curr[1][s];
-            if (suf == -1) {
-                continue;
-            }
-
-            ind = curr[0].indexOf(suf);
-            if (ind > -1) {
-                // matchFound = true;
-                curr[0][ind] = -1;
-                curr[1][s] = -1;
-                ++count;
-
-            }
-            else {
-                for (var prefInd = 0; prefInd < curr[0].length; ++prefInd) {
-                    if (curr[0][prefInd] != suf) {
-                        curr[1][s] = -1;
-                        curr[0][prefInd] = -1;
-                        ++count;
-                        break;
-                    }
-
-                }
-            }
-        }
-
-        curr[0].forEach(function(el) {
-            if (el == -1) {
-
-            }
-            else {
-                ++count;
-            }
-
-        });
-        curr[1].forEach(function(el) {
-            if (el == -1) {
-
-            }
-            else {
-                ++count;
-            }
-
-        });
-
-        for (var i = 0;i < count;++i) {
-            removeDupArr.push(key);
-        }
-
-
-
-
-    }
-
-
-    dnaMasterStrings = removeDupArr.join('\n');
-    dnaMasterChanged();
 
 
 
 }
 
+function stepPhylogeny(e) {
+
+    if (phylGraphMaster) {
+        var parsScoreThisStep = phylGraphMaster.builder.progress[paramObj.phylStepNum].smallParsimony();
+        var thisStep = paramObj.phylStepNum + 1;
+        var maxStep = phylGraphMaster.builder.progress.length;
+        if (thisStep == 1) {
+            document.getElementById('debugText').value ='';
+
+        }
+        document.getElementById('debugText').value +='\nParsimony score step ' + thisStep + '/' + maxStep + ' : '  + parsScoreThisStep + '\n';
+
+        displayPhylogenyGraph(phylGraphMaster.builder.progress[paramObj.phylStepNum], true);
+        ++paramObj.phylStepNum;
+        if (paramObj.phylStepNum > phylGraphMaster.builder.progress.length - 1) {
+            paramObj.phylStepNum = 0;
+        }
+    }
+
+    else {
+        alert('Press Run first, then step will become available');
+
+    }
+
+}
+
+function runPhylogeny(e) {
+
+    // sequencingInput();
+
+
+        initialiseResults();
+
+        paramObj = initialisePhylogenyParams();
+
+        phylGraphMaster = null;
+
+
+        var debug = document.getElementById('debugPH').checked;
+
+
+
+
+
+   // if (( paramObj.seqInput == DGraph.fromDna) || (paramObj.seqInput == DGraph.fromPairedDna)) {
+
+    var inType = -1;
+    switch (paramObj.phylInputSel.id) {
+        case 'phylAdjList':
+            inType = 1;
+            break;
+        case 'phylDistMat':
+            inType = 2;
+            break;
+        case 'phylDNA':
+            inType = 3;
+            break;
+        default:
+            inType = 4;
+            break;
+
+
+    }
+
+    document.getElementById('debugText').value += 'Outputs: ' + 'none' + '\n';
+
+
+//    grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
+
+    var g = null;
+    var parsimonyScore = -1;
+
+    if (inType == 1) {
+        //display graph straight from adj list
+
+        g = new DBTreeGraph(new DGraphTreeBuilder(dnaMasterStrings, new DTreeNodeBuilder(), new DTreeEdgeBuilder()));
+
+        switch (paramObj.phylMethodSel.id) {
+        case 'phylSmallParsimony':
+                parsimonyScore = g.smallParsimony(null,true);
+                if (debug) {
+                    document.getElementById('debugText').value += 'Parsimony score: ' +  parsimonyScore + '\n';
+                }
+                break;
+            case 'phylLargeParsimony':
+                parsimonyScore = g.largeParsimony(true);
+                if (debug) {
+                    document.getElementById('debugText').value +='Parsimony score: '  + parsimonyScore + '\n';
+                }
+                break;
+
+
+            default:
+                break;
+        }
+
+     }
+     else {
+
+        switch (paramObj.phylMethodSel.id) {
+            case 'phylAdd':
+                if (inType == 2) { //dist mat
+                    var builder = new DGraphTreeFromDistBuilder(dnaMasterStrings);
+                    if (builder.isAdditive) {
+                        g = new DBTreeGraph(builder);
+                    }
+                    else {
+                        document.getElementById('debugText').value += 'Non Additive!';
+                    }
+
+                    break;
+
+                }
+                else if (inType == 3) { //alignments
+                    var builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                    if (builder.isAdditive) {
+                        g = new DBTreeGraph(builder);
+                    }
+                    else {
+                        document.getElementById('debugText').value += 'Non Additive!';
+                    }
+                    break;
+
+                }
+
+                break;
+            //    case DGraph.seqTypeComp:
+            //      break;
+                case 'phylUltra':
+                    if (inType == 2) { //dist mat
+                        var builder = new DGraphUltraTreeFromDistBuilder(dnaMasterStrings);
+
+                        g = new DBTreeGraph(builder);
+                        break;
+
+                    }
+                    else if (inType == 3) { //alignments
+                        var builder = new DGraphUltraTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                        g = new DBTreeGraph(builder);
+                        break;
+
+                    }
+
+                   break;
+
+            case 'phylNeighbour':
+                if (inType == 2) { //dist mat
+
+                    var builder = new DGraphTreeNJFromDistBuilder(dnaMasterStrings);
+                    g = new DBTreeGraph(builder, 'This is a neighbour join  graph built from mat');
+                    break;
+
+                }
+                else if (inType == 3) { //alignments
+                    var builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                    g = new DBTreeGraph(builder);
+                    break;
+
+                }
+
+                break;
+
+
+            case 'phylLargeParsimony':
+
+                var builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                g = new DBTreeGraph(builder);
+
+                var parsimonyScore = g.largeParsimony(true);
+                if (debug) {
+                    document.getElementById('debugText').value +='Parsimony score: '  + parsimonyScore + '\n';
+                }
+
+
+
+
+                break;
+
+
+
+
+            default:
+                break;
+
+
+        }
+    }
+
+    phylGraphMaster = g;
+    paramObj.phylStepNum = 0;
+
+    if (g) {
+        displayPhylogenyGraph(g,debug);
+    }
+
+    else {
+            // no g
+            switch (paramObj.phylMethodSel.id) {
+                case 'phylAdd':
+                    if (builder.isAdditive) {
+                        document.getElementById('phylGraphErr').innerHTML = 'No Graph';
+                    }
+                    else { //found reason
+                        document.getElementById('phylGraphErr').innerHTML = 'Non Additive Matrix!';
+                    }
+                    break;
+                default:
+                    document.getElementById('phylGraphErr').innerHTML = 'No Graph';
+                    break;
+
+            }
+
+
+
+    }
+
+    /*
+    var canv = document.getElementById('phylCanvas');
+    var parent = document.getElementById('phylogenyGraphDiv');
+    canv.width = parent.clientWidth * 2;
+    canv.height = parent.clientHeight * 2;
+    var ctx = canv.getContext("2d");
+    ctx.clearRect(0,0,canv.width,canv.height);
+    document.getElementById('phylGraphErr').innerHTML = '';
+
+
+
+    if (g) {
+      //  document.getElementById('graphGraphDiv').setAttribute("style","height:300px");
+      //  document.getElementById('graphGraphDiv').style.height = '400px';
+        phylGraphMaster = g;
+
+        var ssss = g.nodes[0].getSuccessors();
+        var pppp = g.nodes[0].getPredecessors();
+       // g.addRoot(g.nodes[4].getSuccessors()[0]);
+
+       // var tmp = g.nodes[2].getSuccessors()[2].neighbouringEdges();
+     //   var largeScore = g.largeParsimony();
+      // g.swapNeighbours(g.nodes[2].getSuccessors()[2]);
+       // g.unRoot();
+
+
+
+        if (debug) {
+
+            document.getElementById('debugText').value += 'Adjacency List: ' + '\n';
+
+            switch (paramObj.phylMethodSel.id) {
+                case 'phylSmallParsimony':
+
+                    document.getElementById('debugText').value += g.toAdjacencyList(0, 2, true);
+                    break;
+                default:
+                    document.getElementById('debugText').value += g.toAdjacencyList(3, 3);
+                    break;
+            }
+        }
+
+
+        
+        
+       // g.deleteNode(g.nodes[g.nodes.length-1]);
+
+       // var ctx = initGraphCanvas();//('495px','112px');//('660px','150px');
+
+
+        var gvCont = new DBGraphViewController(g);
+        //var gvCont = new DBTestSimpleController();
+        
+        var viewPort = new DBRect(0,0,parent.clientWidth,parent.clientHeight);
+
+        pGraphView = new DBGraphView(canv,viewPort, gvCont);
+        pGraphView.display();
+    }
+
+    else {
+        // no g
+        switch (paramObj.phylMethodSel.id) {
+            case 'phylAdd':
+                if (builder.isAdditive) {
+                    document.getElementById('phylGraphErr').innerHTML = 'No Graph';
+                }
+                else { //found reason
+                    document.getElementById('phylGraphErr').innerHTML = 'Non Additive Matrix!';
+                }
+                break;
+            default:
+                document.getElementById('phylGraphErr').innerHTML = 'No Graph';
+                break;
+
+        }
+
+    }
+   */
+
+
+
+}
+
+
+function readBreak(e) {
+    if (!dnaMasterStrings) {
+         return;
+    }
+
+    var breakNum = parseInt(prompt("Please enter nunber of breaks", "Right here"));
+
+    var strArr =  dnaMasterStrings.split('\n');
+    var tst = strArr[0].split('|');
+    paired = false;
+    paired = (tst.length > 1);
+
+    var currK = 0;
+    if (paired) {
+        currK = tst[0].length;
+    }
+    else {
+        currK = strArr[0].length;
+    }
+
+    var newK = currK - breakNum;
+
+
+    var brokenArr = [];
+    var brokenDict = {};
+
+    var dictEntry;
+
+    brokenArr = [];
+    if (paired) {
+
+        strArr.forEach(function(el) {
+            var spl = el.split('|');
+            for (var i = 0;i < currK - newK + 1;++i) {
+                var broken = spl[0].substring(i, i + newK) + '|' + spl[1].substring(i, i + newK);
+               // var suf = spl[0].substring(1, spl[0].length) + '|' + spl[1].substring(1, spl[1].length);
+               // brokenArr.push(pref);
+               // brokenArr.push(suf);
+                if (broken in brokenDict) {
+                    brokenDict[broken] +=1; //dup
+                }
+                else {
+                    brokenDict[broken] = 1;
+                }
+               // brokenArr.push(broken);
+            }
+        });
+        for (key in brokenDict) {
+            brokenArr.push(key);
+        }
+
+        document.getElementById('pairDistSA').value = parseInt(document.getElementById('pairDistSA').value) + breakNum;
+
+        sequencingInput(e,brokenArr.join('\n'));
+
+    }
+    else {
+
+        //stand along reads - following is too complicated
+        strArr.forEach(function (el, i) {
+            var pref = el.substring(0, el.length - 1);
+            var suf = el.substring(1, el.length);
+            if (pref in brokenDict) {
+                brokenDict[pref][0].push(i);
+            }
+            else {
+                dictEntry = [];
+                dictEntry.push([i]);
+                dictEntry.push([]);
+                brokenDict[pref] = dictEntry;
+            }
+            if (suf in brokenDict) {
+                brokenDict[suf][1].push(i);
+            }
+            else {
+                dictEntry = [];
+                dictEntry.push([]);
+                dictEntry.push([i]);
+                brokenDict[suf] = dictEntry;
+            }
+
+
+            brokenArr.push(el.substring(0, el.length - 1));
+            brokenArr.push(el.substring(1, el.length));
+        });
+
+        brokenArr.sort();
+
+
+        var key;
+
+        var removeDupArr = [];
+        var ind;
+
+        for (key in brokenDict) {
+
+            //var dupCount = 0;
+            // var sameCount = 0; //pref and suf same in single item. need to retain
+            var curr = brokenDict[key];
+
+            var count = 0;
+
+            // var matchFound = false;
+            // var nonMatchFound = false;
+            for (var p = 0; p < curr[0].length; ++p) {
+                var pref = curr[0][p];
+                // curr[0].forEach(function(pref) {
+                ind = curr[1].indexOf(pref);
+                if (ind > -1) {
+                    // matchFound = true;
+                    curr[0][p] = -1;
+                    curr[1][ind] = -1;
+                    ++count;
+
+                }
+                else {
+                    for (var sufInd = 0; sufInd < curr[1].length; ++sufInd) {
+                        if (curr[1][sufInd] != pref) {
+                            curr[1][sufInd] = -1;
+                            curr[0][p] = -1;
+                            ++count;
+                            break;
+                        }
+
+                    }
+                }
+
+            }
+
+            // curr[1].forEach(function(suf) {
+
+            for (var s = 0; s < curr[1].length; ++s) {
+                var suf = curr[1][s];
+                if (suf == -1) {
+                    continue;
+                }
+
+                ind = curr[0].indexOf(suf);
+                if (ind > -1) {
+                    // matchFound = true;
+                    curr[0][ind] = -1;
+                    curr[1][s] = -1;
+                    ++count;
+
+                }
+                else {
+                    for (var prefInd = 0; prefInd < curr[0].length; ++prefInd) {
+                        if (curr[0][prefInd] != suf) {
+                            curr[1][s] = -1;
+                            curr[0][prefInd] = -1;
+                            ++count;
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+            curr[0].forEach(function (el) {
+                if (el == -1) {
+
+                }
+                else {
+                    ++count;
+                }
+
+            });
+            curr[1].forEach(function (el) {
+                if (el == -1) {
+
+                }
+                else {
+                    ++count;
+                }
+
+            });
+
+            for (var i = 0; i < count; ++i) {
+                removeDupArr.push(key);
+            }
+        }
+
+        sequencingInput(e,removeDupArr.join('\n'));
+
+
+
+
+    }
+
+
+
+
+    //dnaMasterStrings = removeDupArr.join('\n');
+    //dnaMasterChanged();
+
+
+
+}
+
+function loopy(e,curr,lim) {
+    if (curr >= lim) {
+
+    }
+    else {
+        readBreak(e);
+        removeDups(e);
+        setTimeout(function() {
+            ++curr;
+            loopy(e,curr,lim);
+       },200);
+    }
+
+}
+
 function pairedToReads(e) {
+
+    /*
+    var breakNum = parseInt(prompt("Please enter nunber of breaks", "Right here"));
+   loopy(e,0,breakNum);
+    return;
+    */
+    
+    
     if (!dnaMasterStrings) {
         return;
     }
 
     var outArr = [];
     var strArr =  dnaMasterStrings.split('\n');
+    var pairArr = [];
     strArr.forEach(function(el) {
         var split = el.split('|');
+
         outArr.push(split[0]);
-        outArr.push(split[1]);
+        pairArr.push(split[1]);
     });
 
-    dnaMasterStrings = outArr.join('\n');
-    dnaMasterChanged();
+    //For the moment, only look at first half of pairs
+    /*
+    pairArr.forEach(function(el) {
+        //if (outArr.indexOf(el) > -1) {
+
+        //}
+        //else {
+            outArr.push(el);
+        //}
+
+    });
+    */
+
+    document.getElementById('seqReads').checked = true;
+    sequencingInputRadClicked('seqReads');
+
+    sequencingInput(e,outArr.join('\n'));
+    //dnaMasterStrings = outArr.join('\n');
+    //dnaMasterChanged();
 
 
 
 }
+
+function removeDups(e) {
+    if (!dnaMasterStrings) {
+        return;
+    }
+
+    var outArr = [];
+    var strArr =  dnaMasterStrings.split('\n');
+    strArr.sort();
+    var prev = '';
+    strArr = strArr.filter(function(el) {
+        if (el == prev) {
+            return false;
+        }
+        else {
+            prev = el;
+            return true;
+        }
+    });
+
+     sequencingInput(e,strArr.join('\n'));
+    //dnaMasterStrings = outArr.join('\n');
+    //dnaMasterChanged();
+
+
+
+}
+
 
 
 
@@ -4180,15 +8073,21 @@ function collectStats(dna,sk,bc) {
 
 }
 
-function initGraphCanvas() {
+function initGraphCanvas(wid,hei) {
+    if (wid == null) {
+        wid = '660';
+    }
+    if (hei == null) {
+        hei = '150';
+    }
 
     var c = document.getElementById("moreCanvas");
 
     var h = c.height;
     var w = c.width;
 
-    c.setAttribute('width', '660');
-    c.setAttribute('height', '150');
+    c.setAttribute('width', wid);
+    c.setAttribute('height', hei);
 
     var ctx = c.getContext("2d");
 
@@ -4202,6 +8101,9 @@ function initGraphCanvas() {
 }
 
 function graphCanvas(grph) {
+    if (grph.nodes.length > 1000) {
+        return;
+    }
 
     var ctx = initGraphCanvas();
 
@@ -4886,6 +8788,343 @@ function colourDNATest(dna,mark) {
 }
 */
 
+
+function colourAlignFromBackground() {
+
+    if ((alignS == '') && (alignT == '')) {
+        document.getElementById('alignStringDiv').innerHTML = 'Enter sequences in box above to align';
+        document.getElementById('alignGridDiv').innerHTML = '';
+
+    }
+    else if (alignS == '') {
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + 'Please load' + '<br>' + 'T: ' + alignT;
+        document.getElementById('alignGridDiv').innerHTML = '';
+    }
+    else if (alignT == '') {
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + alignS + '<br>' + 'T: ' + 'Please load';
+        document.getElementById('alignGridDiv').innerHTML =  '';
+    }
+
+    else
+    if (alignReturned == null) {
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + alignS + '<br>' + 'T: ' + alignT;
+        if (alignU.length > 0) document.getElementById('alignStringDiv').innerHTML += '<br>' + 'U: ' + alignU;
+        document.getElementById('alignStringDiv').innerHTML +=  '<br>Press run to align';
+        document.getElementById('alignGridDiv').innerHTML = '';
+    }
+    else if (alignReturned.inProgress) {
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + alignS + '<br>' + 'T: ' + alignT;
+        if (alignU.length > 0) document.getElementById('alignStringDiv').innerHTML += '<br>' + 'U: ' + alignU;
+        document.getElementById('alignStringDiv').innerHTML +=  '<br>Aligning...';
+        document.getElementById('alignGridDiv').innerHTML = '';
+
+    }
+    else {
+        var sFormatted = '';
+        var tFormatted = '';
+        var uFormatted = '';
+
+        if (alignReturned.alignType == DGraph.alignTypeGlobal) {
+            for (var i = 0;i < alignReturned.sAligned.length;++i) {
+                if (alignU.length > 0) {
+                    if ((alignReturned.sAligned.substring(i,i+1) === alignReturned.tAligned.substring(i,i+1))
+                           && (alignReturned.sAligned.substring(i,i+1) === alignReturned.uAligned.substring(i,i+1))){
+                        sFormatted += '<b>' + alignReturned.sAligned.substring(i,i+1) + '</b>';
+                        tFormatted += '<b>' + alignReturned.tAligned.substring(i,i+1) + '</b>';
+                        uFormatted += '<b>' + alignReturned.uAligned.substring(i,i+1) + '</b>';
+
+                    }
+                    else {
+                        sFormatted += alignReturned.sAligned.substring(i,i+1);
+                        tFormatted += alignReturned.tAligned.substring(i,i+1);
+                        uFormatted += alignReturned.uAligned.substring(i,i+1);
+
+
+                    }
+                }
+
+
+                else {
+
+                    if (alignReturned.sAligned.substring(i, i + 1) === alignReturned.tAligned.substring(i, i + 1)) {
+                        sFormatted += '<b>' + alignReturned.sAligned.substring(i, i + 1) + '</b>';
+                        tFormatted += '<b>' + alignReturned.tAligned.substring(i, i + 1) + '</b>';
+
+                    }
+                    else {
+                        sFormatted += alignReturned.sAligned.substring(i, i + 1);
+                        tFormatted += alignReturned.tAligned.substring(i, i + 1);
+
+                    }
+                }
+            }
+
+
+        }
+        else {
+            sFormatted += '<b>' + alignReturned.sAligned + '</b>';
+            tFormatted += '<b>' + alignReturned.tAligned + '</b>';
+            if (alignU.length > 0) {
+                uFormatted += '<b>' + alignReturned.uAligned + '</b>';
+            }
+
+        }
+        /*
+        */
+
+
+        //add unaligned portion, but only for 2 way alignment
+        if (alignU.length == 0) {
+            sFormatted += alignS.substring(alignReturned.endPosS + 1);
+            tFormatted += alignT.substring(alignReturned.endPosT + 1);
+            var unalignedSStart = alignS.substring(0, alignReturned.startPosS);
+            var unalignedTStart = alignT.substring(0, alignReturned.startPosT);
+
+            var diff = unalignedSStart.length - unalignedTStart.length;
+            if (diff > 0) {
+                for (var i = 0; i < diff; ++i) {
+                    unalignedTStart = '&nbsp;' + unalignedTStart;
+                }
+            }
+            else if (diff < 0) {
+                for (var i = 0; i > diff; --i) {
+                    unalignedSStart = '&nbsp;' + unalignedSStart;
+                }
+            }
+            sFormatted = unalignedSStart + sFormatted;
+            tFormatted = unalignedTStart + tFormatted;
+        }
+
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + sFormatted + '<br>' + 'T: ' + tFormatted;
+        if (alignU.length > 0) {
+            document.getElementById('alignStringDiv').innerHTML += '<BR>' + 'U: ' + uFormatted;
+        }
+
+        document.getElementById('alignGridDiv').innerHTML = alignReturned.formattedGrid;
+
+/*
+        var sp = '&nbsp';
+        var line = '';
+        var sExt = '-' + alignGraph.s;
+        var tExt = '-' + alignGraph.t;
+
+        var sinkNum = alignGraph.rows * alignGraph.cols - 1;
+
+        //var path = [];
+        var pathData = alignGraph.longestPathBacktrack('' + sinkNum,'0');
+        var path = pathData[1];
+
+
+
+        for (var i = 0;i < alignGraph.rows + 1;++i) {
+
+            for (var j = 0;j < alignGraph.cols + 1; ++j) {
+                if ((i == 0) && (j == 0)) {
+                    line += sp + sp + sp + sp;
+                }
+                else if (i == 0) {
+                    line += sExt.substring(j - 1, j) + sp + sp + sp;
+                }
+                else if (j == 0) {
+                    line += tExt.substring(i - 1, i) + sp + sp;
+                }
+                else {
+                    var topOrder = (i-1) * alignGraph.cols + j -1;
+                    var topLab = '' + topOrder;
+                    var node = alignGraph.findNodes('' + topOrder)[0];
+                    var extraSp =  (node.longestPathToThisNode >= 0) ? '&nbsp;' : '';
+
+
+                    if (path.indexOf(topLab) > -1) {
+                        line += '<b>' + extraSp  +  node.longestPathToThisNode + '</b>' + sp + sp;
+                    }
+                    else {
+                        line += extraSp +  node.longestPathToThisNode + sp + sp;
+                    }
+
+
+                }
+
+            }
+
+            line += '<BR>';
+
+
+        }
+
+        document.getElementById('alignGridDiv').innerHTML = line;
+*/
+
+    }
+
+
+}
+
+function colourSBFromBackground() {
+
+    sFormatted = '';
+    var displayLim = 50;
+
+    if (sbS.length > displayLim) {
+        var extra = sbS.length - displayLim;
+        sFormatted = sbS.substring(0,displayLim) + ' [... + ' + extra + ' more]';
+    }
+    else {
+        sFormatted = sbS;
+    }
+    if (sbT.length > displayLim) {
+        var extra = sbT.length - displayLim;
+        tFormatted = sbT.substring(0,displayLim) + ' [... + ' + extra + ' more]';
+    }
+    else {
+        tFormatted = sbT;
+    }
+
+    if ((sbS == '') && (sbT == '')) {
+        document.getElementById('sbStringDiv').innerHTML = 'Enter two sequences in box above to compare';
+
+
+    }
+    else if (sbS == '') {
+        document.getElementById('sbStringDiv').innerHTML = 'S: ' + 'Please load' + '<br>' + 'T: ' + tFormatted;
+
+    }
+    else if (sbT == '') {
+        document.getElementById('sbStringDiv').innerHTML = 'S: ' + sFormatted + '<br>' + 'T: ' + 'Please load';
+
+    }
+    else
+    if (sbReturned == null) {
+        document.getElementById('sbStringDiv').innerHTML = 'S: ' + sFormatted + '<br>' + 'T: ' + tFormatted;
+        document.getElementById('sbStringDiv').innerHTML +=  '<br>Press run to compare';
+
+    }
+    else if (sbReturned.inProgress) {
+        document.getElementById('sbStringDiv').innerHTML = 'S: ' + sFormatted + '<br>' + 'T: ' + tFormatted;
+        document.getElementById('sbStringDiv').innerHTML +=  '<br>Comparing...';
+
+    }
+    else {
+
+        document.getElementById('sbStringDiv').innerHTML = 'S: ' + sFormatted + '<BR>' +  ' T: ' + tFormatted;
+
+        var resStr = '';
+
+
+        if (document.getElementById('debugAL').checked) {
+            sbReturned.sharedAr.forEach(function (el) {
+                // resStr += '<BR>' + '(' + el[0] + ', ' + el[1] + ')';
+            });
+        }
+
+
+        document.getElementById('sbCoordDiv').innerHTML = resStr;
+        plot(document.getElementById('sbCanvas'),[[1,1],[2,4],[3,9],[4,16],[5,25],[6,36],[7,47],[8,64],[9,81],[10,100],[11,121],[12,144],[13,169],[14,196],[15,225],[16,20]]);
+       // sbPlotTimeoutLoop(document.getElementById('sbCanvas'),sbReturned.sharedAr,0,1000);
+       // plot(document.getElementById('sbCanvas'),sbReturned.sharedAr);
+
+
+
+
+
+
+    }
+
+
+
+
+}
+
+function colourAlign() {
+
+    if ((alignS == '') || (alignT == '')) {
+        document.getElementById('alignStringDiv').innerHTML = 'Enter sequences in box above to align';
+        document.getElementById('alignGridDiv').innerHTML = '';
+
+    }
+    else
+    if (alignGraph == null) {
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + alignS + '<br>' + 'T: ' + alignT
+           + '<br>Press run to align';
+        document.getElementById('alignGridDiv').innerHTML = '';
+    }
+    else {
+        var sFormatted = '';
+        var tFormatted = '';
+        for (var i = 0;i < alignGraph.sAligned.length;++i) {
+
+            if (alignGraph.sAligned.substring(i,i+1) === alignGraph.tAligned.substring(i,i+1)) {
+                sFormatted += '<b>' + alignGraph.sAligned.substring(i,i+1) + '</b>';
+                tFormatted += '<b>' + alignGraph.tAligned.substring(i,i+1) + '</b>';
+
+            }
+            else {
+                sFormatted += alignGraph.sAligned.substring(i,i+1);
+                tFormatted += alignGraph.tAligned.substring(i,i+1);
+
+            }
+        }
+        document.getElementById('alignStringDiv').innerHTML = 'S: ' + sFormatted + '<br>' + 'T: ' + tFormatted;
+
+
+
+        var sp = '&nbsp';
+        var line = '';
+        var sExt = '-' + alignGraph.s;
+        var tExt = '-' + alignGraph.t;
+
+        var sinkNum = alignGraph.rows * alignGraph.cols - 1;
+
+        //var path = [];
+        var pathData = alignGraph.longestPathBacktrack('' + sinkNum,'0');
+        var path = pathData[1];
+
+
+
+        for (var i = 0;i < alignGraph.rows + 1;++i) {
+
+            for (var j = 0;j < alignGraph.cols + 1; ++j) {
+                if ((i == 0) && (j == 0)) {
+                    line += sp + sp + sp + sp;
+                }
+                else if (i == 0) {
+                    line += sExt.substring(j - 1, j) + sp + sp + sp;
+                }
+                else if (j == 0) {
+                    line += tExt.substring(i - 1, i) + sp + sp;
+                }
+                else {
+                    var topOrder = (i-1) * alignGraph.cols + j -1;
+                    var topLab = '' + topOrder;
+                    var node = alignGraph.findNodes('' + topOrder)[0];
+                    var extraSp =  (node.longestPathToThisNode >= 0) ? '&nbsp;' : '';
+
+
+                    if (path.indexOf(topLab) > -1) {
+                        line += '<b>' + extraSp  +  node.longestPathToThisNode + '</b>' + sp + sp;
+                    }
+                    else {
+                        line += extraSp +  node.longestPathToThisNode + sp + sp;
+                    }
+
+
+                }
+
+            }
+
+             line += '<BR>';
+
+
+        }
+
+        document.getElementById('alignGridDiv').innerHTML = line;
+
+
+    }
+
+
+}
+
 function colourMotifs(dna,view,bases,mark) {
 
     var numKmer = document.getElementById('numKmers');
@@ -4986,7 +9225,7 @@ function colourMFK(dna,view,bases,mark) {
             });
         }
 
-        d = dna[totPos];
+        var d = dna[totPos];
         if (d === '\n') {
             var b = document.createElement('br');
             view.appendChild(b);
@@ -5474,16 +9713,7 @@ function colourDNA(dna,mark,inclRevCompl) {
         colourMFK(dna,view,bases,mark);
     }
 
-    if ((assemblyView) &&(dnaMasterStrings)) {
-        var strArray = dnaMasterStrings.split('\n');
-        var more = strArray.length - 1;
-        if (strArray.length > 20) {
-            document.getElementById('graphReadsDiv').innerHTML = strArray[0] + ' + ' + more + ' more';
-        }
-        else {
-            document.getElementById('graphReadsDiv').innerHTML = dnaMasterStrings;
-        }
-    }
+
     /*
     for (var totPos = dnaPage * basesPerPage + dnaPageOffset; totPos <  (dnaPage + 1) * basesPerPage + dnaPageOffset; ++totPos) { //dna.length; ++totPos) {
         if (totPos >= dna.length) {
@@ -6075,42 +10305,104 @@ function dnaMasterChanged() {
 }
 
 
+function alignMasterChanged() {
+
+
+   // if (alignedS === '') {
+
+    if (alignGraph == null) {
+        colourAlignFromBackground();
+    }
+    else {
+        colourAlign();
+    }
+
+}
+
+function sbMasterChanged() {
+
+
+    colourSBFromBackground();
+
+}
+
+
+
+
+
 function graphChanged(grph) {
 
     if (grph.dna) {
-        document.getElementById('graphDnaDiv').innerHTML = grph.dna;
+        document.getElementById('graphDnaDiv').innerHTML = 'DNA: ' + grph.dna;
 
+    }
+    else {
+        document.getElementById('graphDnaDiv').innerHTML = 'DNA: ' + 'none input';
     }
 
     if (grph.reads) {
         if ((grph.sourceType == DGraph.fromPairedDna) || (grph.sourceType == DGraph.fromPairedReads)) {
-            document.getElementById('graphReadsDiv').innerHTML = grph.reads.map(function(el) {
-                return '(' + el[0] + '|' + el[1] + ')';
+            var readsDispAr = grph.reads.map(function(el) {
+                var el0 = squishString(el[0],30);
+                var el1 = squishString(el[1],30);
+                return '(' + el0 + '|' + el1 + ')';
 
             });
-
+            var more = grph.reads.length - 1;
+            if (grph.reads.length > 20) {
+                document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + readsDispAr[0] + ' + ' + more + ' more';
+            }
+            else {
+                document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + readsDispAr;
+            }
         }
         else {
-            document.getElementById('graphReadsDiv').innerHTML = grph.reads;
+            document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + grph.reads;
         }
+    }
+    else {
+        document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + 'none';
     }
 
     var adj = grph.getAdjList();
     if (adj) {
         var str = '';
-        adj.forEach(function(el) {
-            str+= el + '<br>';
+        adj.forEach(function(el,i) {
+            if (i > 20) {
+
+            }
+            else if (i == 20) {
+                var more = adj.length - 20;
+                str += ' + '  + more + ' more';
+            }
+            else {
+                if (el.length > 30) {
+                    var spl = el.split('->');
+                    str += squishString(spl[0],15)  + ' -> ' +  squishString(spl[1],15) + '...' +  '<br>';
+                }
+                else {
+
+                    str+= el + '<br>';
+                }
+
+            }
+
+
         });
-        document.getElementById('graphAdjListDiv').innerHTML = str;
+        document.getElementById('graphAdjListDiv').innerHTML = 'Adj list: <br>' + str;
+    }
+    else {
+        document.getElementById('graphAdjListDiv').innerHTML = 'Adj list: <br>' + 'none';
     }
 
-    document.getElementById('debugText').value = grph.sumInfo();
+    document.getElementById('debugText').value +=grph.sumInfo();
 
 
     graphCanvas(grph);
 
+    var dispMaxBranchRecon = false;
 
-    if (paramObj.seqMethod == DGraph.seqTypeComp) {
+    if (grph.graphType == DGraph.seqTypeComp) {
         if (grph.dna) {
             document.getElementById('debugText').value += '\nOriginal: \n' + grph.dna;
         }
@@ -6121,7 +10413,14 @@ function graphChanged(grph) {
             document.getElementById('debugText').value += '\nOriginal: \n' + grph.dna;
             recon =  grph.edgePathReconstructed();
 
-            document.getElementById('debugText').value += '\nReconstructed: \n' + recon;
+            var reconShort;
+            if (recon.length > 250) {
+                reconShort = recon.substring(0,125) + '...' + recon.substring(recon.length-125);
+            }
+            else {
+                reconShort = recon;
+           }
+            document.getElementById('debugText').value += '\nReconstructed: \n' + reconShort;
             if (grph.dna === recon) {
                 document.getElementById('debugText').value += '\nMatch!';
             }
@@ -6132,10 +10431,17 @@ function graphChanged(grph) {
         }
         else {
             recon =  grph.edgePathReconstructed();
-            document.getElementById('debugText').value += '\nReconstructed: \n' + recon;
+            var reconShort;
+            if (recon.length > 300) {
+                reconShort = recon.substring(0,150) + '...' + recon.substring(recon.length-150);
+            }
+            else {
+                reconShort = recon;
+            }
+            document.getElementById('debugText').value += '\nReconstructed: \n' + reconShort;
         }
 
-        document.getElementById('debugText').value += '\nEdges: ' + grph.edgePathToText();
+        if (dispMaxBranchRecon) document.getElementById('debugText').value += '\nEdges: ' + grph.edgePathToText();
 
     }
 
@@ -6144,14 +10450,52 @@ function graphChanged(grph) {
     var nbps = grph.maximalNonBranchingPaths();
 
 
-    var dispMaxBranchRecon = false;
 
-    if (dispMaxBranchRecon) {
-        document.getElementById('debugText').value += '\nMaximal Non Branching:';
 
-        nbps.forEach(function(nbp) {
-            document.getElementById('debugText').value += '\n';
-            nbp.forEach(function(el,i) {
+   // if (dispMaxBranchRecon) {
+   //document.getElementById('debugText').value += '\nMaximal Non Branching:';
+
+    var maxContigLen = 0;
+    var maxContig = '';
+
+    var thresh = 150;
+    var numOverThresh = 0;
+
+    var totContigLen = 0;
+
+    var allContigsTotLen = 0;
+
+    var contigs = [];
+    var contigsNoX = [];
+
+    nbps.forEach(function(nbp) {
+       // if (dispMaxBranchRecon) document.getElementById('debugText').value += '\n';
+        var reconstructed = grph.edgePathReconstructed(nbp);
+        var reconstructedNoX = reconstructed.replace(/x/g,'');
+        contigsNoX.push(reconstructedNoX);
+        contigs.push(reconstructed);
+        allContigsTotLen +=reconstructedNoX.length;
+        if (reconstructed.length == reconstructedNoX.length) {
+            len  = reconstructed.length;
+        }
+        else {
+            len = reconstructedNoX.length / 2; // still some Xs, so only count first half of pair
+        }
+
+       // var len = reconstructedNoX.length;//nbp.length + nbp.edgeLabel().length - 1;
+        if (len > maxContigLen) {
+            maxContigLen = len;
+            maxContig = reconstructed;
+        }
+        totContigLen+= len;
+        if (len > thresh) {
+            ++numOverThresh;
+
+        }
+
+        if (dispMaxBranchRecon) {
+            /*
+            nbp.forEach(function (el, i) {
 
                 document.getElementById('debugText').value += el;
                 if (i == nbp.length - 1) {
@@ -6162,15 +10506,28 @@ function graphChanged(grph) {
 
                 }
             });
+            */
+        }
 
-        });
+    });
+
+    var runningTot = 0;
+    for (var indHalf = 0;indHalf < contigsNoX.length;++indHalf) {
+        runningTot += contigsNoX[indHalf].length;
+        if (runningTot >= allContigsTotLen / 2) {
+            break;
+        }
+    }
 
 
 
-        document.getElementById('debugText').value += '\nMaximal Non Branching reconstructed:';
+    if (dispMaxBranchRecon) document.getElementById('debugText').value += '\nMaximal Non Branching reconstructed:';
 
+    if (dispMaxBranchRecon) {
         nbps.forEach(function (nbp) {
             document.getElementById('debugText').value += '\n';
+            document.getElementById('debugText').value += grph.edgePathReconstructed(nbp);
+            /*
             nbp.forEach(function (el, i) {
                 if (i == 0) {
                     document.getElementById('debugText').value += el;
@@ -6181,14 +10538,86 @@ function graphChanged(grph) {
 
 
             });
+            */
 
         });
+    }
+
+    var avgContigLen = totContigLen  * 1.0 /  nbps.length;
+
+    document.getElementById('debugText').value += '\nNum  contigs: ' + nbps.length;
+    document.getElementById('debugText').value += '\nNum contigs  with len > ' + thresh + ' : ' + numOverThresh;
+    document.getElementById('debugText').value += '\nLargest Contig len: ' + maxContigLen;
+    document.getElementById('debugText').value += '\nAvg Contig Len: ' + avgContigLen;
+    document.getElementById('debugText').value += '\nTotal Contigs Len: ' + allContigsTotLen;
+    document.getElementById('debugText').value += '\nN50: ' + contigsNoX[indHalf].length;
+    document.getElementById('debugText').value += '\nLargest Contig: ' + maxContig;
 
 
+    var contigsStr = '';
+    contigs.forEach(function(el) {
+        contigsStr+=el + '\n';
+    });
+
+    document.getElementById('downloadSeq').href = 'data:text/plain;charset=utf-8,'
+        + encodeURIComponent(contigsStr);
+
+
+
+
+
+
+
+
+}
+
+function autoDetectContents(contents) {
+    // At this stage only detects between adj list, fasta, dist matrix
+    //Possible enhancement: input choice of possibilities which may help to narrow down
+    var spl = contents.split('\n');
+
+    if (spl.length == 1) {
+        //could be dna, rna, protein string. To be implemented
+        return -2;
     }
-    else {
-        document.getElementById('debugText').value += '\nNum non branch paths: ' + nbps.length;
+
+    spl = spl.map(function(el) {
+       return el.trim();
+    });
+
+    spl = spl.filter(function(el) {
+        return (el.length != 0);
+    });
+
+    var firstLine = spl[0];
+
+    if (firstLine.substring(0,1) == '>') {
+        return DGraph.fromFastaDna;
     }
+
+    var adjListTester = firstLine.split('->');
+    if ((adjListTester.length == 2) && (adjListTester[0].length > 0)) {
+        adjListTester = spl[1].split('->'); //also test second line
+        if ((adjListTester.length == 2) && (adjListTester[0].length > 0)) {
+            return DGraph.fromAdjList;
+        }
+    }
+
+    var distMatRows = spl.length;
+    var distMatCols = spl[0].replace(/ +(?= )/g,'').split(' ').length;
+    if (distMatRows == distMatCols) {//assume no header supplied
+        return DGraph.fromDistanceMatrix;
+    }
+    else if (distMatRows == distMatCols + 1) { //assume header supplied
+        return DGraph.fromDistanceMatrix;
+    }
+
+
+    return -1;
+
+
+
+
 
 
 
@@ -6243,6 +10672,41 @@ function cleanContents(contents,contentType) {
 
                 break;
 
+            case DGraph.fromFastaDna: //reads on multiple lines in Fasta format
+                parts = contents.split(/\r\n|\r|\n/g);
+                parts = parts.filter(function(el) {
+                    return el.length != 0;
+
+                });
+                /*
+                var line = '';
+                var newParts = [];
+                parts.forEach(function(el,i) {
+
+                    if (el.substring(0,1) == '>') {
+                        line = '';
+                        line+=el.substring (1);
+                        line += ' ';
+
+                    }
+                    else {
+                        line += el.toUpperCase();;
+
+                        newParts.push(line);
+
+                    }
+
+
+                });
+                */
+
+
+
+                newContents = parts.join('\n');
+                return newContents;
+
+                break;
+
             case DGraph.fromPairedReads: //reads on multiple lines
                 parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
@@ -6262,16 +10726,17 @@ function cleanContents(contents,contentType) {
 
                 break;
 
+
             case DGraph.fromAdjList: //reads on multiple lines
                 parts = contents.split(/\r\n|\r|\n/g);
                 parts = parts.filter(function(el) {
                     return el.substring(0, 1) !== '>';
                 });
-                parts = parts.map(function(el) {
-                    var repl = el.replace(/[^ACGT ->|0123456789acgt]/gm, "");
-                    return repl.toUpperCase();
-
-                });
+               // parts = parts.map(function(el) {
+               //     var repl = el.replace(/[^ACGT ->|0123456789acgt]/gm, "");
+               //     return repl.toUpperCase();
+               //
+                //});
                 parts = parts.filter(function(el) {
                     return el.length != 0;
 
@@ -6336,6 +10801,43 @@ function cleanContents(contents,contentType) {
                 return newContents;
 
                 break;
+
+            case DGraph.fromDistanceMatrix:
+                //to be implemented more fully - check matrix accuracy, insert headings etc
+                parts = contents.split(/\r\n|\r|\n/g);
+
+                parts = parts.filter(function(el) {
+                    return el.length != 0;
+
+                });
+                parts = parts.map(function(el) {
+                    var newLine = el.trim();
+                    newLine = newLine.replace(/ +(?= )/g,'');
+                    return newLine;
+                });
+
+               // var distMatCols = spl[0].replace(/ +(?= )/g,'').split(' ').length;
+                var part0 = parts[0].split(' ');
+                if (part0.length == parts.length) {
+                    //square matrix, no header. Insert one
+                    var header = '';
+                    for (var i = 0;i < parts.length; ++i) {
+                        header += i;
+                        if (i == parts.length - 1) {
+
+                        }
+                        else {
+                            header += ' ';
+                        }
+
+                    }
+                    parts.unshift(header);
+                }
+                newContents = parts.join('\n');
+                return newContents;
+
+                break;
+
 
             default:
                 return contents;
@@ -6404,6 +10906,200 @@ function motifsInput(e) {
 
 }
 
+
+function alignInput(e,contents,seqNum) {
+
+    if (contents) { //loaded from file
+
+        switch (seqNum) {
+            case 2:
+                alignT = contents;
+                break;
+            default:
+                alignS = contents;
+                break;
+        }
+    }
+    else {
+        var alignStrings = document.getElementById('alignStrings').value.split('\n');
+
+        alignStrings = alignStrings.filter(function (el) {
+            return el.length != 0;
+        });
+        /*
+         alignStrings = alignStrings.map(function(el) {
+         return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
+
+         });
+         */
+
+        alignS = alignStrings[0];
+        alignT = alignStrings[1];
+        if (alignStrings[2]) {
+            alignU = alignStrings[2];
+        }
+        else {
+            alignU = '';
+        }
+    }
+
+    alignGraph = null;
+    alignReturned = null;
+
+
+    alignMasterChanged();
+
+
+}
+
+function sbInput(e,contents,seqNum) {
+
+    if (contents) { //loaded from file
+
+        switch (seqNum) {
+            case 2:
+                sbT = contents;
+                break;
+            default:
+                sbS = contents;
+                break;
+        }
+    }
+    else {
+        var sbStrings = document.getElementById('sbStrings').value.split('\n');
+
+        sbStrings = sbStrings.filter(function (el) {
+            return el.length != 0;
+        });
+
+
+        sbS = sbStrings[0];
+        sbT = sbStrings[1];
+    }
+
+
+    sbMasterChanged();
+
+
+}
+
+function phylogenyInput(e,input) {
+
+    var phylInp = getSelectedRadioEl('phylInput');
+
+
+
+    var source;
+    if (input) {
+        source = input;
+
+    }
+    else {
+        source = document.getElementById('phylogenyStrings').value;
+
+    }
+
+    //auto detect contents
+    var detectedInput = autoDetectContents(source);
+    switch (detectedInput) {
+        case DGraph.fromAdjList:
+            document.getElementById('phylAdjList').checked = true;
+            phylInputRadClicked('phylAdjList');
+            break;
+        case DGraph.fromDistanceMatrix:
+            document.getElementById('phylDistMat').checked = true;
+            phylInputRadClicked('phylDistMat');
+            break;
+        case DGraph.fromFastaDna:
+            document.getElementById('phylDNA').checked = true;
+            phylInputRadClicked('phylDNA');
+            break;
+        default:
+            break; //error
+
+    }
+
+    phylInp = getSelectedRadioEl('phylInput');
+
+
+    
+
+    var cleaned;
+
+    switch (phylInp.id) {
+        case 'phylDNA':
+            cleaned =  cleanContents(source,DGraph.fromFastaDna);
+            
+            break;
+
+        case 'phylDistMat':
+            cleaned =  cleanContents(source,DGraph.fromDistanceMatrix);
+            break;
+
+
+        case 'phylAdjList':
+            cleaned =  cleanContents(source,DGraph.fromAdjList);
+            //cleaned=source;
+            break;
+
+
+        default:
+            break;
+
+
+
+    }
+
+
+    if (input) {
+
+    }
+    else {
+
+        document.getElementById('phylogenyStrings').value = cleaned;
+    }
+
+
+    switch (phylInp.id) {
+
+        case 'phylDNA':
+            dnaMasterStrings = '';
+            var line = '';
+            var cleanedAr = cleaned.split('\n');
+             cleanedAr.forEach(function(el,i) {
+                 if (el.substring(0,1) == '>') {
+                     line = el.substring (1);
+                     line += ' ';
+
+
+                 }
+                 else {
+                     line += el.toUpperCase();
+                     if (i == cleanedAr.length - 1) {
+
+                     }
+                     else {
+                         line +='\n';
+                     }
+
+                     dnaMasterStrings+=line;
+                 }
+
+             });
+             //cleaned=source;
+             break;
+        default:
+            dnaMasterStrings = cleaned;
+            break;
+    }
+
+
+    dnaMasterChanged();
+
+
+}
+
+
 function sequencingInput(e,input) {
 
     var seqInp = document.getElementsByName('seqInput');
@@ -6468,7 +11164,7 @@ function sequencingInput(e,input) {
         case 'seqDNA':case 'seqPairedDNA':
             dnaMaster = cleaned;
             dnaMasterChanged();
-            document.getElementById('graphDnaDiv').innerHTML = dnaMaster;
+            document.getElementById('graphDnaDiv').innerHTML = 'DNA: ' + dnaMaster;
             break;
         case 'seqReads':
             dnaMasterStrings = cleaned;
@@ -6485,6 +11181,51 @@ function sequencingInput(e,input) {
 
 
     dnaMasterChanged();
+
+
+    if (dnaMasterStrings) {
+        if (dnaMasterStrings.length > 0) {
+            if (val == 'seqReads') {
+                var strArray = dnaMasterStrings.split('\n');
+                var splStrArray = strArray.map(function(el) {
+                    return squishString(el,30);
+                });
+                var more = strArray.length - 1;
+                if (strArray.length > 20) {
+                    document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + splStrArray[0] + ' + ' + more + ' more';
+                }
+                else {
+                    document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + splStrArray;//dnaMasterStrings;
+                }
+
+            }
+            else if (val == 'seqPairedReads') {
+                var strArray = dnaMasterStrings.split('\n');
+                var splStrArray = strArray.map(function(el) {
+                    var spl =  el.split('|');
+                    spl[0] = squishString(spl[0],30);
+                    spl[1] = squishString(spl[1],30);
+                    return spl;
+                });
+                var more = strArray.length - 1;
+                if (strArray.length > 20) {
+                    var filtered = splStrArray[0];
+                    document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + '(' + filtered[0] + '|' + filtered[1] + ')' + ' + ' + more + ' more ';
+                }
+                else {
+                    document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + splStrArray.map(function(el) {
+                            return '(' + el[0] + '|' + el[1] + ')';
+                        });
+                }
+
+            }
+        }
+
+
+
+
+
+    }
 
 
 
@@ -6516,6 +11257,12 @@ document.getElementById('dnaStrings').value = dnaMaster;
 dnaMasterChanged();
 */
 
+}
+
+function downloadSeq() {
+
+    //document.getElementById('downloadSeq').href = 'data:text/plain;charset=utf-8,'
+    //    + encodeURIComponent(txt.value);
 }
 
 function transInput(e) {
@@ -6798,6 +11545,12 @@ function randMotifPressed(event) {
 
 }
 
+function trimPressed() {
+    var trimFrom = parseInt(document.getElementById("jumpToBase").value) - 1;
+    var trimTo = parseInt(document.getElementById("trimToBase").value);
+    dnaMaster = dnaMaster.substring(trimFrom,trimTo);
+    dnaMasterChanged();
+}
 
 function jumpToPressed() {
 
@@ -6863,6 +11616,79 @@ function pagePressed(inc) {
 
 }
 
+function alignRadClicked(id) {
+
+    var alignTypeRadioSel = getSelectedRadioEl('alignMethod');
+    var  scoreMatrixRadioSel = getSelectedRadioEl('alignScore');
+
+    //Align method Radio Button
+    switch (alignTypeRadioSel.id) {
+        case 'alignLCS':
+        case 'alignEditDist':
+            document.getElementById('indelPenLab').style.display = "none";
+            document.getElementById('indelPenAL').style.display = "none";
+            document.getElementById('mismatchPenLab').style.display = "none";
+            document.getElementById('mismatchPenAL').style.display = "none";
+            document.getElementById('alignPamScoreLab').style.display = "none";
+            document.getElementById('alignPamScore').style.display = "none";
+            document.getElementById('alignBloScoreLab').style.display = "none";
+            document.getElementById('alignBloScore').style.display = "none";
+            document.getElementById('alignNoScoreLab').style.display = "none";
+            document.getElementById('alignNoScore').style.display = "none";
+
+
+            break;
+        case 'alignGlobal':
+        case 'alignLocal':
+        case 'alignFitting':
+        case 'alignOverlap':
+
+            document.getElementById('indelPenLab').style.display = "block";
+            document.getElementById('indelPenAL').style.display = "block";
+            if (scoreMatrixRadioSel.id === 'alignNoScore') {
+                document.getElementById('mismatchPenLab').style.display = "block";
+                document.getElementById('mismatchPenAL').style.display = "block";
+            }
+            else {
+                document.getElementById('mismatchPenLab').style.display = "none";
+                document.getElementById('mismatchPenAL').style.display = "none";
+            }
+
+            document.getElementById('alignPamScoreLab').style.display = "block";
+            document.getElementById('alignPamScore').style.display = "block";
+            document.getElementById('alignBloScoreLab').style.display = "block";
+            document.getElementById('alignBloScore').style.display = "block";
+            document.getElementById('alignNoScoreLab').style.display = "block";
+            document.getElementById('alignNoScore').style.display = "block";
+            break;
+        default:
+            break;
+    }
+
+    alignGraph = null;
+    alignReturned = null;
+    alignMasterChanged();
+}
+
+function sbRadClicked(id) {
+
+    var sbTypeRadioSel = getSelectedRadioEl('sbMethod');
+ 
+    //Align method Radio Button
+    switch (sbTypeRadioSel.id) {
+        case 'sbSharedKmers':
+            break;
+        default:
+            break;
+    }
+
+
+    sbReturned = null;
+    sbMasterChanged();
+}
+
+
+
 
 function motifRadClicked(id) {
     //Motif Radio Button
@@ -6910,6 +11736,93 @@ function motifRadClicked(id) {
     }
 
 }
+
+function phylInputRadClicked(id) {
+    //Motif Radio Button
+    switch (id) {
+        case 'phylDNA':
+
+
+            document.getElementById('phylAdd').hidden = false;
+            document.getElementById('phylAddLab').hidden = false;
+            document.getElementById('phylUltra').hidden = false;
+            document.getElementById('phylUltraLab').hidden = false;
+            document.getElementById('phylNeighbour').hidden = false;
+            document.getElementById('phylNeighbourLab').hidden = false;
+            document.getElementById('phylDisplayTree').hidden = true;
+            document.getElementById('phylDisplayTreeLab').hidden = true;
+            document.getElementById('phylSmallParsimony').hidden = true;
+            document.getElementById('phylSmallParsimonyLab').hidden = true;
+            document.getElementById('phylLargeParsimony').hidden = false;
+            document.getElementById('phylLargeParsimonyLab').hidden = false;
+
+
+            break;
+
+        case 'phylDistMat':
+
+            document.getElementById('phylAdd').hidden = false;
+            document.getElementById('phylAddLab').hidden = false;
+            document.getElementById('phylUltra').hidden = false;
+            document.getElementById('phylUltraLab').hidden = false;
+            document.getElementById('phylNeighbour').hidden = false;
+            document.getElementById('phylNeighbourLab').hidden = false;
+            document.getElementById('phylDisplayTree').hidden = true;
+            document.getElementById('phylDisplayTreeLab').hidden = true;
+            document.getElementById('phylSmallParsimony').hidden = true;
+            document.getElementById('phylSmallParsimonyLab').hidden =  true;
+            document.getElementById('phylLargeParsimony').hidden = true;
+            document.getElementById('phylLargeParsimonyLab').hidden = true;
+
+
+
+            break;
+
+
+        case 'phylAdjList':
+
+            document.getElementById('phylAdd').hidden = true;
+            document.getElementById('phylAddLab').hidden = true;
+            document.getElementById('phylUltra').hidden = true;
+            document.getElementById('phylUltraLab').hidden = true;
+            document.getElementById('phylNeighbour').hidden = true;
+            document.getElementById('phylNeighbourLab').hidden = true;
+            document.getElementById('phylDisplayTree').hidden = false;
+            document.getElementById('phylDisplayTreeLab').hidden = false;
+            document.getElementById('phylSmallParsimony').hidden = false;
+            document.getElementById('phylSmallParsimonyLab').hidden = false;
+            document.getElementById('phylLargeParsimony').hidden = false;
+            document.getElementById('phylLargeParsimonyLab').hidden = false;
+
+
+            break;
+
+
+
+
+
+        default:
+            document.getElementById('phylAdd').hidden = false;
+            document.getElementById('phylAddLab').hidden = false;
+            document.getElementById('phylUltra').hidden = false;
+            document.getElementById('phylUltraLab').hidden = false;
+            document.getElementById('phylNeighbour').hidden = false;
+            document.getElementById('phylNeighbourLab').hidden = false;
+            document.getElementById('phylDisplayTree').hidden = true;
+            document.getElementById('phylDisplayTreeLab').hidden = true;
+            document.getElementById('phylSmallParsimony').hidden = true;
+            document.getElementById('phylSmallParsimonyLab').hidden = true;
+            document.getElementById('phylLargeParsimony').hidden = true;
+            document.getElementById('phylLargeParsimonyLab').hidden = true;
+
+
+
+            break;
+
+    }
+
+}
+
 
 function sequencingInputRadClicked(id) {
     //Motif Radio Button
@@ -7004,6 +11917,34 @@ function sequencingInputRadClicked(id) {
             document.getElementById('numItersLabSA').style.display = "none";
 
 
+            break;
+
+    }
+
+}
+
+function phylRadClicked(id) {
+    //Motif Radio Button
+    switch (id) {
+        case 'phylAdd':
+
+        case 'phylUltra':
+
+        case 'phylNeighbour':
+
+        case 'phylSmallParsimony':
+
+        case 'phylLargeParsimony':
+
+            break;
+        case 'allowStepPH':
+
+            document.getElementById('stepPhylogeny').hidden = (!document.getElementById(id).checked);
+
+            break;
+
+
+        default:
             break;
 
     }
@@ -7297,6 +12238,43 @@ function peptideRadClicked(id) {
 
 }
 
+
+/* now handled in  DGraphView itself
+function phylGraphClicked(e) {
+    //console.log('graph event: '  + e.type + ' ' + e.offsetX +  ' ' + e.offsetY);
+
+   //console.log('event type: ' + e.type);
+    switch(e.type) {
+        case 'click':
+            if (pGraphView) {
+                var nv = pGraphView.determineNodeViewClicked(e);
+            }
+            break;
+        
+        case 'mousedown':
+            pGraphView.mouseDown(e);
+            break;
+        
+        case 'mouseup':
+            pGraphView.mouseUp(e);
+            break;
+        
+        case 'mousemove':
+            pGraphView.mouseMove(e);
+            break;
+        
+        
+        default:
+            break;
+    }
+    
+    
+    
+};
+*/
+
+
+
 function updateExpColl(elId,newState) {
     var el = document.getElementById(elId);
 
@@ -7422,10 +12400,16 @@ function tabClickDone(tabNum) {
              document.getElementById('sequencingTools').style.display = "none";
              document.getElementById('transTools').style.display = "none";
              document.getElementById('pepTools').style.display = "none";
+             document.getElementById('alignTools').style.display = "none";
+             document.getElementById('sbTools').style.display = "none";
+             document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
 
             expDebugState = false;
             expStateChanged('expDebug',false);
@@ -7438,10 +12422,16 @@ function tabClickDone(tabNum) {
             document.getElementById('sequencingTools').style.display = "block";
             document.getElementById('transTools').style.display = "none";
             document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "inline-block";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
+
 
             expDebugState = false;
             expStateChanged('expDebug',false);
@@ -7455,10 +12445,18 @@ function tabClickDone(tabNum) {
             document.getElementById('sequencingTools').style.display = "none";
             document.getElementById('transTools').style.display = "block";
             document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "inline-block";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
+
+
 
             expDebugState = false;
             expStateChanged('expDebug',false);
@@ -7472,12 +12470,19 @@ function tabClickDone(tabNum) {
             document.getElementById('sequencingTools').style.display = "none";
             document.getElementById('transTools').style.display = "none";
             document.getElementById('pepTools').style.display = "block";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "inline-block";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
 
             document.getElementById('rightTwo').style.display = 'none';
+
 
 
 
@@ -7487,16 +12492,97 @@ function tabClickDone(tabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 7: //Misc tab
+        case 7: //Align tab
+
+            document.getElementById('mfkTools').style.display = "none";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "block";
+            document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
+
+            document.getElementById('dnaviewer').style.display = "none";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "inline-block";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
+
+
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+        case 8: // Synteny Block tab
+            document.getElementById('mfkTools').style.display = "none";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "block";
+            document.getElementById('phylogenyTools').style.display = "none";
+
+            document.getElementById('dnaviewer').style.display = "none";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "inline-block";
+            document.getElementById('phylogenyViewer').style.display = "none";
+
+
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+        case 9:  //Phylogeny tab
+            document.getElementById('mfkTools').style.display = "none";
+            document.getElementById('motifTools').style.display = "none";
+            document.getElementById('sequencingTools').style.display = "none";
+            document.getElementById('transTools').style.display = "none";
+            document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "block";
+
+            document.getElementById('dnaviewer').style.display = "none";
+            document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "inline-block";
+
+
+            expDebugState = false;
+            expStateChanged('expDebug',false);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
+            break;
+
+
+        case 10: //Misc tab
             document.getElementById('mfkTools').style.display = "block";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
             document.getElementById('transTools').style.display = "none";
             document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
 
             expDebugState = true;
             expStateChanged('expDebug',true);
@@ -7512,10 +12598,17 @@ function tabClickDone(tabNum) {
             document.getElementById('sequencingTools').style.display = "none";
             document.getElementById('transTools').style.display = "none";
             document.getElementById('pepTools').style.display = "none";
+            document.getElementById('alignTools').style.display = "none";
+            document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('alignViewer').style.display = "none";
+            document.getElementById('sbViewer').style.display = "none";
+            document.getElementById('phylogenyViewer').style.display = "none";
+
 
             expDebugState = false;
             expStateChanged('expDebug',false);

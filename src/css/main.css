@@ -175,7 +175,6 @@ body {
     width:  15%;/*35%;*/
     height: 100%;
     vertical-align:top;
-    margin-left: 0;
     margin: 0;
     padding: 0;
 }
@@ -194,6 +193,18 @@ body {
     height: 100%;
     margin-left: 15px;
 }
+
+#evenMoreCanvas {
+    display: inline-block;
+    /* width: 65%;
+     height: 100%;*/
+    width: 300px;
+    height: 150px;
+    background-color: white;
+    vertical-align: top;
+
+}
+
 
 
 #moreCanvas {
@@ -249,6 +260,21 @@ input[type=number] {
 
 }
 
+#phylogenyViewer {
+    background-color:  beige;
+    width: 100%;
+    height: 100%;
+    /*overflow:auto;*/
+    display:none;
+
+}
+
+#phylogenyGraphDiv {
+    width: 800px;
+    height: 550px;
+    overflow:scroll;
+}
+
 #transViewer {
     background-color:  beige;
     width: 100%;
@@ -257,6 +283,43 @@ input[type=number] {
     display:none;
     font-family: "Lucida Console", Monaco, monospace;
 
+}
+
+#alignViewer {
+
+    background-color:  beige;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    display:none;
+    font-family: "Lucida Console", Monaco, monospace;
+
+}
+
+#sbViewer {
+
+    background-color:  peachpuff;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    display:none;
+    font-family: "Lucida Console", Monaco, monospace;
+
+}
+
+#alignStringDiv {
+    background-color:  mintcream;
+    width: 100%;
+    height: 25%;
+    overflow:auto;
+}
+
+#alignGridDiv {
+    background-color: darkolivegreen;
+    width: 100%;
+    height: 50%;
 }
 
 
@@ -393,6 +456,12 @@ input[type=number] {
     height: 100px;
 }
 
+#phylogenyTools {
+
+    display:none;
+    height: 100px;
+}
+
 #transTools {
 
     display:none;
@@ -403,6 +472,48 @@ input[type=number] {
 
     display:none;
     height: 100px;
+}
+
+#alignTools {
+
+    display:none;
+    height: 100px;
+}
+
+#alignInputManual {
+    display: inline-block;
+}
+
+#alignInputFileArea {
+    display: inline-block;
+}
+
+#alignInputOther {
+    display: inline-block;
+}
+
+
+#sbTools {
+
+    display:none;
+    height: 100px;
+}
+
+
+#sbInputTools {
+    display: inline-block;
+}
+
+#sbInputManual {
+    display: inline-block;
+}
+
+#sbInputFileArea {
+    display: inline-block;
+}
+
+#sbInputOther {
+    display: inline-block;
 }
 
 
@@ -503,6 +614,20 @@ input[type=number] {
 
 }
 
+#sbCanvas {
+    margin: 0;
+    padding: 2px;
+    width: 19%; /*220px;*/
+    height: 140px;
+    background-color: linen;
+    display: inline-block;
+    vertical-align: top;
+
+
+
+}
+
+
 .leftClump {
     display: inline-block;
    /* background-color: red;*/
@@ -547,6 +672,10 @@ input[type=number] {
 }
 
 #rightMotif {
+    width: 30%;
+}
+
+#rightPhyl {
     width: 30%;
 }
 
@@ -610,6 +739,10 @@ input[type=number] {
     width: 110px;
 }
 
+.smallBut {
+    width: 50px;
+}
+
 
 #miscParam1 {
     display: inline-block;
@@ -629,6 +762,12 @@ input[type=number] {
     background-color: blue;
     vertical-align: top;
     overflow: scroll;
+}
+
+#executeMiscDiv {
+    display: inline-block;
+    width: 60px;
+    height: 100px;
 }
 
 .spacedBut {
