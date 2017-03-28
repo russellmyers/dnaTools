@@ -5279,6 +5279,54 @@ function executeMisc(e) {
             var edgeToUseLabFrom = edgeToUse.split(' ')[0];
             var edgeToUseLabTo = edgeToUse.split(' ')[1];
 
+            var firstFrom = '';
+            var firstTo = '';
+
+            var adjArray = adjList.split('\n');
+            adjArray.forEach(function(el) {
+                var n1 = el.split('->')[0];
+                var n2 = el.split('->')[1];
+            
+                if (n1 == edgeToUseLabFrom)  {
+                      if (n2 == edgeToUseLabTo) {
+                      }
+                      else {
+                         if (firstFrom == '') {
+                            firstFrom = n2;
+                         }
+                      }
+                }
+                if (n2 == edgeToUseLabFrom)  {
+                      if (n1 == edgeToUseLabTo) {
+                      }
+                      else {
+                         if (firstFrom == '') {
+                            firstFrom = n1;
+                         }
+                      }
+                }
+                if (n1 == edgeToUseLabTo)  {
+                      if (n2 == edgeToUseLabFrom) {
+                      }
+                      else {
+                         if (firstTo == '') {
+                            firstTo = n2;
+                         }
+                      }
+                }
+                if (n2 == edgeToUseLabTo)  {
+                      if (n1 == edgeToUseLabFrom) {
+                      }
+                      else {
+                         if (firstTo == '') {
+                            firstTo = n1;
+                         }
+                      }
+                }
+
+
+            });
+
             var builder = new DGraphTreeBuilder(adjList);
 
             var gr = new DBTreeGraph(builder);
@@ -5297,9 +5345,59 @@ function executeMisc(e) {
             });
 
             var neighb = edge.neighbouringEdges();
-            var fromNode1 = edge.sourceNode;
-            var fromNode2 = edge.targetNode;
-            gr.builder.swapEdges(neighb[0][1],neighb[1][0],fromNode1,fromNode2);
+            var fromNode1; 
+            var fromNode2; 
+
+            var edgeNum = 0;
+            var otherEdgeNum = 1;
+            if (edge.sourceNode.label == edgeToUseLabFrom) {
+                 fromNode1 = edge.sourceNode;
+                 fromNode2 = edge.targetNode;
+                 edgeNum = 0;
+                 otherEdgeNum = 1;
+            }
+            else {
+                fromNode1 = edge.targetNode;
+                fromNode2 = edge.sourceNode;
+                edgeNum = 1;
+                otherEdgeNum = 0;
+            }
+            
+            
+
+            var fromOneLab = neighb[edgeNum][0].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][0].targetNode.label : neighb[edgeNum][0].sourceNode.label;
+            var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
+
+
+            var toOneLab = neighb[otherEdgeNum][0].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][0].targetNode.label : neighb[otherEdgeNum][0].sourceNode.label;
+            var toTwoLab = neighb[otherEdgeNum][1].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][1].targetNode.label : neighb[otherEdgeNum][1].sourceNode.label;
+
+var fromSwapper = 1;
+//if ( parseInt(fromOneLab) > parseInt(fromTwoLab) ) {
+if (fromOneLab == firstFrom) {
+      fromSwapper = 1;
+}
+else {
+      fromSwapper = 0;
+}
+
+var toSwapper1 = 0;
+var toSwapper2 = 1;
+
+//if ( parseInt(toOneLab) < parseInt(toTwoLab) ) {
+if (toOneLab == firstTo) { 
+      toSwapper1 = 0;
+      toSwapper2 = 1;
+}
+else {
+      toSwapper1 = 1;
+      toSwapper2 = 0;
+}
+
+
+
+
+            gr.builder.swapEdges(neighb[edgeNum][fromSwapper],neighb[otherEdgeNum][toSwapper1],fromNode1,fromNode2);
 
 
             var str = gr.toAdjacencyList(0,false,true,true);
@@ -5321,13 +5419,29 @@ function executeMisc(e) {
             });
 
             neighb = edge.neighbouringEdges();
-            fromNode1 = edge.sourceNode;
-            fromNode2 = edge.targetNode;
-            gr.builder.swapEdges(neighb[0][1],neighb[1][1],fromNode1,fromNode2);
+
+ 
+            if (edge.sourceNode.label == edgeToUseLabFrom) {
+                 fromNode1 = edge.sourceNode;
+                 fromNode2 = edge.targetNode;
+                 edgeNum = 0;
+                 otherEdgeNum = 1;
+            }
+            else {
+                fromNode1 = edge.targetNode;
+                fromNode2 = edge.sourceNode;
+                edgeNum = 1;
+                otherEdgeNum = 0;
+            }
 
 
 
-            str += '\n ' + '\n' + gr.toAdjacencyList(0,false,true,true);
+
+            gr.builder.swapEdges(neighb[edgeNum][fromSwapper],neighb[otherEdgeNum][toSwapper2],fromNode1,fromNode2);
+
+
+
+            str += '\n' + '\n' + gr.toAdjacencyList(0,false,true,true);
 
 
            var resString = str;
