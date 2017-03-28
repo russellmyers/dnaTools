@@ -1,5 +1,5 @@
 
-//Global Variables:
+//Global Variables
 
 var k = 2;
 var mfk = [];
