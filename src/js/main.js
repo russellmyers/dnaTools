@@ -58,12 +58,14 @@ var expMultiState = true;
 
 var pGraphView = null; 
 
-var w = new Worker('js/worker.js');
 
 //Initialisation
 
 initialisePage();
 testStuff();
+
+var w = new Worker('js/worker.js');
+setUpWorkerListeners();
 
 
 function testStuff() {
@@ -322,7 +324,6 @@ function initialisePage() {
     
 
     processHTMLParams();
-    setUpWorkerListeners();
 
     document.getElementById('fileInput')
         .addEventListener('change', readSingleFile, false);
@@ -378,7 +379,7 @@ function initialisePage() {
     readPamScoringMatrix();
     readBlosum62ScoringMatrix();
 
-
+    //
 
 }
 
