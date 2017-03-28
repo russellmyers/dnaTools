@@ -5453,6 +5453,81 @@ else {
 
 
             break;
+			
+		case '74': //BA8A Fartherst First Traversal
+
+
+       
+  
+		  var parseAr = par1El.value.split('\n');
+		  var params = parseAr.shift();
+		  console.log('params: ' + params);
+		  
+		  var k = parseFloat(params.split(' ')[0]);
+		  
+		  
+		  parseAr = parseAr.map(function(el) {
+			var spl = el.split(' ');
+			spl = spl.map(function(splEl) {
+				return parseFloat(splEl).toFixed(1);
+			});
+			return spl;
+		});
+		 
+		  parseAr = parseAr.map(function(el) {
+			 var ar = el.filter(function(elel) {
+				 return (elel != ' ');
+				 
+				
+			 });
+			 return ar;
+		  });
+		   
+		  var centres = [];
+		  centres.push(parseAr.shift());
+		  
+		  
+		  while (centres.length < k) {
+			  
+			  var maxDist = 0;
+			  var maxInd = -1;
+			   parseAr.forEach(function(el,elInd) {
+
+				   var thisClosest = closestCentre(el,centres);
+				  
+			 
+					 // console.log('aha' + ' thisclosest: ' + thisClosest + ' el: ' + el + ' centres: ' + centres);
+				  
+			
+				  if (thisClosest[0] > maxDist) {
+		 
+					 maxDist = thisClosest[0];
+					 maxInd = elInd;
+				  }
+				});
+				var removed = parseAr.splice(maxInd,1);
+				centres.push(removed[0]);
+				
+			  
+		  }
+		  
+		  var resString = '';
+		  centres.forEach(function(el) {
+			// console.log('el: ' + el);
+			 var thisStr = '';
+			 el.forEach(function(elel) {
+				thisStr += elel + ' ';
+			 });
+			 thisStr += '\n';
+			 resString += thisStr;
+			// console.log('resstr: ' + resString);
+		  });
+		 
+
+			
+            resEl.value =resString;
+
+            break;
 
         default:
             break;

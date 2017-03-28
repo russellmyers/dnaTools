@@ -11501,3 +11501,40 @@ function lowestCoins(amt,coins) {
 
     return lowestCoins(amt - best[0], coins) + 1;
 }
+
+function closestCentre(point,centres) {
+      var minDist = 999999999999;
+      var minInd = -1;
+   centres.forEach(function(c,i) {
+      var d = 0;
+      if (point[0] == 18.1) {
+         console.log(' aha point found');
+         
+      }
+      for (var ind = 0;ind < c.length;++ind) {
+         var thisD = (c[ind] - point[ind]) * (c[ind] - point[ind]);
+         
+         d+= thisD;
+      }
+      //console.log('d before sqrt: ' + d);
+      
+      d = Math.sqrt(d);
+      
+     // console.log('centre ind: ' + i  + ' point: ' + point +  ' dist to point: ' + d );
+     
+      if (d < minDist) {
+         minDist = d;
+         minInd = i;
+      }
+      
+      
+   });
+   
+  if (point[0] == 18.1) {
+     console.log('mindist: ' + minDist + ' minInd: ' + minInd);
+  }
+ 
+   
+   return [minDist,minInd];
+
+}
