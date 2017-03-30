@@ -5489,6 +5489,23 @@ function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
     };
 }
 
+function DGraphFromSpectrumBuilder(source) {
+	
+	 DGraphBuilder.apply(this, [source, new DNodeBuilder(), new DEdgeBuilder()]);
+	
+	 this.buildNodes = function () {
+ 
+            var svdThis = this;
+
+
+            this.source.forEach(function (spec) {
+                var newNode = svdThis.addNode(spec);
+                
+			});
+	 }
+	
+}
+
 
 function DGraphTreeBuilder(source) {
 
