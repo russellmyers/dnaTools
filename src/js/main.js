@@ -6797,7 +6797,9 @@ function initialisePeptideParams() {
         case 'pepSequenceLeaderboardConv':
             paramObj.pepMethod = Peptide.PepMethodSequenceLeaderboardConv;
             break;
-
+		case 'pepSequenceGraphBrute':
+		    paramObj.pepMethod = Peptide.PepMethodSequenceGraphBrute;
+            break;
 
         default:
             break;
@@ -7995,6 +7997,7 @@ function runPeptide(e) {
                 'task': 'seqLeaderboardConvCyclopeptide',
                 'spectrum': spectrumMaster,
                 'useTheseAminos':paramObj.useTheseAminos,
+                'useTheseAminos':paramObj.useTheseAminos,
                 'M':paramObj.convSize,
                 'N': paramObj.leaderboardSize,
                 'pepType':paramObj.pepType
@@ -8003,6 +8006,38 @@ function runPeptide(e) {
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
 
             break;
+			
+		case Peptide.PepMethodSequenceGraphBrute:
+		
+            var builder = new DGraphFromSpectrumBuilder(spectrumMaster);
+      
+            var gr = new DBGraph(builder);
+		       if (document.getElementById('debugPS').checked) {
+                var resStr = '';
+                resStr += '\nDebug pressed';
+                resStr += '\nSpectrum Graph processing';
+				
+				var adj = gr.toAdjacencyList().split('\n');
+				
+				
+				
+				adj = adj.map(function(el) {
+					 var spl = el.split(':');
+					 var w = parseFloat(spl[1]).toFixed(0);
+					 spl[1] = w;
+					 var code = Amino.CodeForWeight(parseFloat(w));
+					 spl[1] = code;
+					 return spl.join(':');
+				});
+				
+				var adjStr = adj.join('\n');
+				
+				resStr += '\ntostr: \n' + adjStr;
+ 
+                document.getElementById('debugText').value = resStr;
+            }
+
+            break;		
 
         default:
             break;
