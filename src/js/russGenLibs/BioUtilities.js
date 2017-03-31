@@ -5490,6 +5490,49 @@ function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
     };
 }
 
+function DGraphFromSpectrumBuilder(source) {
+	
+	 DGraphBuilder.apply(this, [source, new DNodeBuilder(), new DEdgeBuilder()]);
+	
+	 this.buildNodes = function () {
+ 
+            var svdThis = this;
+			
+			var srcAr = this.source.split(' ');
+
+
+            srcAr.forEach(function (spec) {
+                var newNode = svdThis.addNode(spec);
+                
+			});
+			
+			srcAr = srcAr.map(function(el) {
+				return parseInt(el);
+			});
+			
+			var amW = Amino.AminoWeights();
+			
+			var foundWs = [];
+			
+			for (var i = 0;i < this.nodes.length;++i) {
+				for (var j = i+1;j < this.nodes.length;++j) {
+					var iW = parseInt(this.nodes[i].label);
+					var jW = parseInt(this.nodes[j].label);
+					if  (amW.indexOf(jW - iW) > -1) {
+						foundWs.push(jW - iW);
+						
+						var newEdge = this.connectNodes(this.nodes[i],this.nodes[j],true,jW - iW);
+					}
+				}
+			}
+			
+			
+			
+			return this.nodes;
+	 }
+	
+}
+
 
 function DGraphTreeBuilder(source) {
 
@@ -7890,6 +7933,21 @@ Amino.AminoWeights = function() {
     return aminoWeights;
 };
 
+
+Amino.CodeForWeight = function(w) {
+	  
+	for (var amEntry in Amino.transTable) {
+        if (Amino.transTable.hasOwnProperty(amEntry)) {
+           if (Amino.transTable[amEntry][2] == w) {
+			   return amEntry;
+		   }
+            
+        }
+	}
+	return '-';
+		
+}
+
 Amino.AllAminos = function() {
 
     var amList = [];
@@ -8435,6 +8493,7 @@ Peptide.PepMethodIdealSpectrum = 1;
 Peptide.PepMethodSequenceBrute = 2;
 Peptide.PepMethodSequenceLeaderboard = 3;
 Peptide.PepMethodSequenceLeaderboardConv = 4;
+Peptide.PepMethodSequenceGraphBrute = 5;
 
 
 function RNA(rna) {

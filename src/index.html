@@ -646,6 +646,9 @@
                         <label for ="pepPeptideTypeCircular"  id = "pepPeptideTypeCircularLab" class="alignLab">Circular</label>
                         <input type="radio" name="pepPeptideType"  class = "alignEl"  id ="pepPeptideTypeCircular" value="pepPeptideTypeCircular" checked >
 
+						<label for ="spectrometerPrefixSuffixPS" class="alignLab">Prefixes/Suffices only</label>
+                        <input type = "checkbox" class="alignEl" name = "spectrometerPrefixSuffixPS" id = "spectrometerPrefixSuffixPS">
+
                         <label for ="debugPS" class="alignLab">Debug</label>
                         <input type = "checkbox" class="alignEl" name = "debugSA" id = "debugPS">
 
@@ -669,13 +672,20 @@
                         <button type = "button" class="fixedBut" onclick="runPeptide(event)">Run</button>
                         <br>
 
-                        <input type="radio"  name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepIdealSpectrum" value="pepIdealSpectrum" checked  >Gen Ideal Spectrum
+						<label  id = "pepIdealSpectrumLab" >
+                        <input type="radio"  name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepIdealSpectrum" value="pepIdealSpectrum" checked  >Gen Ideal Spectrum</label>
+                        
+						<label id = "pepSequenceBruteLab" >
+                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceBrute" value="pepSequenceBrute"  >Sequencing (brute)</label>
                         <br>
-                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceBrute" value="pepSequenceBrute"  >Sequencing (brute)
+						<label id = "pepSequenceLeaderboardLab" >
+                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceLeaderboard" value="pepSequenceLeaderboard"  >Sequencing (leaderboard)</label>
+                        
+						<label id = "pepSequenceLeaderboardConvLab" >
+                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceLeaderboardConv" value="pepSequenceLeaderboardConv"  >Sequencing (leaderboard conv)</label>
                         <br>
-                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceLeaderboard" value="pepSequenceLeaderboard"  >Sequencing (leaderboard)
-                        <br>
-                        <input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceLeaderboardConv" value="pepSequenceLeaderboardConv"  >Sequencing (leaderboard conv)
+						<label id = "pepSequenceGraphBruteLab" >
+						<input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceGraphBrute" value="pepSequenceGraphBrute"  >Sequencing (Graph brute)</label>
                         <br>
 
                         <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->

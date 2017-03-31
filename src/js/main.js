@@ -360,6 +360,9 @@ function initialisePage() {
 
     document.getElementById('alignLCS').checked = true;
     alignRadClicked('alignLCS');
+	
+	document.getElementById('pepPeptide').checked = true;
+	peptideInputRadClicked('pepPeptide');
 
     document.getElementById('phylDistMat').checked = true;
     phylInputRadClicked('phylDistMat');
@@ -6794,7 +6797,9 @@ function initialisePeptideParams() {
         case 'pepSequenceLeaderboardConv':
             paramObj.pepMethod = Peptide.PepMethodSequenceLeaderboardConv;
             break;
-
+		case 'pepSequenceGraphBrute':
+		    paramObj.pepMethod = Peptide.PepMethodSequenceGraphBrute;
+            break;
 
         default:
             break;
@@ -7992,6 +7997,7 @@ function runPeptide(e) {
                 'task': 'seqLeaderboardConvCyclopeptide',
                 'spectrum': spectrumMaster,
                 'useTheseAminos':paramObj.useTheseAminos,
+                'useTheseAminos':paramObj.useTheseAminos,
                 'M':paramObj.convSize,
                 'N': paramObj.leaderboardSize,
                 'pepType':paramObj.pepType
@@ -8000,6 +8006,38 @@ function runPeptide(e) {
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
 
             break;
+			
+		case Peptide.PepMethodSequenceGraphBrute:
+		
+            var builder = new DGraphFromSpectrumBuilder(spectrumMaster);
+      
+            var gr = new DBGraph(builder);
+		       if (document.getElementById('debugPS').checked) {
+                var resStr = '';
+                resStr += '\nDebug pressed';
+                resStr += '\nSpectrum Graph processing';
+				
+				var adj = gr.toAdjacencyList().split('\n');
+				
+				
+				
+				adj = adj.map(function(el) {
+					 var spl = el.split(':');
+					 var w = parseFloat(spl[1]).toFixed(0);
+					 spl[1] = w;
+					 var code = Amino.CodeForWeight(parseFloat(w));
+					 spl[1] = code;
+					 return spl.join(':');
+				});
+				
+				var adjStr = adj.join('\n');
+				
+				resStr += '\ntostr: \n' + adjStr;
+ 
+                document.getElementById('debugText').value = resStr;
+            }
+
+            break;		
 
         default:
             break;
@@ -12267,11 +12305,24 @@ function peptideInputRadClicked(id) {
     switch (id) {
         case 'pepPeptide':
             document.getElementById('pepIdealSpectrum').checked = true;
+			document.getElementById('pepIdealSpectrumLab').style.display = "inline-block";
+			document.getElementById('pepSequenceBruteLab').style.display = "none";
+			document.getElementById('pepSequenceLeaderboardLab').style.display = "none";
+			document.getElementById('pepSequenceLeaderboardConvLab').style.display = "none";
+			document.getElementById('pepSequenceGraphBruteLab').style.display = "none";
             peptideRadClicked('pepIdealSpectrum');
           break;
 
         case 'pepSpectrum':
-            document.getElementById('pepSequenceBrute').checked = true;
+            document.getElementById('pepIdealSpectrumLab').style.display = "none";
+			document.getElementById('pepSequenceBruteLab').style.display = "inline-block";
+			document.getElementById('pepSequenceLeaderboardLab').style.display = "inline-block";
+			document.getElementById('pepSequenceLeaderboardConvLab').style.display = "inline-block";
+			document.getElementById('pepSequenceGraphBruteLab').style.display = "inline-block";
+            peptideRadClicked('pepIdealSpectrum');
+ 
+			document.getElementById('pepSequenceBrute').checked = true;
+			
             peptideRadClicked('pepSequenceBrute');
             break;
 
@@ -12416,6 +12467,10 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "none";
             document.getElementById('leaderLabPS').style.display = "none";
+			
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
+	
 
 
             document.getElementById('pepPeptide').checked = true;
@@ -12430,6 +12485,10 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "none";
             document.getElementById('leaderLabPS').style.display = "none";
+			
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
+
 
 
             document.getElementById('pepSpectrum').checked = true;
@@ -12444,6 +12503,9 @@ function peptideRadClicked(id) {
             document.getElementById('convLabPS').style.display = "block";
             document.getElementById('leaderLabPS').style.display = "block";
 
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
+
 
             document.getElementById('pepSpectrum').checked = true;
 
@@ -12456,6 +12518,26 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "block";
             document.getElementById('leaderLabPS').style.display = "block";
+			
+			document.getElementById('peptideUseTheseAminos').style.display = "block";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "block";
+
+
+
+            document.getElementById('pepSpectrum').checked = true;
+
+            break;
+			
+		case 'pepSequenceGraphBrute':
+
+            document.getElementById('convPS').style.display = "none";
+            document.getElementById('leaderPS').style.display = "none";
+
+            document.getElementById('convLabPS').style.display = "none";
+            document.getElementById('leaderLabPS').style.display = "none";
+
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
 
             document.getElementById('pepSpectrum').checked = true;
@@ -12468,7 +12550,11 @@ function peptideRadClicked(id) {
             document.getElementById('convLabPS').style.display = "none";
             document.getElementById('leaderLabPS').style.display = "none";
 
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
+			
+			
             document.getElementById('pepPeptide').checked = true;
 
             break;
