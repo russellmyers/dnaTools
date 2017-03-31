@@ -151,7 +151,7 @@
             <div id = "pepInputTools">
                 <label for = "pepInput">Enter Peptide/Spectrum:</label>
                 <input type = "text" name="pepInput"  onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
-                <button type = "button" onclick="peptideInput(event)">Apply</button>
+                <button type = "button" id="peptideInput" onclick="peptideInput(event)">Apply</button>
                 <label for="filePepInput">Load Peptide/Spectrum:</label>
                 <input type = "file" name="filePepInput" onclick = "clearFileName(event)" id = "filePepInput">
                 <button type = "button" onclick="randPressed(event)" class="spacedBut">Random</button>

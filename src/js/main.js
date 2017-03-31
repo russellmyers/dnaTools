@@ -10761,23 +10761,39 @@ function graphChanged(grph) {
 
 }
 
-function autoDetectContents(contents) {
+function autoDetectContents(contents,area) {
+
+    //Optional: area - broadly indicate the type of data to help decide
+
     // At this stage only detects between adj list, fasta, dist matrix
     //Possible enhancement: input choice of possibilities which may help to narrow down
     var spl = contents.split('\n');
 
-    if (spl.length == 1) {
-        //could be dna, rna, protein string. To be implemented
-        return -2;
-    }
-
     spl = spl.map(function(el) {
-       return el.trim();
+        return el.trim();
     });
 
     spl = spl.filter(function(el) {
         return (el.length != 0);
     });
+
+    if (spl.length == 1) {
+        if (area == 'peptideInput') {
+            if (spl[0].match("^[a-zA-Z]+$")) {
+                return DGraph.fromProtein;
+            }
+            else {
+                return DGraph.fromSpectrum;
+            }
+
+
+        }
+        else {
+            //could be dna, rna, etc.. To be implemented
+            return -2;
+        }
+    }
+
 
     var firstLine = spl[0];
 
@@ -11509,9 +11525,9 @@ function transInput(e) {
     }
 }
 
-function peptideInput(e) {
+function peptideInput(e,input) {
 
-
+/*
     var pepInp = document.getElementsByName('pepInput');
 
     var val = '';
@@ -11520,12 +11536,45 @@ function peptideInput(e) {
             val = pepInp[i].value;
         }
     }
+*/
+    var pepInp =  getSelectedRadioEl('pepInput');
+
+    var source;
+    if (input) {
+        source = input;
+
+    }
+    else {
+        source = document.getElementById('pepInput').value;
+
+    }
+
+    //auto detect contents
+    var xqd = 1;
+    var detectedInput = autoDetectContents(source,'peptideInput');
+    switch (detectedInput) {
+        case DGraph.fromProtein:
+            document.getElementById('pepPeptide').checked = true;
+            peptideInputRadClicked('pepPeptide');
+            break;
+        case DGraph.fromSpectrum:
+            document.getElementById('pepSpectrum').checked = true;
+            peptideInputRadClicked('pepSpectrum');
+            break;
+
+        default:
+            break; //error
+
+    }
+
+    pepInp =  getSelectedRadioEl('pepInput');
+
 
     var cleaned;
 
     cleaned = document.getElementById('pepInput').value;
 
-    switch(val) {
+    switch(pepInp.value) {
         case 'pepPeptide':
             cleaned = cleanContents(cleaned,DGraph.fromProtein);
             break;
@@ -11546,7 +11595,7 @@ function peptideInput(e) {
     sequencedWeights = null;
     convMaster = null;
 
-    switch (val) {
+    switch (pepInp.value) {
         case 'pepPeptide':
             //cleaned = document.getElementById('pepInput').value.toUpperCase();
             proteinMaster = new Peptide(Peptide.AminoArrFromStr(cleaned));

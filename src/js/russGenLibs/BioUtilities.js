@@ -6,6 +6,7 @@
 //Bioinformatics routines
 
 var c_Bases = ['A','C','G','T'];
+var c_Bases = ['A','C','G','T'];
 var c_NumBases = 4;
 var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
