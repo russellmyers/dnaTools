@@ -6771,6 +6771,8 @@ function initialisePeptideParams() {
     
     paramObj.useTheseAminos = document.getElementById('peptideUseTheseAminos').value;
 
+    paramObj.prefixSuffixOnly = document.getElementById('spectrometerPrefixSuffixPS').checked;
+
     var rads = document.getElementsByName('pepMethod');
 
     var methodSelected;
@@ -7951,7 +7953,7 @@ function runPeptide(e) {
         case Peptide.PepMethodIdealSpectrum:
 
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
-            spectrumMaster = proteinMaster.spectrum(paramObj.pepType == Peptide.circular,true);
+            spectrumMaster = proteinMaster.spectrum(paramObj.pepType == Peptide.circular,true,paramObj.prefixSuffixOnly);
             colourDNA(null, null, false);
 
             if (document.getElementById('debugPS').checked) {
@@ -7959,7 +7961,7 @@ function runPeptide(e) {
                 resStr += '\nDebug pressed';
                 resStr += '\nProtein: ' + proteinMaster.toMedString();
                 resStr += '\nSpectrum length: ' + spectrumMaster.length;
-                resStr += '\nSpectrum: ' + proteinMaster.spectrum(paramObj.pepType == Peptide.circular,false);
+                resStr += '\nSpectrum: ' + arrayToString(proteinMaster.spectrum(paramObj.pepType == Peptide.circular,false,paramObj.prefixSuffixOnly));
 
 
 
@@ -7969,10 +7971,12 @@ function runPeptide(e) {
             break;
         case Peptide.PepMethodSequenceBrute:
 
+        var res = cyclopeptideSequencing(spectrumMaster,false,null,paramObj.prefixSuffixOnly);
         w.postMessage({
             'task': 'seqCyclopeptide',
             'spectrum': spectrumMaster,
-            'pepType': paramObj.pepType
+            'pepType': paramObj.pepType,
+            'prefixSuffixOnly':paramObj.prefixSuffixOnly
         }); // Start the worker.
 
         //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
@@ -7985,7 +7989,8 @@ function runPeptide(e) {
                 'spectrum': spectrumMaster,
                 'M':paramObj.convSize,
                 'N': paramObj.leaderboardSize,
-                'pepType':paramObj.pepType
+                'pepType':paramObj.pepType,
+                'prefixSufixOnly':paramObj.prefixSuffixOnly
             }); // Start the worker.
 
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
@@ -8000,7 +8005,8 @@ function runPeptide(e) {
                 'useTheseAminos':paramObj.useTheseAminos,
                 'M':paramObj.convSize,
                 'N': paramObj.leaderboardSize,
-                'pepType':paramObj.pepType
+                'pepType':paramObj.pepType,
+                'prefixSufixOnly':paramObj.prefixSuffixOnly
             }); // Start the worker.
 
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
@@ -11596,8 +11602,10 @@ function peptideInput(e,input) {
             peptideInputRadClicked('pepPeptide');
             break;
         case DGraph.fromSpectrum:
-            document.getElementById('pepSpectrum').checked = true;
-            peptideInputRadClicked('pepSpectrum');
+            if (document.getElementById('pepPeptide').checked) {
+                document.getElementById('pepSpectrum').checked = true;
+                peptideInputRadClicked('pepSpectrum');
+            }
             break;
 
         default:

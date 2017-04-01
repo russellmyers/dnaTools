@@ -8292,9 +8292,10 @@ function Peptide(aminoArr,startPosInRNA) {
 
     
     
-    this.spectrum = function (cyclic,retSubPeptides) {
+    this.spectrum = function (cyclic,retSubPeptides,prefSufOnly) {
         
         //retSubPeptides: flag to indicate whether to also return the sub peptide strings
+        //prefSufOnly - only include prefixes and suffices, not "interior" sub-peptides
 
         var pepStr = this.toShortString('');
         
@@ -8313,7 +8314,14 @@ function Peptide(aminoArr,startPosInRNA) {
         for (var st = 0; st < this.peptide.length + 1; ++st) {
             for (var end = st + 1; end < this.peptide.length + 1; ++end) {
                 w = prefixMasses[end] - prefixMasses[st];
-                spec.push([w,pepStr.substring(st,end)]);
+                if (prefSufOnly) {
+                    if ((st == 0) || (end == this.peptide.length)) {
+                        spec.push([w,pepStr.substring(st,end)]);
+                    }
+                }
+                else {
+                    spec.push([w, pepStr.substring(st, end)]);
+                }
                 if (st > 0 && end < this.peptide.length) {
                     if (cyclic) {
                         spec.push([peptideMass - w,pepStr.substring(end) + pepStr.substring(0, st)]); //wrap around bit
@@ -8339,8 +8347,8 @@ function Peptide(aminoArr,startPosInRNA) {
 
     };
 
-    this.linearSpectrum = function () {
-        return this.spectrum(false);
+    this.linearSpectrum = function (prefSufOnly) {
+        return this.spectrum(false,false,prefSufOnly);
     };
 
     this.cyclicSpectrum = function () {
@@ -8348,13 +8356,13 @@ function Peptide(aminoArr,startPosInRNA) {
     };
 
 
-    this.linearScore = function (expSpectrum) {
+    this.linearScore = function (expSpectrum,prefSufOnly) {
 
-        return this.score(expSpectrum, true);
+        return this.score(expSpectrum, true,prefSufOnly);
 
     };
 
-    this.score = function (expSpectrum, linear) {
+    this.score = function (expSpectrum, linear,prefSufOnly) {
 
         var isFloatSpectrum;
         var floatErr = 0;
@@ -8372,7 +8380,7 @@ function Peptide(aminoArr,startPosInRNA) {
 
         var theor;
         if (linear) {
-            theor = this.linearSpectrum();
+            theor = this.linearSpectrum(prefSufOnly);
         }
         else {
             theor = this.cyclicSpectrum();
@@ -9838,7 +9846,7 @@ function allPossiblePeptidesWithWeight(w) {
     return wMatrix[w];
 }
 
-function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback) {
+function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback,prefSufOnly) {
     //actually caters for linear peptide  (cyclic flag false) or cyclic peptide (cyclic flag true)
     
     var expSpectrumAr = expSpectrum.split(' ');
@@ -10002,7 +10010,7 @@ function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback) {
                     if (newCandW == parentWeight) {
                        // console.log('aha');
                         var candPep = new Peptide(Peptide.AminoArrFromWeights(newCand));
-                        var candSpec =  candPep.spectrum(cyclicFlag); ///candPep.cyclicSpectrum();
+                        var candSpec =  candPep.spectrum(cyclicFlag,false,prefSufOnly); ///candPep.cyclicSpectrum();
                         var match = true;
                         if (candSpec.length !== expSpectrumAr.length) {
                             match = false;
@@ -10083,7 +10091,7 @@ function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback) {
 
 }
 
-function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicFlag,useTheseAminos,progCallback) {
+function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicFlag,useTheseAminos,progCallback,prefSufOnly) {
 
     var linearFlag = !cyclicFlag;
 
@@ -10194,10 +10202,10 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
         //branch
 
         var candProgAr = candidates.map(function(el) {
-            return el.toShortString('') + ' ' + el.getIntegerWeight() + ' ' +  el.linearScore(expSpectrumAr);
+            return el.toShortString('') + ' ' + el.getIntegerWeight() + ' ' +  el.linearScore(expSpectrumAr,prefSufOnly);
         });
         var bestProgAr = bestCands.map(function(el) {
-            return el.toShortString('') + ' '  + el.getIntegerWeight() + ' '+ el.score(expSpectrumAr,false);
+            return el.toShortString('') + ' '  + el.getIntegerWeight() + ' '+ el.score(expSpectrumAr,false,prefSufOnly);
         });
 
 
@@ -10334,7 +10342,7 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
 }
 
 
-function trimLeaderboard(leaderBoard,spectrum,N,round,progCallback) {
+function trimLeaderboard(leaderBoard,spectrum,N,round,progCallback,prefSufOnly) {
     //trim leaderboard in cyclopeptide sequencing
 
     //leaderboard is an array of [[peptide,score],[peptide,score]..]
@@ -10348,7 +10356,7 @@ function trimLeaderboard(leaderBoard,spectrum,N,round,progCallback) {
                 progCallback('Process bound [' + i + '/' + leaderBoard.length + '] round ', round, '');
             }
         }
-       return [el,el.linearScore(spectrum)]; 
+       return [el,el.linearScore(spectrum,prefSufOnly)]; 
        // return [el,el.score(spectrum,false)]; //uses cyclic score on Rosalind tedxtbook track problem
     });
 

@@ -3736,7 +3736,7 @@ self.addEventListener('message', function(e) {
 
             //var res = gibbsSampler(e.ata.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
-            res = cyclopeptideSequencing(e.data.spectrum,cycFlag,countProgMostFreqWithStages);
+            res = cyclopeptideSequencing(e.data.spectrum,cycFlag,countProgMostFreqWithStages,e.data.prefixSuffixOnly);
             self.postMessage({'task': 'seqCyclopeptide','msgType' : 'result','txtStuff' : res});
             break;
 
