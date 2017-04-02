@@ -10268,11 +10268,11 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
               //  else if ((newCandW >= parentWeight - floatErr) && (newCandW <= parentWeight + floatErr)) {
                // else if (newCandW == parWeight) {
                 else if ((newCandW >= parWeight + parMinTolerance) && (newCandW <= parWeight + parTolerance)) {
-                    if (newCand.score(expSpectrumAr,linearFlag) >  highScore) {
+                    if (newCand.score(expSpectrumAr,linearFlag,prefSufOnly) >  highScore) {
                         bestCands = [newCand];
-                        highScore = newCand.score(expSpectrumAr,linearFlag);
+                        highScore = newCand.score(expSpectrumAr,linearFlag,prefSufOnly);
                     }
-                    else if (newCand.score(expSpectrumAr,linearFlag) == highScore) {
+                    else if (newCand.score(expSpectrumAr,linearFlag,prefSufOnly) == highScore) {
                         bestCands.push(newCand);
                     }
                     newCandidates.push(newCand); //12/4/16 - keep full peptides  on leaderboard!
