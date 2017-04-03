@@ -8018,6 +8018,9 @@ function runPeptide(e) {
             var builder = new DGraphFromSpectrumBuilder(spectrumMaster);
       
             var gr = new DBGraph(builder);
+			
+			var paths = gr.allPathsSourceToSink();
+			
 		       if (document.getElementById('debugPS').checked) {
                 var resStr = '';
                 resStr += '\nDebug pressed';

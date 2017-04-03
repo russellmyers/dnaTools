@@ -6732,8 +6732,81 @@ function DBGraph(builder,comments) {
 
 
     };
+	
+	this.getSourceNode = function() {
+		//assumes DAG
+		for (var i = 0;i < this.nodes.length;++i) {
+			if (this.nodes[i].inDegree() == 0) {
+				return this.nodes[i];
+			}
+		}
+		return null;
+	};
+	
+	this.getSinkNode = function() {
+		//assumes DAG
+		for (var i = 0;i < this.nodes.length;++i) {
+			if (this.nodes[i].outDegree() == 0) {
+				return this.nodes[i];
+			}
+		}
+		return null;
+	};	
+	
+	this.allPathsSourceToSink = function() {
+		
+         //assumes DAG
+		 
+		 //iterative queue based
+		 
+		 var done = false;
+		 
+		 var sourceNode = this.getSourceNode();
+		 var sinkNode = this.getSinkNode();
+		 
+		 var paths = [];
+		 
+		 sourceNode.getSuccessorNodes().forEach(function(el) {
+			 var path = [];
+			path.push(sourceNode);
+            path.push(el);	
+            paths.push(path);				
+		 });
+		 
+		 var svdThis = this;
+		 
+		 while (!done) {
+			 var newPaths = [];
+			 var done = true;
+			 
+			 paths.forEach(function(path) {
+				if (path[path.length-1] == svdThis.getSinkNode()) {
+					newPaths.push(path);
+				}
+				else {
+					done = false;
+			    	var succs = path[path.length-1].getSuccessorNodes();
+					succs.forEach(function(suc) {
+						var newPath = path.map(function(p) {
+							return p;
+						});
+						newPath.push(suc);
+						newPaths.push(newPath);
+					});
+				}
+				
 
-   
+				
+			 });
+			 
+			 paths = newPaths;
+			 
+		 }
+		 
+		 return paths;
+		 
+		 
+	};
 
 
 
