@@ -5531,8 +5531,48 @@ else {
             resEl.value =resString;
 
             break;
+			
 
-        default:
+		case '76': //Peptide Vector
+
+  
+		  var pepStr = par1El.value;
+		  
+		  var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+		  
+		  var vect = pep.toPeptideVector();
+		  
+		  
+		  var resString = '';
+		  
+		  resString += arrayToString(vect);
+		  
+			
+          resEl.value =resString;
+
+            break;
+			
+	case '77': //Peptide from Vector
+
+  
+		  var vecStr = par1El.value;
+		  
+		  var pep = new Peptide(Peptide.AminoArrFromVector(vecStr));
+		  
+	  
+		  
+		  var resString = '';
+		  
+		  resString += pep.toShortString('');
+		  
+			
+          resEl.value =resString;
+
+            break;
+						
+						
+
+    default:
             break;
     }
 
@@ -8021,6 +8061,31 @@ function runPeptide(e) {
 			
 			var paths = gr.allPathsSourceToSink();
 			
+			var prots = paths.map(function(path) {
+				return path.map(function(el) {
+					return Amino.CodeForWeight(el.edgeWeight);
+				});
+				
+			});
+			
+			var protStrs = prots.map(function(protAr) {
+				return arrayToString(protAr,'');
+			});
+			
+			
+			var specs = [];
+			protStrs.forEach(function(protStr) {
+				
+				var pep = new Peptide(Peptide.AminoArrFromStr(protStr));
+				//var tst = pep.toPeptideVector();
+				var spec = pep.linearSpectrum(paramObj.prefixSuffixOnly);
+				var specStr = arrayToString(spec);
+				specs.push([protStr,specStr,specStr == spectrumMaster ? true : false]);
+				
+			});
+			
+			
+			
 		       if (document.getElementById('debugPS').checked) {
                 var resStr = '';
                 resStr += '\nDebug pressed';
@@ -8042,7 +8107,18 @@ function runPeptide(e) {
 				var adjStr = adj.join('\n');
 				
 				resStr += '\ntostr: \n' + adjStr;
+				
+				var possStr = '';
+				specs.forEach(function(el) {
+					possStr +='\n' + el[0];
+					possStr += el[2] ? ' Yes' : ' No';
+					
+				});
+				
+				resStr += '\n\nPossible proteins:' + possStr;
  
+                
+				
                 document.getElementById('debugText').value = resStr;
             }
 

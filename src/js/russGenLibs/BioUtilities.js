@@ -6766,10 +6766,9 @@ function DBGraph(builder,comments) {
 		 
 		 var paths = [];
 		 
-		 sourceNode.getSuccessorNodes().forEach(function(el) {
-			 var path = [];
-			path.push(sourceNode);
-            path.push(el);	
+		 sourceNode.getSuccessors().forEach(function(el) {
+			var path = [];
+			path.push(el);
             paths.push(path);				
 		 });
 		 
@@ -6780,12 +6779,12 @@ function DBGraph(builder,comments) {
 			 var done = true;
 			 
 			 paths.forEach(function(path) {
-				if (path[path.length-1] == svdThis.getSinkNode()) {
+				if (path[path.length-1].targetNode == svdThis.getSinkNode()) {
 					newPaths.push(path);
 				}
 				else {
 					done = false;
-			    	var succs = path[path.length-1].getSuccessorNodes();
+			    	var succs = path[path.length-1].targetNode.getSuccessors();
 					succs.forEach(function(suc) {
 						var newPath = path.map(function(p) {
 							return p;
@@ -8361,6 +8360,47 @@ function Peptide(aminoArr,startPosInRNA) {
             return 0;
         }
     };
+	
+	this.prefixMasses = function() {
+		
+		var prefMasses = [];
+		
+		var totMass = 0;
+		
+		
+		
+		this.peptide.forEach(function(am) {
+			var w = am.getIntegerWeight();
+			totMass += w;
+			prefMasses.push(totMass);
+		});
+		
+		return prefMasses;
+		
+	};
+	
+	
+	this.toPeptideVector = function() {
+		//prefix masses
+		
+		var prefMasses = this.prefixMasses();
+		
+		var vect = [];
+		
+		for (var i = 1;i <=		 prefMasses[prefMasses.length -1];++i) {
+		   	if (prefMasses.indexOf(i) > -1) {
+				vect.push(1);
+			}
+			else {
+				vect.push(0);
+			}
+		}
+		
+		return vect;
+		
+		
+		
+	};
 
 
     
@@ -8566,6 +8606,33 @@ Peptide.AminoArrFromWeights = function(weights) {
     return amArr;
 
 };
+
+Peptide.AminoArrFromVector = function(vector) {
+	
+	var amWeightArr = [];
+	
+	var vecArr = vector.split(' ');
+	
+	var prevMass = 0;
+	
+	vecArr.forEach(function(el,i) {
+		
+		if (el == 1) {
+			var thisMass = i + 1 - prevMass;
+			amWeightArr.push(thisMass);
+			
+			prevMass = i + 1;
+		}
+			
+			
+			
+	});
+	
+	return Peptide.AminoArrFromWeights(amWeightArr);
+	
+	
+};
+
 
 Peptide.linear = 1;
 Peptide.circular = 2;

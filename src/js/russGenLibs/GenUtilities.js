@@ -1754,7 +1754,7 @@ function turnpike(turn) {
 //added: 4/3/17
 function arrayToString(ar,sep) {
     var str = ''
-    if (!sep) {
+    if (sep == null) {
         sep = ' ';
     }
     
