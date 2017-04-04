@@ -6842,6 +6842,9 @@ function initialisePeptideParams() {
 		case 'pepSequenceGraphBrute':
 		    paramObj.pepMethod = Peptide.PepMethodSequenceGraphBrute;
             break;
+	    case 'pepSequenceGraphVector':
+		    paramObj.pepMethod = Peptide.PepMethodSequenceGraphVector;
+            break;			
 
         default:
             break;
@@ -8124,6 +8127,30 @@ function runPeptide(e) {
 
             break;		
 
+		case Peptide.PepMethodSequenceGraphVector:
+		
+            var builder = new DGraphFromSpectralVectorBuilder(spectrumMaster);
+      
+            var gr = new DBGraph(builder);
+			
+			var ret = gr.longestPathNodeWeighted();
+			
+			if (document.getElementById('debugPS').checked) {
+                var resStr = '';
+                resStr += 'Debug pressed';
+                resStr += '\nSpectral Vector Graph processing:\n';
+				resStr += ret[0]; //protein
+				resStr += '\n';
+				resStr += 'Bests: ' + ret[1];
+			}
+			
+			
+			document.getElementById('debugText').value = resStr;
+			
+			
+			break;
+
+			
         default:
             break;
 
@@ -11124,8 +11151,10 @@ function cleanContents(contents,contentType) {
 
 
                 newContents = contents.replace(/[,]/gm, " ");
-                newContents = newContents.replace(/[^0123456789. ]/gm, "");
-                newContents = newContents.trim();
+                //newContents = newContents.replace(/[^0123456789.- ]/gm, "");
+				newContents = newContents.replace(/^[+-]?\d+$/gm, "");
+                
+				newContents = newContents.trim();
                 newContents = newContents.toUpperCase();
                 return newContents;
 
@@ -12397,6 +12426,7 @@ function peptideInputRadClicked(id) {
 			document.getElementById('pepSequenceLeaderboardLab').style.display = "none";
 			document.getElementById('pepSequenceLeaderboardConvLab').style.display = "none";
 			document.getElementById('pepSequenceGraphBruteLab').style.display = "none";
+			document.getElementById('pepSequenceGraphVectorLab').style.display = "none";
             peptideRadClicked('pepIdealSpectrum');
           break;
 
@@ -12406,6 +12436,7 @@ function peptideInputRadClicked(id) {
 			document.getElementById('pepSequenceLeaderboardLab').style.display = "inline-block";
 			document.getElementById('pepSequenceLeaderboardConvLab').style.display = "inline-block";
 			document.getElementById('pepSequenceGraphBruteLab').style.display = "inline-block";
+			document.getElementById('pepSequenceGraphVectorLab').style.display = "inline-block";
             peptideRadClicked('pepIdealSpectrum');
  
 			document.getElementById('pepSequenceBrute').checked = true;
@@ -12616,6 +12647,22 @@ function peptideRadClicked(id) {
             break;
 			
 		case 'pepSequenceGraphBrute':
+
+            document.getElementById('convPS').style.display = "none";
+            document.getElementById('leaderPS').style.display = "none";
+
+            document.getElementById('convLabPS').style.display = "none";
+            document.getElementById('leaderLabPS').style.display = "none";
+
+			document.getElementById('peptideUseTheseAminos').style.display = "none";
+			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
+
+
+            document.getElementById('pepSpectrum').checked = true;
+
+            break;
+			
+		case 'pepSequenceGraphVector':
 
             document.getElementById('convPS').style.display = "none";
             document.getElementById('leaderPS').style.display = "none";

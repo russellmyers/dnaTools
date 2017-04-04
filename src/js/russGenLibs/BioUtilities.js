@@ -5534,6 +5534,52 @@ function DGraphFromSpectrumBuilder(source) {
 }
 
 
+function DGraphFromSpectralVectorBuilder(source) {
+	
+	 DGraphBuilder.apply(this, [source, new DNodeBuilder(), new DEdgeBuilder()]);
+	
+	 this.buildNodes = function () {
+ 
+            var svdThis = this;
+			
+			var srcAr = this.source.split(' ');
+
+ 			
+			svdThis.addNode('0:0');
+            srcAr.forEach(function (spec,i) {
+                var newNode = svdThis.addNode('' + (i+1) + ':' + spec);
+                
+			});
+			
+			/*
+			srcAr = srcAr.map(function(el) {
+				return parseInt(el);
+			});
+			*/
+			
+			var amW = Amino.AminoWeights();
+			
+			var foundWs = [];
+			
+			for (var i = 0;i < this.nodes.length;++i) {
+				for (var j = i+1;j < this.nodes.length;++j) {
+					var iW = parseInt(this.nodes[i].label.split(':')[0]);
+					var jW = parseInt(this.nodes[j].label.split(':')[0]);
+					if  (amW.indexOf(jW - iW) > -1) {
+						foundWs.push(jW - iW);
+						
+						var newEdge = this.connectNodes(this.nodes[i],this.nodes[j],true,jW - iW);
+					}
+				}
+			}
+			
+			
+			
+			return this.nodes;
+	 }
+	
+}
+
 function DGraphTreeBuilder(source) {
 
     DGraphBuilder.apply(this, [source, new DTreeNodeBuilder(), new DTreeEdgeBuilder()]);
@@ -6745,13 +6791,92 @@ function DBGraph(builder,comments) {
 	
 	this.getSinkNode = function() {
 		//assumes DAG
-		for (var i = 0;i < this.nodes.length;++i) {
+		for (var i = this.nodes.length - 1;i >= 0;--i) {
 			if (this.nodes[i].outDegree() == 0) {
 				return this.nodes[i];
 			}
 		}
 		return null;
 	};	
+	
+	this.longestPathNodeWeighted = function(sourceNode,sinkNode) {
+                //longest path in Graph based on node weights not edge weights)
+				//assumes DAG
+				//assumes nodes are in order, ie later nodes are all successors of prev ones
+        
+		if (sourceNode) {
+			
+     
+		}
+		else {
+			sourceNode = this.getSourceNode();
+		}
+		
+		if (sinkNode) {
+			
+		}
+		else {
+			sinkNode = this.getSinkNode();
+		}
+		
+		var done = false;
+		
+		var bests = [[0,0]];
+		
+		var currNode = sourceNode;
+		var currNodeNum = parseInt(currNode.label.split(':')[0]);
+		
+		var sinkNodeNum = parseInt(sinkNode.label.split(':')[0]);
+		
+		for (var i = currNodeNum+1;i <= sinkNodeNum;++i) {
+			var currNode = this.nodes[i];
+			var predNodes = currNode.getPredecessors();
+			var bestPred = DGraph.infinity * -1;
+			var bestNum = -1;
+			
+			predNodes.forEach(function(pred) {
+				var predNum  = parseInt(pred.label.split(':')[0]);
+				var predScore = bests[predNum][0];
+				if (predScore  > bestPred) {
+					bestPred = predScore;
+					bestNum = predNum;
+					
+				}
+					
+				
+			});
+			
+			var thisNodeWeight = parseInt(currNode.label.split(':')[1]);
+			if (bestPred == DGraph.infinity * -1) {
+				thisNodeWeight = 0;
+				bestNum = -1;
+			}
+			bests.push([bestPred + thisNodeWeight,bestNum]);
+			
+			
+		}
+		
+		
+		//backtrack
+		var currNum = bests.length - 1;
+		
+		var diffAr = [];
+		
+		while (currNum > 0) {
+			var diff = currNum - bests[currNum][1];
+			diffAr.unshift(diff);
+			currNum = bests[currNum][1];
+		}
+		
+		var pep = new Peptide(Peptide.AminoArrFromWeights(diffAr));
+		
+		return [pep.toShortString(''),bests];
+	 
+	};
+	
+
+
+      
 	
 	this.allPathsSourceToSink = function() {
 		
@@ -7957,6 +8082,7 @@ function Amino(amino) {
     this.init();
 }
 
+
 Amino.transTable =  {
     'K' : ['Lys','Lycine',128],
     'V' : ['Val','Valine',99],
@@ -7981,6 +8107,14 @@ Amino.transTable =  {
     'G' : ['Gly','Glysine',57]
 
 };
+
+/* Toy testing:
+
+Amino.transTable =  {
+    'X' : ['Lys','Lycine',4],
+    'Z' : ['Val','Valine',5]
+}
+*/
 
 Amino.AminoWeights = function() {
     var aminoWeights = [];
@@ -8642,6 +8776,7 @@ Peptide.PepMethodSequenceBrute = 2;
 Peptide.PepMethodSequenceLeaderboard = 3;
 Peptide.PepMethodSequenceLeaderboardConv = 4;
 Peptide.PepMethodSequenceGraphBrute = 5;
+Peptide.PepMethodSequenceGraphVector = 6;
 
 
 function RNA(rna) {
