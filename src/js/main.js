@@ -5570,7 +5570,133 @@ else {
 
             break;
 						
-						
+	case '78': //Peptide Identification
+
+  
+		  var vecStr = par1El.value;
+		  var proteome = par2El.value;
+		  
+		  var res = peptideIdentification(vecStr,proteome);
+		  
+		  /*
+		  
+		  var vecAr = vecStr.split(' ');
+		  
+		  vecAr = vecAr.map(function(el) {
+			 return parseInt(el); 
+		  });
+		  
+		  var pepWeight = vecAr.length;
+		  
+		  
+		  
+		  var candidates = [];
+		  
+		  		  
+		  for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
+			  //find candidate peptide starting at stPos with correct weight
+			  var candFound = false;
+			  for (var endPos = stPos;endPos <= proteome.length - 1;++endPos) {
+				  var pepStr = proteome.substring(stPos,endPos+1);
+				  var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+				  var w = pep.getIntegerWeight();
+				  if (w == pepWeight) {
+					  candFound = true;
+					  candidates.push(pep);
+				  }
+				  if (w >= pepWeight) {
+					  break;
+				  }
+			  }
+		  }
+		  
+		  
+		  var bestCand = '';
+		  var bestScore = DGraph.infinity * -1;
+		
+		  candidates.forEach(function(cand,i) {
+			  var score = cand.scoreAgainstSpectralVector(vecAr);
+			  if (score > bestScore) {
+				  bestCand = cand.toShortString('');
+				  bestScore = score;
+			  }
+			  
+		  });
+		  
+          */	 
+		  
+		  var resString = '';
+		  
+		  resString += '\nBest score: '  + res[1] + '\nBest Candidate: ' + res[0];
+		  
+			
+          resEl.value =resString;
+
+            break;	
+
+	case '79': //PSM
+
+  
+		  var vecStrs = par1El.value;
+		  var vecArs = vecStrs.split('\n');
+		  var proteome = par2El.value;
+		  var threshold = parseInt(par3El.value);
+		  
+		  var psmMatches = [];
+		  
+		  vecArs.forEach(function(vecStr) {
+			  var res = peptideIdentification(vecStr,proteome);
+			  if (res[1] > threshold) {
+				  psmMatches.push(res[0]);
+			  }
+			  
+		  });
+		  
+		  
+		  
+		  	  
+		  var resString = '';
+		  
+		  resString += '\nPS Matches: \n' + arrayToString(psmMatches,'\n');
+		  
+			
+          resEl.value =resString;
+
+            break;		
+
+	case '80': //Spectral Dictionary Size
+
+  
+		  var vecStr = par1El.value;
+		 
+		  var threshold = parseInt(par2El.value);
+		  var max_score = parseInt(par3El.value);
+		  
+		  var vecAr = vecStr.split(' ');
+		  
+	      vecAr = vecAr.map(function(el) {
+			 return parseInt(el); 
+		  });
+		  
+		  
+		  var totSize = 0;
+		  
+		  for (var t = threshold;t <=max_score;++t) {
+			  var size = spectralDictSize(vecAr,t,[],false);
+			  totSize += size;
+		  }
+		 
+		  
+		  	  
+		  var resString = '';
+		  
+		  resString += '\nSpectral Dict Size: \n' + totSize;
+		  
+			
+          resEl.value =resString;
+
+            break;							
+			
 
     default:
             break;

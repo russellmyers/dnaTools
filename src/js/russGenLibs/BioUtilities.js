@@ -560,6 +560,8 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
         }
         //}
+		
+	
 
 
     };
@@ -8108,12 +8110,14 @@ Amino.transTable =  {
 
 };
 
-/* Toy testing:
+// Toy testing:
 
+/*
 Amino.transTable =  {
     'X' : ['Lys','Lycine',4],
     'Z' : ['Val','Valine',5]
 }
+
 */
 
 Amino.AminoWeights = function() {
@@ -8676,6 +8680,27 @@ function Peptide(aminoArr,startPosInRNA) {
         return sc;
 
     };
+	
+	this.scoreAgainstSpectralVector = function(specVector) {
+		
+		var pepVector = this.toPeptideVector();
+		
+		if (pepVector.length == specVector.length) {
+			
+			var score = 0;
+			
+			specVector.forEach(function(el,i) {
+				score += (el * pepVector[i]);
+			});
+			
+			return score;
+			
+		}
+		else {
+			return DGraph.infinity * -1;
+		
+		}
+	};
 
     this.allCycles = function() {
       var cyclesAr = [];  
@@ -11880,4 +11905,121 @@ function closestCentre(point,centres) {
    
    return [minDist,minInd];
 
+}
+
+function peptideIdentification(spectralVectorString,proteome) {
+	
+	      var vecAr = spectralVectorString.split(' ');
+		  
+	      vecAr = vecAr.map(function(el) {
+			 return parseInt(el); 
+		  });
+		  
+     	  var pepWeight = vecAr.length;
+		  
+		  var candidates = [];
+		  
+		  		  
+		  for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
+			  //find candidate peptide starting at stPos with correct weight
+			  var candFound = false;
+			  for (var endPos = stPos;endPos <= proteome.length - 1;++endPos) {
+				  var pepStr = proteome.substring(stPos,endPos+1);
+				  var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+				  var w = pep.getIntegerWeight();
+				  if (w == pepWeight) {
+					  candFound = true;
+					  candidates.push(pep);
+				  }
+				  if (w >= pepWeight) {
+					  break;
+				  }
+			  }
+		  }
+		  
+		  
+		  var bestCand = '';
+		  var bestScore = DGraph.infinity * -1;
+		
+		  candidates.forEach(function(cand,i) {
+			  var score = cand.scoreAgainstSpectralVector(vecAr);
+			  if (score > bestScore) {
+				  bestCand = cand.toShortString('');
+				  bestScore = score;
+			  }
+			  
+		  });
+		  
+	 
+		  
+		  return [bestCand,bestScore];
+	
+
+	
+}
+
+function spectralDictSize(vecAr,t,grid,useToy) {
+	
+	if (t < 0) {
+		return 0;
+	}
+	var i = vecAr.length;
+	
+	if ((i == 0) && (t == 0)) {
+		return 1;
+	}
+	
+	
+	var aminoSet;
+	if (useToy) {
+	  aminoSet = ['X','Z'];
+	}
+	else {
+	  
+	  aminoSet = c_Aminos.slice(0,c_Aminos.length -1);  //c_aminos contains an extra 'X' at end
+	}
+	
+	var sumPrevious = 0;
+	
+	var currPeak = vecAr[vecAr.length - 1];
+	
+	aminoSet.forEach(function(el) {
+		
+		var w;
+		if (useToy) {
+			w = 0;
+			if (el == 'X') {
+				w = 4;
+			}
+			else if (el == 'Z') {
+				w = 5;
+			}
+		}
+		else {
+			var am = new Amino(el);
+		    w = am.getIntegerWeight();
+		}
+		
+		var prevI = i - w;
+		if (prevI < 0) {
+			
+		}
+		else {
+			var prevT = t - currPeak;
+			var key = prevI + ':' + prevT;
+			if (key in grid) {
+				sumPrevious += grid[key];
+			}
+			else {
+				prev = spectralDictSize(vecAr.slice(0,prevI),prevT,grid,useToy);
+				grid[key] = prev;
+				sumPrevious += prev;
+			}
+		}
+		
+	});
+	
+	return sumPrevious;
+	
+	
 }
