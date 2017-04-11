@@ -5008,7 +5008,7 @@ function DBGridNode(label) {
         
     DBNode.apply(this,[label]);
 	
-	this.NodeWeight = 0;
+	this.nodeWeight = 0;
 	this.row = -1;
 	this.col = -1;
 	this.lay = -1;
@@ -5671,18 +5671,109 @@ function DGraphGridBuilder(source) {
 		
 	};
 
+    this.findNodeWithCoord = function(r,c,l) {
+        for (var i = 0;i < this.nodes.length;++i) {
+            var node = this.nodes[i];
+            if ((node.row == r) && (node.col == c) && (node.lay == l)) {
+                return node;
+            }
+        }
+
+        return null;
+
+    }
+
 
 }
 
 
 function DGraphGridFromSpecAlignBuilder(source) {
 	
-	var this.pep = source[0];
-	var this.spec = source[1];
-	var this.k = source[2];
+	this.pep = source[0];
+    this.spec = source[1];
+	this.k = source[2];
 	
 	
-	DGraphGridBuilder.apply(this,[[this.pep.getIntegerWeight() + 1,this.spec.length + 1,this.k + 1]]);
+	DGraphGridBuilder.apply(this,[[this.pep.peptide.length + 1,this.spec.length + 1,this.k + 1]]);
+
+    this.buildNodes = function() {
+        var svdThis = this;
+
+        for (var l = 0;l < this.lays;++l) {
+            for (var r = 0;r < this.rows;++r) {
+                for (var c = 0;c< this.cols;++c)  {
+                    var diff = 0;
+                    if (r == 0) {
+                       diff = 0;
+                    }
+                    else {
+                        diff = this.pep.peptide[r -1].getIntegerWeight();
+                    }
+                    var w = 0;
+                    if (c == 0) {
+                        w = 0;
+                    }
+                    else {
+                        w = this.spec[c];
+                    }
+                    var newNode = svdThis.addNode(l + '-' + r + '-' +  c + '-' + diff);
+                    newNode.setAttributes(r,c,l,w);
+                }
+            }
+
+        }
+
+        for (var l = 0;l < this.lays;++l) {
+            for (var r = 0; r < this.rows - 1; ++r) {
+                for (var c = 0; c < this.cols - 1; ++c) {
+
+                    if ((r == 0) && (c > 0)) {
+                        break;
+                    }
+                    else {
+                        var node = this.findNodeWithCoord(r, c, l);
+                        if ((r == 0) && (c == 0) && (l == 0)) {
+
+                        }
+                        else {
+                            if (node.getPredecessors().length == 0) {
+                                continue;
+                            }
+                        }
+                        var arbitraryNextRowNode = this.findNodeWithCoord(r + 1, c, l);
+                        var diff = parseInt(arbitraryNextRowNode.label.split('-')[3]);
+                        var nextRow = r + 1;
+                        for (var nextCol = c + 1; nextCol < this.cols; ++nextCol) {
+                            var nextLay;
+                            if (nextCol - c == diff) {
+                                nextLay = l;
+                            }
+                            else {
+                                nextLay = l + 1;
+                            }
+
+                            if (nextLay > k) { // too many mods
+
+                            }
+                            else {
+                                var nextNode = this.findNodeWithCoord(nextRow, nextCol, nextLay);
+                                this.connectNodes(node, nextNode, true, 0); // no edge weights, only node weights
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+
+        }
+
+
+        return this.nodes;
+
+
+    };
 	
 	
 }
