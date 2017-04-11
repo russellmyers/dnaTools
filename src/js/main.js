@@ -5681,22 +5681,75 @@ else {
 		  
 		  var totSize = 0;
 		  
+		  var useToy = false;
+		  
 		  for (var t = threshold;t <=max_score;++t) {
-			  var size = spectralDictSize(vecAr,t,[],false);
+			  var size = spectralDictSize(vecAr,t,[],useToy);
 			  totSize += size;
 		  }
-		 
 		  
+		  
+		  /*
+		  var totNum = numPeptidesWithSpectralVector(vecAr,[], useToy);
+		  */
+		  var totProb = 0;
+		  
+		  for (var t = threshold;t <=max_score;++t) {
+			  var prob = spectralDictProbability(vecAr,t,[],useToy);
+			  totProb += prob;
+		  }
+		 
+	  
 		  	  
 		  var resString = '';
 		  
-		  resString += '\nSpectral Dict Size: \n' + totSize;
+		  resString += '\nSpectral Dict Size: \n' + totSize +   '\nProb: \n' + totProb;
 		  
 			
           resEl.value =resString;
 
             break;							
+
+case '81': //Spectral Alignment
+
+  
+          var pepStr = par1El.value;
+		  var vecStr = par2El.value;
+		 
+		 
+		  var k  = parseInt(par3El.value);
+		  
+		  var vecAr = vecStr.split(' ');
+		  
+	      vecAr = vecAr.map(function(el) {
+			 return parseInt(el); 
+		  });
+		  
+		  var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+		  
+		  var pepWeight = pep.getIntegerWeight();
+		  
+		  var delta = vecAr.length - pepWeight;
+		  
+		  var rows = pepWeight + 1;
+		  var cols = vecAr.length + 1;
+		  var lays = k + 1;
+		  
+		  builder = new DGraphGridFromSpecAlignBuilder([pep,vecAr,k]);
+		  
+		  var gg = new DBGridGraph(builder,'generic grid');
+		  
+  
+		  	  
+		  var resString = '';
+		  
+		  resString += 'Pep weight: ' + pepWeight + '\n Spectrum len: ' + vecAr.length + '\ndelta: ' + delta;
+		  
 			
+          resEl.value =resString;
+
+            break;							
+						
 
     default:
             break;

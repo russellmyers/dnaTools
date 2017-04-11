@@ -5643,7 +5643,7 @@ function DGraphTreeBuilder(source) {
 
 
 }
-function DGraphGridBuilder(source) {
+/*function DGraphGridBuilder(source) {
 
     DGraphBuilder.apply(this, [source, new DGridNodeBuilder(), new DEdgeBuilder()]);
 	
@@ -5686,7 +5686,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
 	
 	
 }
-
+*/
 function DGraphTreeFromNodesBuilder(source,copyFlag) {
     DGraphTreeBuilder.apply(this, [source, new DTreeNodeBuilder(), new DTreeEdgeBuilder()]);
 
@@ -7582,14 +7582,12 @@ function DBTreeGraph(builder,comments) {
     }
 }
 
-
 function DBGridGraph(builder,comments) {
     DBGraph.apply(this,[builder,comments]);
 	
 	
 	
 }
-
 
 
 function DBasicGraph(source,sourceType) {
