@@ -5205,23 +5205,35 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
     };
 
 
-    this.connectNodes = function(node1,node2,dirFlag,w) {
+    this.connectNodes = function(node1,node2,dirFlag,w,suppressConv) {
         if (!w) {
             w = 0;
         }
+		
+		//supppressConv means suppress logic to convert anti parallel directed edges to an undirected edge
+		//This logic is not needed in a lot of cases, and is quicker without
+		if (suppressConv == null) {
+			suppressConv = false;
+		}
 
        // node1.successors.push(new DBEdge(node1,node2,w));
 
         //If directed, first check if a directed edge already exits the other way. If so, join and make undir
 
         var processed = false;
-        node2.getSuccessors().forEach(function(ed) {
-           if ((ed.isDirected()  && (ed.getTargetNode(node2) === node1) )){
-               ed.setDirected(false);
-               processed = true;
+		
+		if (suppressConv) {
+			
+		}
+		else {
+			node2.getSuccessors().forEach(function(ed) {
+			   if ((ed.isDirected()  && (ed.getTargetNode(node2) === node1) )){
+				   ed.setDirected(false);
+				   processed = true;
 
-           }
-        });
+			   }
+			});
+		}
 
         if (processed) {
             return;
@@ -5812,7 +5824,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
                             }
                             else {
                                 var nextNode = this.findNodeWithCoord(nextLay,nextRow, nextCol);
-                                this.connectNodes(node, nextNode, true, 0); // no edge weights, only node weights
+                                this.connectNodes(node, nextNode, true, 0,true); // no edge weights, only node weights
                             }
                         }
                     }
