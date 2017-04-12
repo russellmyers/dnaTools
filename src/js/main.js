@@ -5740,10 +5740,12 @@ case '81': //Spectral Alignment
 		  var gg = new DBGridGraph(builder,'generic grid');
 		  
   
+
+          var res = gg.longestPathNodeWeighted(gg.getSourceNode(),gg.getSinkNode());
 		  	  
 		  var resString = '';
 		  
-		  resString += 'Pep weight: ' + pepWeight + '\n Spectrum len: ' + vecAr.length + '\ndelta: ' + delta;
+		  resString += 'Best Modified Peptide: ' + res[0] + ' Score: ' + res[1];
 		  
 			
           resEl.value =resString;

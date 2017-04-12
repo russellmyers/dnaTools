@@ -5012,18 +5012,32 @@ function DBGridNode(label) {
 	this.row = -1;
 	this.col = -1;
 	this.lay = -1;
+    this.numRows = -1;
+    this.numCols = -1;
+    this.numLays = -1;
+    
+    this.bestPathScore = DGraph.infinity * -1;
+    this.bestPathEdge = null;
 	
 	
-	
-	this.setAttributes = function(row,col,lay,w) {
+	this.setAttributes = function(row,col,lay,numRows,numCols,numLays,w) {
 		
 	   this.nodeWeight = w ? w : 0;
 	
 	   this.row = (row == null) ? -1 : row;
 	   this.col = (col == null) ? -1 : col;
 	   this.lay = (lay == null) ? -1 : lay;
+        
+       this.numRows = (numRows == null) ? -1 : numRows;
+       this.numCols = (numCols == null) ? -1 : numCols;
+       this.numLays = (numLays == null) ? -1 : numLays;
 		
-	}
+	};
+    
+    this.orderNum = function() {
+        return (this.row * this.numCols + (this.col + 1)) + (this.lay * this.numCols * this.numRows);
+        
+    }
     
     
 }
@@ -5658,7 +5672,7 @@ function DGraphGridBuilder(source) {
 			for (var r = 0;r < this.rows;++r) {
 				for (var c = 0;c< this.cols;++c)  {
 					var newNode = svdThis.addNode(l + '-' + r + '-' +  c);
-					newNode.setAttributes(r,c,l,0);
+					newNode.setAttributes(r,c,l,this.rows,this.cols,this.lays,0);
 				}
 			}
 			
@@ -5682,6 +5696,17 @@ function DGraphGridBuilder(source) {
         return null;
 
     }
+
+    this.findNodeWithOrderNum = function(orderNum) {
+        for (var i = 0;i < this.nodes.length;++i) {
+            var node = this.nodes[i];
+            if (node.orderNum() == orderNum) {
+                return node;
+            }
+        }
+        return null;
+
+    };
 
 
 }
@@ -5714,10 +5739,10 @@ function DGraphGridFromSpecAlignBuilder(source) {
                         w = 0;
                     }
                     else {
-                        w = this.spec[c];
+                        w = this.spec[c - 1];
                     }
                     var newNode = svdThis.addNode(l + '-' + r + '-' +  c + '-' + diff);
-                    newNode.setAttributes(r,c,l,w);
+                    newNode.setAttributes(r,c,l,this.rows,this.cols,this.lays,w);
                 }
             }
 
@@ -7676,9 +7701,145 @@ function DBTreeGraph(builder,comments) {
 
 function DBGridGraph(builder,comments) {
     DBGraph.apply(this,[builder,comments]);
-	
-	
-	
+
+
+    this.longestPathNodeWeighted = function(sourceNode,sinkNode) {
+        //longest path in Graph based on node weights not edge weights)
+        //assumes DAG
+        //assumes nodes are in order, ie later nodes are all successors of prev ones
+
+        if (sourceNode) {
+
+
+        }
+        else {
+            sourceNode = this.getSourceNode();
+        }
+
+        if (sinkNode) {
+
+        }
+        else {
+            sinkNode = this.getSinkNode();
+        }
+
+        var done = false;
+
+        var bests = [[0,0]];
+
+        var currNode = sourceNode;
+        
+        var currRow = currNode.row;
+        var currCol = currNode.col;
+        var currLay = currNode.lay;
+
+        var sourceNodeNum = currNode.orderNum();
+        var currNodeNum = currNode.orderNum();
+
+        var sinkNodeNum = sinkNode.orderNum();
+
+        sourceNode.bestPathScore = 0;
+
+        for (var i = currNodeNum+1;i <= sinkNodeNum;++i) {
+            var currNode = this.builder.findNodeWithOrderNum(i);
+            var predNodes = currNode.getPredecessors();
+            var bestPred = DGraph.infinity * -1;
+            var bestNum = -1;
+            var bestPredNode = null;
+
+            predNodes.forEach(function(pred) {
+                var predNum  = pred.orderNum();
+                var predScore = pred.bestPathScore;
+                if (predScore  > bestPred) {
+                    bestPred = predScore;
+                    bestNum = predNum;
+                    bestPredNode = pred;
+
+
+                }
+
+
+            });
+
+            var thisNodeWeight = currNode.nodeWeight;
+            if (bestPred == DGraph.infinity * -1) {
+                thisNodeWeight = 0;
+                bestNum = -1;
+                bestPredNode = null;
+            }
+            currNode.bestPathScore = bestPred + thisNodeWeight;
+            currNode.bestPathEdge = bestPredNode;
+            //bests.push([bestPred + thisNodeWeight,bestNum]);
+
+
+        }
+
+
+        //backtrack
+
+        var bestLayerSink = null;
+        var bestSinkScore =  DGraph.infinity * -1;
+        for (var l = 0; l < this.builder.lays;++l) {
+            var node = this.builder.findNodeWithCoord(this.builder.rows -1,this.builder.cols -1,l);
+            if  (node.bestPathScore > bestSinkScore) {
+                bestSinkScore = node.bestPathScore;
+                bestLayerSink = node;
+            }
+        }
+        var currNum =  bestLayerSink.orderNum();//sinkNodeNum;
+
+        var massAr = [];
+
+        var prevNode = null;
+        var currNode = this.builder.findNodeWithOrderNum(currNum);
+        var prevTotMass = currNode.col;
+        while ((currNum > sourceNodeNum)) {
+            if (currNode.bestPathEdge) {
+                prevNode = currNode;
+                currNode = currNode.bestPathEdge;
+            }
+            else {
+                break;
+            }
+
+            var mass = prevTotMass - currNode.col;
+            var origPepMass = parseInt(prevNode.label.split('-')[3]);
+            massAr.unshift([mass,origPepMass]);
+            prevTotMass = currNode.col;
+
+        }
+
+        var pepDiffStr = '';
+
+        var svdThis = this;
+
+        massAr.forEach(function(el,i) {
+            var amStr = svdThis.builder.pep.peptide[i].short;
+            pepDiffStr += amStr;
+            if (el[0] == el[1]) {
+
+            }
+            else {
+                pepDiffStr +='(';
+                var diff = el[0] - el[1];
+                if (diff > 0) {
+                    pepDiffStr += '+';
+                }
+                pepDiffStr += diff;
+                pepDiffStr += ')';
+            }
+
+        });
+
+        return [pepDiffStr,bestSinkScore];
+
+
+
+    };
+
+
+
+
 }
 
 
@@ -8260,7 +8421,7 @@ function Amino(amino) {
     this.init();
 }
 
-/*
+
 Amino.transTable =  {
     'K' : ['Lys','Lycine',128],
     'V' : ['Val','Valine',99],
@@ -8285,15 +8446,15 @@ Amino.transTable =  {
     'G' : ['Gly','Glysine',57]
 
 };
-*/
+
 // Toy testing:
 
-
+/*
 Amino.transTable =  {
     'X' : ['Lys','Lycine',4],
     'Z' : ['Val','Valine',5]
 }
-
+*/
 
 
 Amino.AminoWeights = function() {
