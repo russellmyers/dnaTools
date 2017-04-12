@@ -5751,6 +5751,9 @@ function DGraphGridFromSpecAlignBuilder(source) {
         for (var l = 0;l < this.lays;++l) {
             for (var r = 0; r < this.rows - 1; ++r) {
                 for (var c = 0; c < this.cols - 1; ++c) {
+                    if ((l == 2) && (r == 5) && (c == 516)) {
+                        var ghs = 1;
+                    }
 
                     if ((r == 0) && (c > 0)) {
                         break;
@@ -5770,6 +5773,9 @@ function DGraphGridFromSpecAlignBuilder(source) {
                         var nextRow = r + 1;
                         for (var nextCol = c + 1; nextCol < this.cols; ++nextCol) {
                             var nextLay;
+                            if (nextCol == 714) {
+                                var gsha = 1;
+                            }
                             if (nextCol - c == diff) {
                                 nextLay = l;
                             }
@@ -5777,7 +5783,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
                                 nextLay = l + 1;
                             }
 
-                            if (nextLay > k) { // too many mods
+                            if (nextLay > this.k) { // too many mods
 
                             }
                             else {
@@ -7761,6 +7767,9 @@ function DBGridGraph(builder,comments) {
 
             });
 
+            if (currNodeNum == 14102) {
+                var xxxy = 1;
+            }
             var thisNodeWeight = currNode.nodeWeight;
             if (bestPred == DGraph.infinity * -1) {
                 thisNodeWeight = 0;
