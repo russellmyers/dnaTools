@@ -5685,7 +5685,9 @@ function DGraphGridBuilder(source) {
 		
 	};
 
-    this.findNodeWithCoord = function(r,c,l) {
+    this.findNodeWithCoord = function(l,r,c) {
+		
+		/*
         for (var i = 0;i < this.nodes.length;++i) {
             var node = this.nodes[i];
             if ((node.row == r) && (node.col == c) && (node.lay == l)) {
@@ -5694,10 +5696,20 @@ function DGraphGridBuilder(source) {
         }
 
         return null;
+		*/
+		var ord = this.coordToOrderNum(l,r,c);
+		return this.findNodeWithOrderNum(ord);
 
-    }
+    };
+	
+	this.coordToOrderNum = function(l,r,c) {
+		return (l * this.rows * this.cols) + (r * this.cols) + c + 1;
+		
+	};
 
     this.findNodeWithOrderNum = function(orderNum) {
+		
+		/*
         for (var i = 0;i < this.nodes.length;++i) {
             var node = this.nodes[i];
             if (node.orderNum() == orderNum) {
@@ -5706,6 +5718,18 @@ function DGraphGridBuilder(source) {
         }
         return null;
 
+		*/
+		
+		//Speed up! Assumes nodes created in layer/row/col order
+		if (orderNum > this.nodes.length) {
+			return null;
+		}
+		
+		else {
+			return this.nodes[orderNum-1];
+		}
+		
+		
     };
 
 
@@ -5759,7 +5783,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
                         break;
                     }
                     else {
-                        var node = this.findNodeWithCoord(r, c, l);
+                        var node = this.findNodeWithCoord(l,r,c);
                         if ((r == 0) && (c == 0) && (l == 0)) {
 
                         }
@@ -5768,7 +5792,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
                                 continue;
                             }
                         }
-                        var arbitraryNextRowNode = this.findNodeWithCoord(r + 1, c, l);
+                        var arbitraryNextRowNode = this.findNodeWithCoord(l,r + 1,c);
                         var diff = parseInt(arbitraryNextRowNode.label.split('-')[3]);
                         var nextRow = r + 1;
                         for (var nextCol = c + 1; nextCol < this.cols; ++nextCol) {
@@ -5787,7 +5811,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
 
                             }
                             else {
-                                var nextNode = this.findNodeWithCoord(nextRow, nextCol, nextLay);
+                                var nextNode = this.findNodeWithCoord(nextLay,nextRow, nextCol);
                                 this.connectNodes(node, nextNode, true, 0); // no edge weights, only node weights
                             }
                         }
@@ -7789,7 +7813,7 @@ function DBGridGraph(builder,comments) {
         var bestLayerSink = null;
         var bestSinkScore =  DGraph.infinity * -1;
         for (var l = 0; l < this.builder.lays;++l) {
-            var node = this.builder.findNodeWithCoord(this.builder.rows -1,this.builder.cols -1,l);
+            var node = this.builder.findNodeWithCoord(l,this.builder.rows -1,this.builder.cols -1);
             if  (node.bestPathScore > bestSinkScore) {
                 bestSinkScore = node.bestPathScore;
                 bestLayerSink = node;
