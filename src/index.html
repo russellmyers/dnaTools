@@ -20,7 +20,6 @@
         <![endif]-->
 
         <!-- Add your site or application content here -->
-        wackywackydone in wacky branch
         <div id = "bannerDiv">
             <div id = "leftBannerDiv">
                 <h2>
@@ -898,9 +897,9 @@
                     <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" spellcheck="false" autocomplete = "off"></textarea>
                     <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "12"  id = "miscParam3" ></textarea>
                     <div id = "miscRadioBox">
-                    <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked>Rev Comp
+                    <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked onclick = "miscRadioClicked(event.target.id)">Rev Comp
 
-                    <input type="radio" name="miscRadio" id = "miscFunc2"  value="2">Prof Most Prob
+                    <input type="radio" name="miscRadio" id = "miscFunc2"  value="2" onclick = "miscRadioClicked(event.target.id)">Prof Most Prob
                         <br>
                     <!--input type="radio" name="miscRadio" id = "miscFunc3"  value="3">Create hamilton
 
@@ -916,87 +915,95 @@
                         <br>
                     <input type="radio" name="miscRadio" id = "miscFunc9"  value="9">deB path from paired reads
                         <br-->
-                    <input type="radio" name="miscRadio" id = "miscFunc10"  value="10">Pattern to Number
-                    <input type="radio" name="miscRadio" id = "miscFunc11"  value="11">Number to Pattern
+                    <input type="radio" name="miscRadio" id = "miscFunc10"  value="10" onclick = "miscRadioClicked(event.target.id)">Pattern to Number
+                    <input type="radio" name="miscRadio" id = "miscFunc11"  value="11" onclick = "miscRadioClicked(event.target.id)">Number to Pattern
                         <br>
 
-                    <input type="radio" name="miscRadio" id = "miscFunc12"  value="12">d-Neighbourhood
-                    <input type="radio" name="miscRadio" id = "miscFunc13"  value="13">Dist pattern vs strings
+                    <input type="radio" name="miscRadio" id = "miscFunc12"  value="12" onclick = "miscRadioClicked(event.target.id)">d-Neighbourhood
+                    <input type="radio" name="miscRadio" id = "miscFunc13"  value="13" onclick = "miscRadioClicked(event.target.id)">Dist pattern vs strings
                        <br>
                     <!--input type="radio" name="miscRadio" id = "miscFunc14"  value="14">kmer Composition-->
-                    <input type="radio" name="miscRadio" id = "miscFunc15"  value="15">string from genome path
+                    <input type="radio" name="miscRadio" id = "miscFunc15" onclick = "miscRadioClicked(event.target.id)"  value="15">string from genome path
                         <br>
 
                     <!--input type="radio" name="miscRadio" id = "miscFunc16"  value="16">Overlap graph-->
                     <!--input type="radio" name="miscRadio" id = "miscFunc17"  value="17">debCycle from adj list
                         <br>
                     <input type="radio" name="miscRadio" id = "miscFunc18"  value="18">debPath from adj list-->
-                    <input type="radio" name="miscRadio" id = "miscFunc19"  value="19">Universal string
+                    <input type="radio" name="miscRadio" id = "miscFunc19"  value="19" onclick = "miscRadioClicked(event.target.id)">Universal string
                          <BR>
-                    <input type="radio" name="miscRadio" id = "miscFunc20"  value="20">Genome Path to string
-                    <input type="radio" name="miscRadio" id = "miscFunc21"  value="21">DNA to Amino String
-                    <input type="radio" name="miscRadio" id = "miscFunc22"  value="22">RNA to Amino String
-                    <input type="radio" name="miscRadio" id = "miscFunc23"  value="23">Find Amino Acid sequence in genome
-                    <input type="radio" name="miscRadio" id = "miscFunc24"  value="24">Spectrum
-                    <input type="radio" name="miscRadio" id = "miscFunc25"  value="25">Num peptides with mass
-                    <input type="radio" name="miscRadio" id = "miscFunc26"  value="26">Cyclopeptide sequencing
-                    <input type="radio" name="miscRadio" id = "miscFunc27"  value="27">Cyclopeptide score
-                    <input type="radio" name="miscRadio" id = "miscFunc28"  value="28">Leaderboard Cyclopeptide seq
-                    <input type="radio" name="miscRadio" id = "miscFunc29"  value="29">Trim Leaderboard
-                    <input type="radio" name="miscRadio" id = "miscFunc30"  value="30">Spectrum Convolution
-                    <input type="radio" name="miscRadio" id = "miscFunc31"  value="31">Edit Dist badgood
-                    <input type="radio" name="miscRadio" id = "miscFunc32"  value="32">Lowest Coins
-                    <input type="radio" name="miscRadio" id = "miscFunc33"  value="33">Align DNA badgood
-                    <input type="radio" name="miscRadio" id = "miscFunc34"  value="34">Align  Blosum badgood
-                    <input type="radio" name="miscRadio" id = "miscFunc35"  value="35">Align  LCS badgood
-                    <input type="radio" name="miscRadio" id = "miscFunc36"  value="36">Longest Path DAG
-                    <input type="radio" name="miscRadio" id = "miscFunc37"  value="37">Longest Path Manhattan Grid
-                    <input type="radio" name="miscRadio" id = "miscFunc38"  value="38">Topological ordering
-                    <input type="radio" name="miscRadio" id = "miscFunc39"  value="39">Greedy Rev Dist
-                    <input type="radio" name="miscRadio" id = "miscFunc40"  value="40">Num Breakpoints
-                    <input type="radio" name="miscRadio" id = "miscFunc41"  value="41">Breakpoint Graph
-                    <input type="radio" name="miscRadio" id = "miscFunc42"  value="42">Shared kmers
-                    <input type="radio" name="miscRadio" id = "miscFunc43"  value="43">Synteny construction
-                    <input type="radio" name="miscRadio" id = "miscFunc44"  value="44">Turnpike
-                    <input type="radio" name="miscRadio" id = "miscFunc45"  value="45">Dist Mat from Tree
-                    <input type="radio" name="miscRadio" id = "miscFunc46"  value="46">Limb Length
-                    <input type="radio" name="miscRadio" id = "miscFunc47"  value="47">Additive Phylogeny from dist mat
-                    <input type="radio" name="miscRadio" id = "miscFunc48"  value="48">Additive Phylogeny from alignments
-                    <input type="radio" name="miscRadio" id = "miscFunc49"  value="49">Ultrametric tree from dist mat
-                    <input type="radio" name="miscRadio" id = "miscFunc50"  value="50">Test graph printing
+                    <input type="radio" name="miscRadio" id = "miscFunc20"  value="20" onclick = "miscRadioClicked(event.target.id)">Genome Path to string
+                    <input type="radio" name="miscRadio" id = "miscFunc21"  value="21" onclick = "miscRadioClicked(event.target.id)">DNA to Amino String
+                    <input type="radio" name="miscRadio" id = "miscFunc22"  value="22" onclick = "miscRadioClicked(event.target.id)">RNA to Amino String
+                    <input type="radio" name="miscRadio" id = "miscFunc23"  value="23" onclick = "miscRadioClicked(event.target.id)">Find Amino Acid sequence in genome
+                    <BR>
+					<BR><B>Cyclopeptide Sequencing</B>
+					<br><input type="radio" name="miscRadio" id = "miscFunc24"  value="24" onclick = "miscRadioClicked(event.target.id)">Spectrum
+                    <br><input type="radio" name="miscRadio" id = "miscFunc25"  value="25" onclick = "miscRadioClicked(event.target.id)">Num peptides with mass
+                    <br><input type="radio" name="miscRadio" id = "miscFunc26"  value="26" onclick = "miscRadioClicked(event.target.id)">Cyclopeptide sequencing
+                    <br><input type="radio" name="miscRadio" id = "miscFunc27"  value="27" onclick = "miscRadioClicked(event.target.id)">Cyclopeptide score
+                    <br><input type="radio" name="miscRadio" id = "miscFunc28"  value="28" onclick = "miscRadioClicked(event.target.id)">Leaderboard Cyclopeptide seq
+                    <br><input type="radio" name="miscRadio" id = "miscFunc29"  value="29" onclick = "miscRadioClicked(event.target.id)">Trim Leaderboard
+                    <br><input type="radio" name="miscRadio" id = "miscFunc30"  value="30" onclick = "miscRadioClicked(event.target.id)">Spectrum Convolution
+                    <br><input type="radio" name="miscRadio" id = "miscFunc31"  value="31" onclick = "miscRadioClicked(event.target.id)">Edit Dist badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc32"  value="32" onclick = "miscRadioClicked(event.target.id)">Lowest Coins
+                    <input type="radio" name="miscRadio" id = "miscFunc33"  value="33" onclick = "miscRadioClicked(event.target.id)">Align DNA badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc34"  value="34" onclick = "miscRadioClicked(event.target.id)">Align  Blosum badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc35"  value="35" onclick = "miscRadioClicked(event.target.id)">Align  LCS badgood
+                    <input type="radio" name="miscRadio" id = "miscFunc36"  value="36" onclick = "miscRadioClicked(event.target.id)">Longest Path DAG
+                    <input type="radio" name="miscRadio" id = "miscFunc37"  value="37" onclick = "miscRadioClicked(event.target.id)">Longest Path Manhattan Grid
+                    <input type="radio" name="miscRadio" id = "miscFunc38"  value="38" onclick = "miscRadioClicked(event.target.id)">Topological ordering
+                    <input type="radio" name="miscRadio" id = "miscFunc39"  value="39" onclick = "miscRadioClicked(event.target.id)">Greedy Rev Dist
+                    <input type="radio" name="miscRadio" id = "miscFunc40"  value="40" onclick = "miscRadioClicked(event.target.id)">Num Breakpoints
+                    <input type="radio" name="miscRadio" id = "miscFunc41"  value="41" onclick = "miscRadioClicked(event.target.id)">Breakpoint Graph
+                    <input type="radio" name="miscRadio" id = "miscFunc42"  value="42" onclick = "miscRadioClicked(event.target.id)">Shared kmers
+                    <input type="radio" name="miscRadio" id = "miscFunc43"  value="43" onclick = "miscRadioClicked(event.target.id)">Synteny construction
+                    <input type="radio" name="miscRadio" id = "miscFunc44"  value="44" onclick = "miscRadioClicked(event.target.id)">Turnpike
+					<br>
+					<BR><B>Phylogeny</B>
+                    <br><input type="radio" name="miscRadio" id = "miscFunc45"  value="45" onclick = "miscRadioClicked(event.target.id)">Dist Mat from Tree
+                    <br><input type="radio" name="miscRadio" id = "miscFunc46"  value="46" onclick = "miscRadioClicked(event.target.id)">Limb Length
+                    <br><input type="radio" name="miscRadio" id = "miscFunc47"  value="47" onclick = "miscRadioClicked(event.target.id)">Additive Phylogeny from dist mat
+                    <br><input type="radio" name="miscRadio" id = "miscFunc48"  value="48" onclick = "miscRadioClicked(event.target.id)">Additive Phylogeny from alignments
+                    <br><input type="radio" name="miscRadio" id = "miscFunc49"  value="49" onclick = "miscRadioClicked(event.target.id)">Ultrametric tree from dist mat
                     <br>
-                    <input type="radio" name="miscRadio" id = "miscFunc51"  value="51">Alg - Fibonacci
-                    <input type="radio" name="miscRadio" id = "miscFunc52"  value="52">Alg - Binary search
-                     <br>
-                    <input type="radio" name="miscRadio" id = "miscFunc53"  value="53">Alg - Insertion Sort
-                    <input type="radio" name="miscRadio" id = "miscFunc54"  value="54">Alg - Majority Element
-                    <input type="radio" name="miscRadio" id = "miscFunc55"  value="55">Alg - Merge Sorted Arrays
-                    <input type="radio" name="miscRadio" id = "miscFunc56"  value="56">Alg - Merge Sort
-                    <input type="radio" name="miscRadio" id = "miscFunc57"  value="57">Alg - Count inversions
-                    <input type="radio" name="miscRadio" id = "miscFunc58"  value="58">Alg - 2Sum
-                    <input type="radio" name="miscRadio" id = "miscFunc59"  value="59">Alg - 3Sum
-                    <input type="radio" name="miscRadio" id = "miscFunc60"  value="60">Alg - Binary Heap
-                    <input type="radio" name="miscRadio" id = "miscFunc61"  value="61">Alg - Heap sort
-                    <input type="radio" name="miscRadio" id = "miscFunc62"  value="62">Alg - Heap sort partial
-                    <input type="radio" name="miscRadio" id = "miscFunc63"  value="63">Alg - Degree
-                    <input type="radio" name="miscRadio" id = "miscFunc64"  value="64">Alg - Double Degree
-                    <input type="radio" name="miscRadio" id = "miscFunc65"  value="65">Alg - Two way partition
-                    <input type="radio" name="miscRadio" id = "miscFunc66"  value="66">Alg - Three way partition
-                    <input type="radio" name="miscRadio" id = "miscFunc67"  value="67">Alg - Median
-                    <input type="radio" name="miscRadio" id = "miscFunc68"  value="68">Alg - Quick Sort
-                    <input type="radio" name="miscRadio" id = "miscFunc69"  value="69">Top order DAG
-                    <input type="radio" name="miscRadio" id = "miscFunc70"  value="70">Turnpike
-                    <input type="radio" name="miscRadio" id = "miscFunc71"  value="71">Alg - Depth-first search
-                    <input type="radio" name="miscRadio" id = "miscFunc72"  value="72">Alg - Breadth-first search
-                    <input type="radio" name="miscRadio" id = "miscFunc73"  value="73">Alg - Nearest Neighbours
-                    <input type="radio" name="miscRadio" id = "miscFunc74"  value="74">BA8A Farthest First Traversal
-                    <input type="radio" name="miscRadio" id = "miscFunc75"  value="75">BA8A Sq Distortion
-					<input type="radio" name="miscRadio" id = "miscFunc76"  value="76">Peptide to Vector
-		            <input type="radio" name="miscRadio" id = "miscFunc77"  value="77">Vector to Peptide					
-                    <input type="radio" name="miscRadio" id = "miscFunc78"  value="78">Peptide Identification
-                    <input type="radio" name="miscRadio" id = "miscFunc79"  value="79">PSM
-					<input type="radio" name="miscRadio" id = "miscFunc80"  value="80">Spectral Dict Size
-					<input type="radio" name="miscRadio" id = "miscFunc81"  value="81">Spectral Alignment
+					<br><input type="radio" name="miscRadio" id = "miscFunc50"  value="50" onclick = "miscRadioClicked(event.target.id)">Test graph printing
+	                <br>
+					<BR><B>Algorithms</B>
+	                <br><input type="radio" name="miscRadio" id = "miscFunc51"  value="51" onclick = "miscRadioClicked(event.target.id)">Alg - Fibonacci
+                    <br><input type="radio" name="miscRadio" id = "miscFunc52"  value="52" onclick = "miscRadioClicked(event.target.id)">Alg - Binary search
+                    <br><input type="radio" name="miscRadio" id = "miscFunc53"  value="53" onclick = "miscRadioClicked(event.target.id)">Alg - Insertion Sort
+                    <br><input type="radio" name="miscRadio" id = "miscFunc54"  value="54" onclick = "miscRadioClicked(event.target.id)">Alg - Majority Element
+                    <br><input type="radio" name="miscRadio" id = "miscFunc55"  value="55" onclick = "miscRadioClicked(event.target.id)">Alg - Merge Sorted Arrays
+                    <br><input type="radio" name="miscRadio" id = "miscFunc56"  value="56" onclick = "miscRadioClicked(event.target.id)">Alg - Merge Sort
+                    <br><input type="radio" name="miscRadio" id = "miscFunc57"  value="57" onclick = "miscRadioClicked(event.target.id)">Alg - Count inversions
+                    <br><input type="radio" name="miscRadio" id = "miscFunc58"  value="58" onclick = "miscRadioClicked(event.target.id)">Alg - 2Sum
+                    <br><input type="radio" name="miscRadio" id = "miscFunc59"  value="59" onclick = "miscRadioClicked(event.target.id)">Alg - 3Sum
+                    <br><input type="radio" name="miscRadio" id = "miscFunc60"  value="60" onclick = "miscRadioClicked(event.target.id)">Alg - Binary Heap
+                    <br><input type="radio" name="miscRadio" id = "miscFunc61"  value="61" onclick = "miscRadioClicked(event.target.id)">Alg - Heap sort
+                    <br><input type="radio" name="miscRadio" id = "miscFunc62"  value="62" onclick = "miscRadioClicked(event.target.id)">Alg - Heap sort partial
+                    <br><input type="radio" name="miscRadio" id = "miscFunc63"  value="63" onclick = "miscRadioClicked(event.target.id)">Alg - Degree
+                    <br><input type="radio" name="miscRadio" id = "miscFunc64"  value="64" onclick = "miscRadioClicked(event.target.id)">Alg - Double Degree
+                    <br><input type="radio" name="miscRadio" id = "miscFunc65"  value="65" onclick = "miscRadioClicked(event.target.id)">Alg - Two way partition
+                    <br><input type="radio" name="miscRadio" id = "miscFunc66"  value="66" onclick = "miscRadioClicked(event.target.id)">Alg - Three way partition
+                    <br><input type="radio" name="miscRadio" id = "miscFunc67"  value="67" onclick = "miscRadioClicked(event.target.id)">Alg - Median
+                    <br><input type="radio" name="miscRadio" id = "miscFunc68"  value="68" onclick = "miscRadioClicked(event.target.id)">Alg - Quick Sort
+					<br><input type="radio" name="miscRadio" id = "miscFunc71"  value="71" onclick = "miscRadioClicked(event.target.id)">Alg - Depth-first search
+                    <br><input type="radio" name="miscRadio" id = "miscFunc72"  value="72" onclick = "miscRadioClicked(event.target.id)">Alg - Breadth-first search
+                    <br><input type="radio" name="miscRadio" id = "miscFunc73"  value="73" onclick = "miscRadioClicked(event.target.id)">Alg - Nearest Neighbours
+                    <br> 
+                    <br><input type="radio" name="miscRadio" id = "miscFunc69"  value="69" onclick = "miscRadioClicked(event.target.id)">Top order DAG
+                    <input type="radio" name="miscRadio" id = "miscFunc70"  value="70" onclick = "miscRadioClicked(event.target.id)">Turnpike
+                    <input type="radio" name="miscRadio" id = "miscFunc74"  value="74" onclick = "miscRadioClicked(event.target.id)">BA8A Farthest First Traversal
+                    <input type="radio" name="miscRadio" id = "miscFunc75"  value="75" onclick = "miscRadioClicked(event.target.id)">BA8A Sq Distortion
+					<BR>
+					<BR><B>Protein Sequencing</B>
+					<BR><input type="radio" name="miscRadio" id = "miscFunc76"  value="76" onclick = "miscRadioClicked(event.target.id)">Peptide to Vector
+		            <BR><input type="radio" name="miscRadio" id = "miscFunc77"  value="77" onclick = "miscRadioClicked(event.target.id)">Vector to Peptide					
+                    <BR><input type="radio" name="miscRadio" id = "miscFunc78"  value="78" onclick = "miscRadioClicked(event.target.id)">Peptide Identification
+                    <BR><input type="radio" name="miscRadio" id = "miscFunc79"  value="79" onclick = "miscRadioClicked(event.target.id)">PSM
+					<BR><input type="radio" name="miscRadio" id = "miscFunc80"  value="80" onclick = "miscRadioClicked(event.target.id)">Spectral Dict Size
+					<BR><input type="radio" name="miscRadio" id = "miscFunc81"  value="81" onclick = "miscRadioClicked(event.target.id)">Spectral Alignment
                   
 
                     </div>
@@ -1039,7 +1046,7 @@
             <div id = "rightOne">
 
                 <span id = "rightOneLab">Results Selector</span>
-                <img class = "expCollImg"  id = "expMulti" onclick = "expCollClicked(event.target.id)"src = 'img/toggle-expand-alt_blue.png'>
+                <img class = "expCollImg"  id = "expMulti" onclick = "expCollClicked(event.target.id)"src = 'img/vector-expand.jpg'>
                 <br>
 
 

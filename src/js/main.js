@@ -2246,6 +2246,51 @@ function miscParLoadedFromServer(fileName,parId,text) {
 };
 
 
+function miscRadioClicked(id) {
+	
+	var par1El = document.getElementById('miscParam1');
+	var par2El = document.getElementById('miscParam2');
+	var par3El = document.getElementById('miscParam3');
+	
+	par1El.value = '';
+	par2El.value = '';
+	par3El.value = '';
+	
+	
+	switch (id) {
+		
+		case 'miscFunc79':
+		    par1El.placeholder = 'Enter Spectral Vectors';
+			par2El.placeholder = 'Enter Proteome';
+			par3El.placeholder = 'Enter Threshold';
+		    break;	
+		
+		case 'miscFunc80':
+		    par1El.placeholder = 'Enter Spectral Vector';
+			par2El.placeholder = 'Enter Threshold';
+			par3El.placeholder = 'Enter Max Score';
+		    break;	
+	
+		
+		case 'miscFunc81':
+		    par1El.placeholder = 'Enter Peptide';
+			par2El.placeholder = 'Enter Spectral Vector';
+			par3El.placeholder = 'Enter mod threshold (k)';
+		    break;
+		
+		default:
+		    par1El.placeholder = 'Enter param 1';
+			par2El.placeholder = 'Enter param 2';
+			par3El.placeholder = 'Enter param 3';
+		
+		  break;
+		  
+	}
+		
+	
+}
+
+
 
 function executeMisc(e) {
 
@@ -5712,6 +5757,7 @@ else {
 
 case '81': //Spectral Alignment
 
+          par1El.placeholder = 'blah';
   
           var pepStr = par1El.value;
 		  var vecStr = par2El.value;
@@ -12918,7 +12964,7 @@ function phylGraphClicked(e) {
 function updateExpColl(elId,newState) {
     var el = document.getElementById(elId);
 
-    el.src = newState ? 'img/toggle-collapse-alt_blue.png' : 'img/toggle-expand-alt_blue.png';
+    el.src = newState ? 'img/collapse_black.png' : 'img/expand_black.png';
 
     switch (elId) {
         case 'expDebug':
