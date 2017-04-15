@@ -783,7 +783,7 @@ input[type=number] {
     display: inline-block;
     width: 350px;
     height: 100px;
-    background-color: blue;
+    background-color: beige;
     vertical-align: top;
     overflow: scroll;
 }
