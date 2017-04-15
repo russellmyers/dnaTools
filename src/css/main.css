@@ -111,7 +111,7 @@ body {
 
 #bannerDiv {
 
-//background-color: brown;
+    /*background-color: brown;*/
     height: 110px;
     width: 100%;
     font-size: 0;
@@ -145,7 +145,7 @@ body {
     padding-top: 5px;
     padding-bottom: 5px;
 
-    vertical-align: bottom;
+		vertical-align: bottom;
 
 }
 
@@ -588,6 +588,7 @@ input[type=number] {
     text-align: center;
     vertical-align: top;
     overflow: scroll;
+	background-color: white;
 	
 }
 

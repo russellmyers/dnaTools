@@ -30,15 +30,18 @@
             <div id = "rightBannerDiv">
             </div>
         </div>
+		
+	
 
         <div id = "rightTwo">DNA Stats</div>
-        <br>
+        
         <div id = "progressDiv">
             <span id="currPosInDNA"></span>
             <span id = "progress"></span>
 
         </div>
         <div id = "mfkTools">
+		<br>
         <div id = "mfkInputTools">
             <label for="dnaInput">Enter DNA:</label>
             <input type = "text" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
@@ -89,6 +92,7 @@
 
         </div>
         <div id = "motifTools">
+		    <br>
             <div id = "motifInputTools">
                 <textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
                 <button type = "button" id="motifsInput" onclick="motifsInput(event)">Apply</button>
@@ -105,6 +109,7 @@
             </div>
         </div>
         <div id = "sequencingTools">
+		    <br>
             <div id = "sequencingInputTools">
                 <textarea name = "sequencingStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true,'|')"  id = "sequencingStrings" ></textarea>
                 <button type = "button" id="sequencingInput" onclick="sequencingInput(event)">Apply</button>
@@ -116,6 +121,7 @@
             </div>
         </div>
         <div id = "phylogenyTools">
+		    <br>
             <div id = "phylogenyInputTools">
                 <textarea name = "phylogenyStrings" placeholder = "Enter or paste DNA alignments / dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
                 <button type = "button" id="phylogenyInput" onclick="phylogenyInput(event)">Apply</button>
@@ -128,6 +134,7 @@
         </div>
 
         <div id = "transTools">
+		    <br>
             <div id = "transInputTools">
                 <label for = "transInput">Enter DNA/RNA/Protein:</label>
                 <input type = "text" name="transInput" onkeypress = "return restrictToACGT(event,false,'Uu')" onchange="transInput(event)" id = "transInput">
@@ -147,6 +154,7 @@
         </div>
 
         <div id = "pepTools">
+		    <br>
             <div id = "pepInputTools">
                 <label for = "pepInput">Enter Peptide/Spectrum:</label>
                 <input type = "text" name="pepInput"  onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
@@ -168,6 +176,7 @@
         </div>
 
         <div id = "alignTools">
+		    <br>
             <div id = "alignInputTools">
                 <div id = "alignInputManual">
                 <textarea name = "alignStrings" placeholder = "Enter or paste DNA sequences to align (one per line)" rows = "4" cols = "30"  id = "alignStrings" ></textarea>
@@ -194,6 +203,7 @@
         </div>
 
         <div id = "sbTools">
+		    <br>
             <div id = "sbInputTools">
                 <div id = "sbInputManual">
                 <textarea name = "sbStrings" placeholder = "Enter or paste DNA sequences to compare (one per line)" rows = "4" cols = "30"  id = "sbStrings" ></textarea>
@@ -214,8 +224,7 @@
             </div>
         </div>
 
-
-        <div id="tabs">
+		<div id="tabs">
             <a href="#"  onclick="tab_click(0,tabClickDone);">Most Freq k-mers</a>
             <a href="#"  onclick="tab_click(1,tabClickDone);">LT Clumps</a>
             <a href="#"  onclick="tab_click(2,tabClickDone);">Find k-mer</a>
@@ -229,6 +238,8 @@
             <a href="#" onclick="tab_click(10,tabClickDone);">Misc</a>
             <!--a href="#tabs" onclick="tab_click(2);">tab 3</a-->
         </div>
+
+  
         <div id="tabDataPlusCanvas">
         <div id="tabs_data">
             <section class="tabFieldset">
@@ -889,7 +900,7 @@
 
             </section>
             <section class="tabFieldset">
-                <h3 id="tabFieldsetHead6">Misc</h3>
+                <h3 id="tabFieldsetHead6">Miscellaneous Tools</h3>
 
                 <article id="art7">
                     <!--label for kmer>DNA strings:</label-->

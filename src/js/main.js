@@ -13255,7 +13255,7 @@ function tabClickDone(tabNum) {
 
 
         case 10: //Misc tab
-            document.getElementById('mfkTools').style.display = "block";
+            document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
             document.getElementById('transTools').style.display = "none";
@@ -13270,6 +13270,8 @@ function tabClickDone(tabNum) {
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
 
+			document.getElementById('rightTwo').style.display = 'none';
+			
             expDebugState = true;
             expStateChanged('expDebug',true);
             expMultiState = false;
