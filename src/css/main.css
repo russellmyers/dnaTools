@@ -149,6 +149,14 @@ body {
 
 }
 
+#statsAndInputTools {
+    height: 125px;
+    background-color: beige;
+    margin-bottom:5px;
+
+
+}
+
 
 
 #moreDetailDiv {
@@ -447,44 +455,44 @@ input[type=number] {
 #mfkTools {
 
     display:block;
-    height: 100px;
-	background-color: beige;
+    /*height: 110px;*/
+
 }
 
 #motifTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #sequencingTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #phylogenyTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #transTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #pepTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #alignTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 #alignInputManual {
@@ -503,7 +511,7 @@ input[type=number] {
 #sbTools {
 
     display:none;
-    height: 100px;
+    /*height: 100px;*/
 }
 
 
@@ -538,6 +546,7 @@ input[type=number] {
     display:  inline-block; /*inline-block;*/
     margin: 0;
     padding: 0;
+
 
 
     vertical-align: top;
@@ -589,6 +598,7 @@ input[type=number] {
     vertical-align: top;
     overflow: scroll;
 	background-color: white;
+    display:none;
 	
 }
 
@@ -613,14 +623,16 @@ input[type=number] {
 #skewCanvas {
     margin: 0;
 	margin-left:6px;
+    margin-top:2px;
     padding: 2px;
     width: 18%; /*220px;*/
-    height: 137px;
+    height: 134px;
     background-color: white; /*#75aeb5; *//*was purple*/
-    display: inline-block;
+    display: none; /* inline-block when switched on*/
     vertical-align: top;
 	border-style: solid;
 	border-width: 1px;
+
 
 
 

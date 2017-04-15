@@ -445,6 +445,9 @@ function setUpWorkerListeners() {
 
                 case 'mostFrequentKmers':
 
+                    expMultiState = true;
+                    expStateChanged('expMulti',true);
+
                     mfk = e.data.indArray;
                     tot = 0;
                     if (mfk.length == 0) {
@@ -518,6 +521,9 @@ function setUpWorkerListeners() {
                   break;
 
                 case 'ltClump':
+
+                    expMultiState = true;
+                    expStateChanged('expMulti',true);
 
                     mfk = e.data.indArray;
                     var clumps = e.data.clumps;
@@ -9230,8 +9236,10 @@ function skewCanvas(skewData) {
 
     var ctx;
     if (skewData) {
+        c.style.display = "inline-block";
     }
     else {
+        c.style.display = "none";
         ctx = c.getContext("2d");
         ctx.clearRect(0, 0, w, h);
         return;
@@ -10857,6 +10865,13 @@ function dnaMasterChanged() {
 
     colourDNA(dnaMaster);
 
+    if ((!dnaMaster) ||(dnaMaster.length == 0)) {
+        document.getElementById('rightTwo').style.display = 'none';
+    }
+    else {
+        document.getElementById('rightTwo').style.display = 'inline-block';
+    }
+
     document.getElementById('rightTwo').innerHTML = stats;
 
     //skewCanvas(gcSkew(inDNA.value,Math.min(300,inDNA.value.length - 1)));
@@ -12236,6 +12251,14 @@ function pagePressed(inc) {
 
 }
 
+function debugSwitchClicked(e) {
+    expDebugState = e.target.checked;
+    expStateChanged('expDebug',e.target.checked);
+
+
+}
+
+
 function alignRadClicked(id) {
 
     var alignTypeRadioSel = getSelectedRadioEl('alignMethod');
@@ -13078,6 +13101,11 @@ function tabClickDone(tabNum) {
     initialiseResults();
 
     document.getElementById('rightTwo').style.display = 'block';
+    document.getElementById('statsAndInputTools').style.display = 'block';
+
+    skewCanvas(null);
+
+    document.getElementById('rightTwo').style.display = 'none';
 
     switch (tabNum) {
         case 3: //Motif tab
@@ -13271,6 +13299,8 @@ function tabClickDone(tabNum) {
             document.getElementById('phylogenyViewer').style.display = "none";
 
 			document.getElementById('rightTwo').style.display = 'none';
+
+            document.getElementById('statsAndInputTools').style.display = 'none';
 			
             expDebugState = true;
             expStateChanged('expDebug',true);
@@ -13300,8 +13330,8 @@ function tabClickDone(tabNum) {
 
             expDebugState = false;
             expStateChanged('expDebug',false);
-            expMultiState = true;
-            expStateChanged('expMulti',true);
+            expMultiState = false;
+            expStateChanged('expMulti',false);
             break;
 
     }
