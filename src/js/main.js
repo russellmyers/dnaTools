@@ -364,6 +364,9 @@ function initialisePage() {
 	document.getElementById('pepPeptide').checked = true;
 	peptideInputRadClicked('pepPeptide');
 
+    document.getElementById('pepPeptideTypeCircular').checked = true;
+    peptideShapeRadClicked('pepPeptideTypeCircular');
+
     document.getElementById('phylDistMat').checked = true;
     phylInputRadClicked('phylDistMat');
     phylRadClicked('phylAdd');
@@ -11289,7 +11292,12 @@ function autoDetectContents(contents,area) {
                 return DGraph.fromProtein;
             }
             else {
-                return DGraph.fromSpectrum;
+                if (spl[0].split(' ').length > 100) { //educated guess
+                    return DGraph.fromSpectralVector;
+                }
+                else {
+                    return DGraph.fromSpectrum;
+                }
             }
 
 
@@ -12072,6 +12080,13 @@ function peptideInput(e,input) {
             }
             break;
 
+        case DGraph.fromSpectralVector:
+
+            document.getElementById('pepSpectralVector').checked = true;
+            peptideInputRadClicked('pepSpectralVector');
+
+            break;
+
         default:
             break; //error
 
@@ -12772,7 +12787,30 @@ function transInputRadClicked(id) {
 
 }
 
-function peptideInputRadClicked(id) {
+
+function peptideShapeRadClicked(id) {
+    //Linear or Circular Radio Button
+
+    switch (id) {
+        case 'pepPeptideTypeCircular':
+            document.getElementById('spectrometerPrefixSuffixPS').checked = false;
+            document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'hidden';
+            document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'hidden';
+
+            break;
+        case 'pepPeptideTypeLinear':
+            document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'visible';
+            document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'visible';
+
+            break;
+
+        default:
+            break;
+    }
+
+}
+
+        function peptideInputRadClicked(id) {
     //Motif Radio Button
     switch (id) {
         case 'pepPeptide':
@@ -12792,12 +12830,26 @@ function peptideInputRadClicked(id) {
 			document.getElementById('pepSequenceLeaderboardLab').style.display = "inline-block";
 			document.getElementById('pepSequenceLeaderboardConvLab').style.display = "inline-block";
 			document.getElementById('pepSequenceGraphBruteLab').style.display = "inline-block";
-			document.getElementById('pepSequenceGraphVectorLab').style.display = "inline-block";
+			document.getElementById('pepSequenceGraphVectorLab').style.display = "none";
             peptideRadClicked('pepIdealSpectrum');
  
 			document.getElementById('pepSequenceBrute').checked = true;
 			
             peptideRadClicked('pepSequenceBrute');
+            break;
+
+        case 'pepSpectralVector':
+            document.getElementById('pepIdealSpectrumLab').style.display = "none";
+            document.getElementById('pepSequenceBruteLab').style.display = "none";
+            document.getElementById('pepSequenceLeaderboardLab').style.display = "none";
+            document.getElementById('pepSequenceLeaderboardConvLab').style.display = "none";
+            document.getElementById('pepSequenceGraphBruteLab').style.display = "none";
+            document.getElementById('pepSequenceGraphVectorLab').style.display = "inline-block";
+
+
+            document.getElementById('pepSequenceGraphVector').checked = true;
+
+            peptideRadClicked('pepSequenceGraphVector');
             break;
 
 
@@ -13030,7 +13082,7 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
 
-            document.getElementById('pepSpectrum').checked = true;
+            document.getElementById('pepSpectralVector').checked = true;
 
             break;
         default:
