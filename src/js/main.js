@@ -2277,6 +2277,12 @@ function miscRadioClicked(id) {
 			par2El.placeholder = 'Enter Spectral Vector';
 			par3El.placeholder = 'Enter mod threshold (k)';
 		    break;
+
+        case 'miscFunc82':
+            par1El.placeholder = 'Enter number of graphs, then space line, then graphs in edge list format separated by space lines';
+            par2El.placeholder = 'Param 2\nnot used';
+            par3El.placeholder = 'Param 3\nnot used';
+            break;
 		
 		default:
 		    par1El.placeholder = 'Enter param 1';
@@ -5796,10 +5802,133 @@ case '81': //Spectral Alignment
 			
           resEl.value =resString;
 
-            break;							
-						
+            break;
 
-    default:
+        case '82': //Alg - acyclic check
+
+            //check graph is acyclic
+
+            var params = par1El.value.split('\n');
+
+            k = parseInt(params.shift());
+
+            params.shift();
+
+            done = false;
+
+            var adjLists = [];
+
+            while (params.length > 0) {
+                adjList = [];
+                var adj = params.shift();
+                if (adj == '') {
+                    break;
+                }
+                while (adj && adj != '') {
+                    adjList.push(adj);
+                    adj = params.shift();
+
+                }
+                adjLists.push(adjList);
+
+
+            }
+
+
+            var aCyclicFlags = [];
+
+            adjLists.forEach(function(adjList) {
+
+
+                var info = adjList.shift();
+                var numVertices = -1;
+                var numEdges = -1;
+                if (info.length == 0) {
+
+                }
+                else {
+                    var infoSplit = info.split(' ');
+                    numVertices = parseInt(infoSplit[0]);
+                    numEdges = parseInt(infoSplit[1]);
+                }
+
+                adjList = adjList.join('\n');
+                var builder = new DGraphBuilder(adjList);
+
+                var gr = new DBGraph(builder);
+
+                var done = false;
+
+                gr.resetNodesVisited();
+
+                var order = [];
+
+
+                done = false;
+                var connectedComponents = 0;
+
+                var cycleExists = false;
+
+                while (!done) {
+
+                    var foundNonVisited = false;
+                    for (var i = 0;i < gr.nodes.length;++i) {
+                        if (gr.nodes[i].visited) {
+
+                        }
+                        else {
+                            foundNonVisited = true;
+                            ++connectedComponents;
+                            break;
+                        }
+                    }
+                    if (foundNonVisited) {
+                        var nd = gr.nodes[i];
+                        var cycleFound = gr.checkCycle(nd);
+                        if (cycleFound) {
+                            cycleExists = true;
+                            break;
+                        }
+
+                    }
+                    else {
+                        done = true;
+                    }
+
+                }
+
+                aCyclicFlags.push(cycleExists ? "-1" : "1");
+
+
+                var numNodes = gr.nodes.length;
+
+                if (numVertices == -1) {
+
+                }
+                else {
+                    //check for extra non-used vertices
+                    if (numVertices > numNodes) {
+                        connectedComponents += (numVertices - numNodes);
+                    }
+                }
+
+            });
+
+
+
+            var resString = arrayToString(aCyclicFlags);
+
+
+            resEl.value =resString;
+
+
+
+
+            break;
+
+
+
+        default:
             break;
     }
 

@@ -5385,6 +5385,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
                     spl = adj.split('->');
                     if (spl.length < 2) {
                         spl = adj.split(' ');
+                        isDirected = true;
                     }
                     else {
                         isDirected = true;
@@ -6736,6 +6737,28 @@ function DBGraph(builder,comments) {
 
     };
     
+    this.checkCycle = function(node) {
+        if (node.visited) {
+            return true;
+        }
+
+        node.visited = true;
+        var succs = node.getSuccessorNodes();
+        var svdThis = this;
+
+        var cycleFound = false;
+        succs.forEach(function(n) {
+            var cyc = svdThis.checkCycle(n);
+            if (cyc) {
+                cycleFound = true;
+            }
+         
+        });
+        return cycleFound;
+
+        
+    };
+
     this.getConnected = function(node) {
         if (node.visited) {
             return [];
@@ -6750,7 +6773,7 @@ function DBGraph(builder,comments) {
         });
         return allConnected;
 
-        
+
     };
 
     this.isBalanced = function() {
