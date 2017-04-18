@@ -12833,13 +12833,22 @@ function peptideShapeRadClicked(id) {
     switch (id) {
         case 'pepPeptideTypeCircular':
             document.getElementById('spectrometerPrefixSuffixPS').checked = false;
-            document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'hidden';
-            document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'hidden';
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
+            // document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'hidden';
+           // document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'hidden';
 
             break;
         case 'pepPeptideTypeLinear':
-            document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'visible';
-            document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'visible';
+           //document.getElementById('spectrometerPrefixSuffixPS').style.visibility = 'visible';
+           // document.getElementById('spectrometerPrefixSuffixLabPS').style.visibility = 'visible';
+            if ((document.getElementById('pepSequenceGraphVector').checked)
+                ||  ((document.getElementById('pepSequenceGraphBrute').checked)))
+            {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled =  true;
+            }
+            else {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
+            }
 
             break;
 
@@ -12861,6 +12870,17 @@ function peptideShapeRadClicked(id) {
 			document.getElementById('pepSequenceGraphBruteLab').style.display = "none";
 			document.getElementById('pepSequenceGraphVectorLab').style.display = "none";
             peptideRadClicked('pepIdealSpectrum');
+
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+
+            if (document.getElementById('pepPeptideTypeLinear').checked) {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
+            }
+            else {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
+            }
+
+
           break;
 
         case 'pepSpectrum':
@@ -12875,6 +12895,17 @@ function peptideShapeRadClicked(id) {
 			document.getElementById('pepSequenceBrute').checked = true;
 			
             peptideRadClicked('pepSequenceBrute');
+
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+
+            if (document.getElementById('pepPeptideTypeLinear').checked) {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
+            }
+            else {
+                document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
+            }
+
+
             break;
 
         case 'pepSpectralVector':
@@ -12886,9 +12917,17 @@ function peptideShapeRadClicked(id) {
             document.getElementById('pepSequenceGraphVectorLab').style.display = "inline-block";
 
 
+            document.getElementById('pepPeptideTypeLinear').checked = true;
+            peptideShapeRadClicked('pepPeptideTypeLinear');
+
+            document.getElementById('pepPeptideTypeCircular').disabled = true;
+
             document.getElementById('pepSequenceGraphVector').checked = true;
 
             peptideRadClicked('pepSequenceGraphVector');
+
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
+
             break;
 
 
@@ -13036,7 +13075,8 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 	
-
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
 
             document.getElementById('pepPeptide').checked = true;
 
@@ -13054,7 +13094,8 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
-
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
 
             document.getElementById('pepSpectrum').checked = true;
 
@@ -13071,6 +13112,8 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
 
             document.getElementById('pepSpectrum').checked = true;
 
@@ -13087,7 +13130,8 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "block";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "block";
 
-
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
 
             document.getElementById('pepSpectrum').checked = true;
 
@@ -13104,6 +13148,12 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
+            document.getElementById('pepPeptideTypeLinear').checked = true;
+            document.getElementById('spectrometerPrefixSuffixPS').checked = true;
+            peptideShapeRadClicked('pepPeptideTypeLinear');
+
+            document.getElementById('pepPeptideTypeCircular').disabled = true;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
 
             document.getElementById('pepSpectrum').checked = true;
 
@@ -13120,6 +13170,11 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
+            document.getElementById('pepPeptideTypeLinear').checked = true;
+            document.getElementById('spectrometerPrefixSuffixPS').checked = true;
+            peptideShapeRadClicked('pepPeptideTypeLinear');
+            document.getElementById('pepPeptideTypeCircular').disabled = true;
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
 
             document.getElementById('pepSpectralVector').checked = true;
 
@@ -13134,7 +13189,7 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
-			
+            document.getElementById('pepPeptideTypeCircular').disabled = false;
 			
             document.getElementById('pepPeptide').checked = true;
 
