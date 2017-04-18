@@ -655,11 +655,11 @@
                         <input type = "number" class="sensibleNum alignEl"  name = "leaderPS"  id = "leaderPS" value = 200 min = 1>
 
                         <label for ="pepPeptideTypeLinear" id = "pepPeptideTypeLinearLab" class="alignLab">Linear</label>
-                        <input type="radio" name="pepPeptideType"   class = "alignEl"  id ="pepPeptideTypeLinear" value="pepPeptideTypeLinear"  >
-                        <label for ="pepPeptideTypeCircular"  id = "pepPeptideTypeCircularLab" class="alignLab">Circular</label>
-                        <input type="radio" name="pepPeptideType"  class = "alignEl"  id ="pepPeptideTypeCircular" value="pepPeptideTypeCircular" checked >
+                        <input type="radio" name="pepPeptideType"   class = "alignEl" onclick = "peptideShapeRadClicked(event.target.id)"  id ="pepPeptideTypeLinear" value="pepPeptideTypeLinear"  >
+                        <label for ="pepPeptideTypeCircular"   id = "pepPeptideTypeCircularLab" class="alignLab">Circular</label>
+                        <input type="radio" name="pepPeptideType"  class = "alignEl"  onclick = "peptideShapeRadClicked(event.target.id)" id ="pepPeptideTypeCircular" value="pepPeptideTypeCircular" checked >
 
-						<label for ="spectrometerPrefixSuffixPS" class="alignLab">Prefixes/Suffices only</label>
+						<label for ="spectrometerPrefixSuffixPS" id = "spectrometerPrefixSuffixLabPS" class="alignLab">Prefixes/Suffices only</label>
                         <input type = "checkbox" class="alignEl" name = "spectrometerPrefixSuffixPS" id = "spectrometerPrefixSuffixPS">
 
                         <label for ="debugPS" class="alignLab">Debug</label>
@@ -675,8 +675,7 @@
                         <br>
                         <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectrum" value="pepSpectrum"  >Exp Spectrum
                         <br>
-                        <label for ="peptideUseTheseAminos" id = "peptideUseTheseAminosLab" class="alignLab">Use:</label>
-                        <input type="text"  class = "alignEl sensibleNum"  id ="peptideUseTheseAminos"  >
+                        <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectralVector" value="pepSpectrum"  >Spectral Vector
 
 
                     </div>
@@ -703,6 +702,9 @@
 						<input type="radio" name="pepMethod"  onclick = "peptideRadClicked(event.target.id)" id ="pepSequenceGraphVector" value="pepSequenceGraphVector"  >Sequencing (Graph Spectral Vector)</label>
     
 						<br>
+
+                        <label for ="peptideUseTheseAminos" id = "peptideUseTheseAminosLab" class="alignLab">Use:</label>
+                        <input type="text"  class = "alignEl sensibleNum"  id ="peptideUseTheseAminos"  >
 
                         <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->
                     </div>
