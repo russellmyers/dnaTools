@@ -300,7 +300,12 @@ input[type=number] {
 }
 
 #peptideViewer {
+    background-color:  beige;
+    width: 100%;
+    height: 100%;
+    /*overflow:auto;*/
     display:none;
+
 }
 
 #alignViewer {
@@ -380,20 +385,23 @@ input[type=number] {
 }
 
 #peptideGraphDiv {
-    background-color:  orange;
+
     width: 800px;
-    height: 150px;
-    overflow-x: scroll;
+    height: 450px;
+    overflow: scroll;
+    background-color: white;
 
 }
 
 #peptideCanvas {
     display: inline-block;
+
+
     /* width: 65%;
      height: 100%;*/
    /* width: 800px;
     height: 150px;*/
-    background-color: white;
+
     vertical-align: top;
 
 }

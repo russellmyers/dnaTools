@@ -3964,7 +3964,7 @@ function DBNodeView(ctx,r,style) {
 
         if (this.style == DGraph.styleSequencing) {
             //text inside the bubble
-            this.ctx.fillText(this.text,this.centre().x -  this.textOffsetX,this.centre().y);
+            this.ctx.fillText(this.text,this.centre().x -  5,this.centre().y +5);
         }
         else {
             this.ctx.fillText(this.text, this.r.x, this.r.y);
