@@ -3626,6 +3626,7 @@ DGraph.alignTypeOverlap = 4;
 //used for tree graph view styles
 DGraph.styleUnrooted = 1;
 DGraph.styleRooted = 2;
+DGraph.styleSequencing = 3;
 
 
 
@@ -3659,12 +3660,16 @@ function DBPos(x,y) {
 
 }
 
-function DBEdgeView(startPos,angle,w,ctx,absEnd,lenFactor) {
+function DBEdgeView(startPos,angle,w,ctx,absEnd,lenFactor,nodeRadius,style) {
+
+    //nodeRadius is used to offset the start and end of the edge (ie start and end edge outside node radius)
 
     this.text = "blah";
     this.ctx = ctx;
     this.angle = angle;
     this.w = w;
+    this.style = style;
+
     if (lenFactor == null) {
         this.len = 100;
     }
@@ -3673,6 +3678,19 @@ function DBEdgeView(startPos,angle,w,ctx,absEnd,lenFactor) {
     }
 
     this.absEnd = absEnd;
+
+    this.nodeRadius = nodeRadius;
+
+    if (this.style == DGraph.styleSequencing) {
+        this.nodeRadiusXOffset = 0;
+        this.nodeRadiusYOffset = this.nodeRadius;
+    }
+    else {
+        this.nodeRadiusXOffset = Math.cos(this.angle) * this.nodeRadius;
+        this.nodeRadiusYOffset = Math.sin(this.angle) * this.nodeRadius;
+    }
+    //this.nodeRadiusXOffset = Math.cos(this.angle) * this.nodeRadius;
+   //this.nodeRadiusYOffset = Math.sin(this.angle) * this.nodeRadius;
 
     this.lenFactor = lenFactor;
 
@@ -3706,8 +3724,28 @@ function DBEdgeView(startPos,angle,w,ctx,absEnd,lenFactor) {
         if (this.highlight) {
             this.ctx.strokeStyle = "#FF0000";
         }
-        this.ctx.moveTo(this.startPos.x,this.startPos.y);
-        this.ctx.lineTo(this.endPos.x, this.endPos.y);
+        this.ctx.moveTo(this.startPos.x + this.nodeRadiusXOffset,this.startPos.y - this.nodeRadiusYOffset);
+
+        //this.ctx.lineTo(this.endPos.x - this.nodeRadiusXOffset, this.endPos.y + this.nodeRadiusYOffset);
+        var startX = this.startPos.x + this.nodeRadiusXOffset;
+        var startY = this.startPos.y  - this.nodeRadiusYOffset;
+        var endX = this.endPos.x - this.nodeRadiusXOffset;
+        var endY;
+        if (this.style == DGraph.styleSequencing) {
+            endY = this.endPos.y - this.nodeRadiusYOffset;
+        }
+        else {
+            endY = this.endPos.y + this.nodeRadiusYOffset;
+        }
+        var controlPointX = startX + ((endX - startX) / 2);
+        var controlPointY = startY - 60;
+        if (this.style == DGraph.styleSequencing) {
+            this.ctx.quadraticCurveTo(controlPointX, controlPointY, endX, endY);
+        }
+        else {
+            this.ctx.lineTo(endX,endY);
+        }
+        //this.ctx.lineTo(endX,endY);
         this.ctx.stroke();
         this.ctx.strokeStyle = svdStrokeStyle;
         var txtPosXSt = Math.min(this.startPos.x, this.endPos.x);
@@ -3716,7 +3754,13 @@ function DBEdgeView(startPos,angle,w,ctx,absEnd,lenFactor) {
         var txtPosYSt = Math.min(this.startPos.y, this.endPos.y);
         var txtPosYEnd = Math.max(this.startPos.y, this.endPos.y);
         var txtPosY = txtPosYSt +  ((txtPosYEnd - txtPosYSt) / 2);
-        this.ctx.fillText(parseFloat(this.w).toFixed(3),txtPosX, txtPosY);
+
+        if (this.style == DGraph.styleSequencing) {
+            this.ctx.fillText(parseFloat(this.w).toFixed(3), controlPointX - 5, controlPointY + 30);
+        }
+        else {
+            this.ctx.fillText(parseFloat(this.w).toFixed(3), txtPosX, txtPosY);
+        }
 
 
     }
@@ -3776,6 +3820,7 @@ function DBNodeView(ctx,r,style) {
     this.startAngleRad = 0;
     this.incRad = 90 / 360 * 2 * Math.PI;
     this.isLeaf = false;
+    this.nodeRadius = 2;
 
     this.highlight = false;
     this.edgeHighlight = false;
@@ -3784,7 +3829,9 @@ function DBNodeView(ctx,r,style) {
         this.r = r;
     }
     else {
-        this.r = new DBRect(0,0,10,10);
+
+        this.r = new DBRect(0, 0, 10, 10);
+
     }
 
     this.absPos = false; //absolute positioning
@@ -3810,23 +3857,55 @@ function DBNodeView(ctx,r,style) {
             ang = this.startAngleRad - leafAdj;
         }
         else if (this.edgeViews.length == 1) {
-            ang =  this.style == DGraph.styleRooted ? this.startAngleRad - this.incRad + leafAdj : this.startAngleRad + this.incRad;
+            if (this.style == DGraph.styleRooted) {
+                ang = this.startAngleRad - this.incRad + leafAdj;
+            }
+            else if (this.style == DGraph.styleUnrooted) {
+                ang = this.startAngleRad + this.incRad;
+            }
+            else if (this.style == DGraph.styleSequencing) {
+                ang = 0;
+            }
+            //ang =  this.style == DGraph.styleRooted ? this.startAngleRad - this.incRad + leafAdj : this.startAngleRad + this.incRad;
         }
         else {
-            ang = this.startAngleRad + (Math.PI * 1.25);
+            if (this.style == DGraph.styleSequencing) {
+                ang = 0;
+            }
+            else {
+                ang = this.startAngleRad + (Math.PI * 1.25);
+            }
         }
 
         var edge;
         if (nodeTo.absPos) {
-            var absEnd = new DBPos(nodeTo.r.x + (10/2),nodeTo.r.y + (10/2));
-            edge = new DBEdgeView(this.centre(), ang, w, this.ctx,absEnd);
+            var cent = nodeTo.centre();
+            var absEnd = new DBPos(cent.x,cent.y);
+            edge = new DBEdgeView(this.centre(), ang, w, this.ctx,absEnd,null,nodeTo.nodeRadius,nodeTo.style);
         }
         else {
-            edge = new DBEdgeView(this.centre(), ang, w, this.ctx,null,lenFactor);//(this.x,this.y,this.len,ang,this.edges.length,w);
-            nodeTo.r.x = edge.endPos.x - (10 / 2);
-            nodeTo.r.y = edge.endPos.y - (10 / 2);
+            edge = new DBEdgeView(this.centre(), ang, w, this.ctx,null,lenFactor,nodeTo.nodeRadius,nodeTo.style);//(this.x,this.y,this.len,ang,this.edges.length,w);
+            nodeTo.setR(edge.endPos);
+            //nodeTo.r.x = edge.endPos.x - (10 / 2);
+            //nodeTo.r.y = edge.endPos.y - (10 / 2);
         }
-        nodeTo.startAngleRad = this.style == DGraph.styleRooted ? -45 / 360 * 2 * Math.PI  :  ang - (this.incRad/2);
+        //nodeTo.startAngleRad = this.style == DGraph.styleRooted ? -45 / 360 * 2 * Math.PI  :  ang - (this.incRad/2);
+        switch (this.style) {
+            case DGraph.styleRooted:
+                nodeTo.startAngleRad = -45 / 360 * 2 * Math.PI;
+                break;
+            case DGraph.styleUnrooted:
+                nodeTo.startAngleRad = ang - (this.incRad/2);
+                break;
+            case DGraph.styleSequencing:
+                nodeTo.startAngleRad = 0;
+            default:
+                nodeTo.startAngleRad = 0;
+                break;
+
+
+        }
+
 
         if ((this.edgeHighlight) && (nodeTo.edgeHighlight)) {
             edge.highlight = true;
@@ -3837,14 +3916,40 @@ function DBNodeView(ctx,r,style) {
     }
 
 
+    this.setR = function(centrePoint) {
+
+        if (this.style == DGraph.styleSequencing) {
+            this.nodeRadius = 10;
+        }
+        else {
+            this.nodeRadius = 2;
+        }
+
+        if (!centrePoint) {
+            centrePoint = new DBPos(this.nodeRadius,this.nodeRadius);
+        }
+
+        this.r = new DBRect(centrePoint.x - this.nodeRadius,centrePoint.y - this.nodeRadius,this.nodeRadius*2,this.nodeRadius*2);
+
+
+
+    };
+
     this.display = function() {
         this.ctx.beginPath();
         var svdStrokeStyle = this.ctx.strokeStyle;
         if (this.highlight) {
             this.ctx.strokeStyle = "#FF0000";
         }
-        this.ctx.arc(this.centre().x,this.centre().y,2,0,Math.PI*2,true);
-        this.ctx.stroke();
+        this.ctx.arc(this.centre().x,this.centre().y,this.nodeRadius,0,Math.PI*2,true);
+        if (this.style == DGraph.styleSequencing) {
+            this.ctx.stroke();
+        }
+        else {
+            this.ctx.fill();
+        }
+       // this.ctx.stroke();
+
         this.ctx.strokeStyle = svdStrokeStyle;
 
         var svdFont = this.ctx.font;
@@ -3857,7 +3962,13 @@ function DBNodeView(ctx,r,style) {
             this.ctx.font = 'bold ' + this.ctx.font;
         }
 
-        this.ctx.fillText(this.text,this.r.x + this.textOffsetX,this.r.y);
+        if (this.style == DGraph.styleSequencing) {
+            //text inside the bubble
+            this.ctx.fillText(this.text,this.centre().x -  this.textOffsetX,this.centre().y);
+        }
+        else {
+            this.ctx.fillText(this.text, this.r.x, this.r.y);
+        }
         this.ctx.font = svdFont;
 
         this.displayEdges();
@@ -3913,7 +4024,7 @@ function DBTestSimpleController() {
     
 }
 
-function DBGraphViewController(g) {
+function DBGraphViewController(g,prefStyle) {
 
     //"implements" gvDataSource
     //-numNodes: returns number of nodes in graph
@@ -3924,6 +4035,11 @@ function DBGraphViewController(g) {
     //-getComments: returns comments about graph
 
     this.g = g;
+
+    if (prefStyle) {
+        this.prefStyle = prefStyle;
+    }
+
     this.numNodes = function() {
         return g.numNodes();
     }
@@ -3941,7 +4057,8 @@ function DBGraphViewController(g) {
                 vNode.edgeHighlight = true;
             }
 
-            if ((el.sequence.length > 0) && (el.sequence != el.label))  {
+            if ((el.sequence) && (el.sequence.length > 0) && (el.sequence != el.label))  {
+
                 var seq = el.sequence;
                 var thresh = (svdThis.preferredStyle() == DGraph.styleRooted) ? 8 : 20;
                 if (el.sequence.length > thresh) {
@@ -3952,7 +4069,9 @@ function DBGraphViewController(g) {
                 vNode.text += seq;
             }
             vNode.tag = i;
-            vNode.isLeaf = el.isLeaf(svdThis.g.checkDirected());
+            if ((svdThis.preferredStyle() == 'DGraph.styleRooted') || (svdThis.preferredStyle() == 'DGraph.styleUnrooted')) {
+                vNode.isLeaf = el.isLeaf(svdThis.g.checkDirected());
+            }
             vNodes.push(vNode);
         });
         return vNodes;
@@ -3977,6 +4096,9 @@ function DBGraphViewController(g) {
 
     this.longestPathToLeaf = function() {
 
+        if (this.preferredStyle() == DGraph.styleSequencing) {
+            return 1;
+        }
         var lvs = g.leaves();
 
         var startNode = this.findStartNode();
@@ -3999,11 +4121,14 @@ function DBGraphViewController(g) {
         var startNodeLab;
         var startNode;
 
-        if (g.isRooted()) {
+        if ((this.preferredStyle() == DGraph.styleRooted) && g.isRooted()) {
             startNodeLab = g.findRoot().label;
         }
-        else {
+        else if (this.preferredStyle == DGraph.styleUnrooted) {
             startNodeLab = g.centralNode();
+        }
+        else {
+            startNodeLab = g.nodes[0].label;
         }
         // var ind = g.getNodeIndexForNode(centralNode);
 
@@ -4064,11 +4189,17 @@ function DBGraphViewController(g) {
     }
 
     this.preferredStyle = function() {
-        if (this.g.isRooted()) {
-            return DGraph.styleRooted;
+
+        if (this.prefStyle) {
+            return this.prefStyle;
         }
         else {
-            return DGraph.styleUnrooted;
+            if (this.g.isRooted()) {
+                return DGraph.styleRooted;
+            }
+            else {
+                return DGraph.styleUnrooted;
+            }
         }
 
     };
@@ -4135,9 +4266,26 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
             nv.edgeViews = [];
         });
 
+        if (gvDataSource.preferredStyle() == DGraph.styleSequencing) {
+            var stX = 50;
+            var xInc = 120;
+            var stY = 100;
+            this.nvs.forEach(function(nv,i) {
+                nv.setR(new DBPos(stX + (i * xInc),stY));
+                nv.absPos = true;
+            });
+            
+        }
+
+
         order.forEach(function(pair) {
             svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor);
         });
+
+        if (gvDataSource.preferredStyle() == DGraph.styleSequencing) {
+            return;
+            //don't adjust
+        }
 
         var highest = this.findHighestNodeView();
         var leftest = this.findLeftmostNodeView();
@@ -4293,10 +4441,13 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
        this.nvs.forEach(function(nv) {
           nv.ctx = svdThis.ctx;
           nv.style = svdThis.gvDataSource.preferredStyle();
+          nv.setR();
+
        });
 
        //this.nvs[order[0][0]].r = new DBRect(this.r.x + (this.r.w / 2),this.r.y  + (this.r.h/2),10,10); //central node
-        this.nvs[order[0][0]].r = new DBRect(this.viewPort.x + (this.viewPort.w / 2),this.viewPort.y  + (this.viewPort.h/2),10,10); //central n
+        this.nvs[order[0][0]].setR(new DBPos(this.viewPort.x + (this.viewPort.w / 2),this.viewPort.y  + (this.viewPort.h/2)));
+        //this.nvs[order[0][0]].r = new DBRect(this.viewPort.x + (this.viewPort.w / 2),this.viewPort.y  + (this.viewPort.h/2),10,10); //central n
 
        if (this.gvDataSource.preferredStyle() == DGraph.styleRooted) {
           this.nvs[order[0][0]].startAngleRad = -45 / 360 * 2 * Math.PI;
@@ -6717,6 +6868,19 @@ function DBGraph(builder,comments) {
            node.visited = false;
        });  
     };
+    
+    this.resetFreshNodesAndEdges = function() {
+        //fresh nodes/edges used in graph displays to highlight new nodes/edges or paths
+        svdThis = this;
+        
+        this.nodes.forEach(function(node) {
+            node.freshNode = false;
+            node.edges.forEach(function(edge) {
+               edge.freshEdge = false; 
+            });
+            
+        });
+    }
     
     this.getNodeFromLabel = function(lab) {
 

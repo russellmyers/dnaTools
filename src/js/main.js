@@ -2077,7 +2077,14 @@ function NodePrinter(node,x,y,num) {
 
 
 
-    var k = node.dna.length;
+    var k;
+    if (node.dna) {
+        k = node.dna.length;
+
+    }
+    else {
+        k = node.label.length;
+    }
 
     if (k <=3) {
         this.font = '12pt Arial';
@@ -2105,7 +2112,8 @@ function NodePrinter(node,x,y,num) {
         ctx.moveTo(this.x + this.radius,this.y);
 
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
-        var dna = squishString(this.node.dna,6);
+        var str = this.node.dna ? this.node.dna : this.node.label;
+        var dna = squishString(str,6);
 
         ctx.fillText(dna,this.x - 15,this.y+5);
         if (this.node.pairedDna) {
@@ -7635,6 +7643,34 @@ function runSequencing(e) {
 
 }
 
+function displayPeptideSeqGraph(g,debug) {
+    var canv = document.getElementById('peptideCanvas');
+    var parent = document.getElementById('peptideGraphDiv');
+    canv.width = parent.clientWidth * 2;
+    canv.height = parent.clientHeight;
+    var ctx = canv.getContext("2d");
+    ctx.clearRect(0,0,canv.width,canv.height);
+
+
+    if (g) {
+        //  document.getElementById('graphGraphDiv').setAttribute("style","height:300px");
+        //  document.getElementById('graphGraphDiv').style.height = '400px';
+
+
+
+        var gvCont = new DBGraphViewController(g,DGraph.styleSequencing);
+
+        var viewPort = new DBRect(0,0,parent.clientWidth,parent.clientHeight);
+
+        pGraphView = new DBGraphView(canv,viewPort, gvCont);
+        pGraphView.display();
+    }
+
+
+
+
+}
+
 
 function displayPhylogenyGraph(g,debug) {
 
@@ -8458,13 +8494,20 @@ function runPeptide(e) {
 			
 			
 			var specs = [];
-			protStrs.forEach(function(protStr) {
+			protStrs.forEach(function(protStr,i) {
 				
 				var pep = new Peptide(Peptide.AminoArrFromStr(protStr));
 				//var tst = pep.toPeptideVector();
 				var spec = pep.linearSpectrum(paramObj.prefixSuffixOnly);
 				var specStr = arrayToString(spec);
 				specs.push([protStr,specStr,specStr == spectrumMaster ? true : false]);
+                if (specStr == spectrumMaster) {
+                    gr.resetFreshNodesAndEdges();
+                    var pth = paths[i];
+                    pth.forEach(function(p) {
+                       p.freshEdge = true;
+                    });
+                }
 				
 			});
 			
@@ -8504,6 +8547,19 @@ function runPeptide(e) {
                 
 				
                 document.getElementById('debugText').value = resStr;
+
+
+
+            }
+
+            if (gr) {
+                /*
+                var canv = document.getElementById('peptideCanvas');
+                initGraphCanvas(null,null,canv);
+                graphCanvas(gr);
+                */
+
+                displayPeptideSeqGraph(gr,document.getElementById('debugPS').checked);
             }
 
             break;		
@@ -8794,7 +8850,7 @@ function collectStats(dna,sk,bc) {
 
 }
 
-function initGraphCanvas(wid,hei) {
+function initGraphCanvas(wid,hei,canv) {
     if (wid == null) {
         wid = '660';
     }
@@ -8802,7 +8858,14 @@ function initGraphCanvas(wid,hei) {
         hei = '150';
     }
 
-    var c = document.getElementById("moreCanvas");
+    var c;
+
+    if (canv) {
+        c = canv;
+    }
+    else {
+       c = document.getElementById("moreCanvas");
+    }
 
     var h = c.height;
     var w = c.width;
@@ -8826,7 +8889,8 @@ function graphCanvas(grph) {
         return;
     }
 
-    var ctx = initGraphCanvas();
+   // var ctx = initGraphCanvas(null,null,document.getElementById('peptideCanvas'));
+   var ctx = initGraphCanvas();
 
     ctx.beginPath();
 
@@ -10213,7 +10277,7 @@ function colourTrans() {
 }
 
 function colourPep() {
-    var trans = document.getElementById('transViewer');
+    var trans = document.getElementById('peptideDets');
 
     trans.innerHTML = '';
 
@@ -13373,6 +13437,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13390,10 +13455,12 @@ function tabClickDone(tabNum) {
             document.getElementById('pepTools').style.display = "none";
             document.getElementById('alignTools').style.display = "none";
             document.getElementById('sbTools').style.display = "none";
+            document.getElementById('phylogenyTools').style.display = "none";
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "inline-block";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13418,6 +13485,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "inline-block";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13442,7 +13510,9 @@ function tabClickDone(tabNum) {
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
-            document.getElementById('transViewer').style.display = "inline-block";
+            document.getElementById('transViewer').style.display = "none";
+           /* document.getElementById('transViewer').style.display = "inline-block";*/
+            document.getElementById('peptideViewer').style.display = "inline-block";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13471,6 +13541,7 @@ function tabClickDone(tabNum) {
 
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "inline-block";
             document.getElementById('sbViewer').style.display = "none";
@@ -13497,6 +13568,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "inline-block";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13522,6 +13594,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "none";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "inline-block";
@@ -13546,6 +13619,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
@@ -13575,6 +13649,7 @@ function tabClickDone(tabNum) {
             document.getElementById('dnaviewer').style.display = "inline-block";
             document.getElementById('graphviewer').style.display = "none";
             document.getElementById('transViewer').style.display = "none";
+            document.getElementById('peptideViewer').style.display = "none";
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
