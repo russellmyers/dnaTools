@@ -1,4 +1,4 @@
-/**
+/*
  * Created by RussellM on 16/12/2015.
  */
 
@@ -278,7 +278,7 @@ function motifSearch(dnaStrings,k,d,inclRevCompl,progCallback) {
 
 }
 
-
+/*
 function processBrute(dnaStrings,k,d,laplace,progCallback) {
 
    // var kmers = [];
@@ -288,6 +288,7 @@ function processBrute(dnaStrings,k,d,laplace,progCallback) {
     }
 
 }
+*/
 
 
 function bruteMotifSearch(dnaStrings,k,d,laplace,progCallback) {
@@ -470,9 +471,9 @@ function greedyMotif(dnaStrings,k,d,laplace,progCallback) {
     var progThreshold = 1;
 
 
-    var minDist = 999999;
-    var minPosns;
-    var greedy = '';
+    //var minDist = 999999;
+    //var minPosns;
+   // var greedy = '';
 
 
     var first = dnaStrings[0];
@@ -513,9 +514,9 @@ function greedyMotif(dnaStrings,k,d,laplace,progCallback) {
 
     }
 
-    var b = bestMotifs;
+    //var b = bestMotifs;
 
-    var res = [
+    res = [
         [
             [
 
@@ -547,9 +548,9 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
     var progThreshold = 1;
 
 
-    var minDist = 999999;
-    var minPosns;
-    var greedy = '';
+    //var minDist = 999999;
+    //var minPosns;
+    //var greedy = '';
 
  //   var first = dnaStrings[0];
 
@@ -626,7 +627,7 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
 
     }
 
-    var res = [
+    res = [
         [
             [
 
@@ -652,21 +653,21 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback) {
 
 function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
 
-    var motifs = {};
+   //var motifs = {};
 
     var progThreshold = 1;
 
 
-    var minDist = 999999;
-    var minPosns;
-    var greedy = '';
+    //var minDist = 999999;
+    //var minPosns;
+    //var greedy = '';
 
     //   var first = dnaStrings[0];
 
 
     var bestConsensus = '';
-    var bestMotifs = [];
-    var bestIndexes = [];
+    //var bestMotifs = [];
+    //var bestIndexes = [];
 
 
     var bestScore = 99999;
@@ -675,6 +676,7 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
 
     var kmers = [];
     var kmerInds = [];
+
 
     var res,profMatrix;
 
@@ -788,7 +790,7 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback) {
         }
         */
 
-    var res = [
+    res = [
         [
             [
 
@@ -832,7 +834,7 @@ function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback) {
         revComplKmer = reverseComplement(kmer);
 
     }
-    var count = 0;
+    //var count = 0;
 
     for (var j = 0; j < dna.length - k + 1; ++j) {
         if (progCallback) {
@@ -952,7 +954,7 @@ function mostFrequentKMersSort(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,d
     }
 */
    // var kMersDone = [];
-    var mostCount = 0;
+   // var mostCount = 0;
 
     mostArray = [];
 
@@ -1286,7 +1288,7 @@ function deleteKmerFromFreqArray(kmer,pos,freqArray,inclRevCompl,countOnly) {
     }
 
     if (inclRevCompl) {
-        var revInd =  kMerToIndSmall(reverseComplement(kmer));//kMerToInd(reverseComplement(kmer));
+        revInd =  kMerToIndSmall(reverseComplement(kmer));//kMerToInd(reverseComplement(kmer));
         var checkRevPos = freqArray[revInd][1][0];
         if (checkRevPos == pos) {
             freqArray[revInd][1].splice(0, 1);
@@ -1323,7 +1325,7 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl,countO
         }
 
         if (inclRevCompl) {
-            var revInd =  kMerToIndSmall(reverseComplement(kmer)); // kMerToInd(reverseComplement(kmer));
+            revInd =  kMerToIndSmall(reverseComplement(kmer)); // kMerToInd(reverseComplement(kmer));
 
             if (!freqArray[revInd]) {
                 freqArray[revInd] = 1;
@@ -1378,7 +1380,7 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl,countO
 
 
     if (inclRevCompl) {
-        var revInd =  kMerToIndSmall(reverseComplement(kmer)); //kMerToInd(reverseComplement(kmer));
+        revInd =  kMerToIndSmall(reverseComplement(kmer)); //kMerToInd(reverseComplement(kmer));
         if (!freqArray[revInd]) freqArray[revInd] = [];
 
         if (!freqArray[revInd][1]) {
@@ -2707,7 +2709,7 @@ function seqAssembly(input,seqInputType,seqType,seqMethod,k,makeCycle,pairDist,p
 
     var nbps = grph.maximalNonBranchingPaths();
 
-    var sum = grph.sumInfo();
+    grph.sumInfo();
 
     if (progCallback) {
         progCallback('Done', 10, 10,'','');
@@ -2715,7 +2717,7 @@ function seqAssembly(input,seqInputType,seqType,seqMethod,k,makeCycle,pairDist,p
 
 
     if (progCallback) {
-        var nbps = grph.maximalNonBranchingPaths();
+        grph.maximalNonBranchingPaths();
     }
 
 
@@ -2736,7 +2738,7 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,co
 
     var progThreshold = 100;
 
-    var limit = dna.length - l;
+    //var limit = dna.length - l;
 
     //document.getElementById('progress').innerHTML = curr + ' / ' + limit;
 
@@ -2820,7 +2822,7 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,co
             var newKmer = dna.substring(curr+l-k,curr+l);
 
             if (newKmer == 'AACAGCAAC') {
-                var kkk = 0;
+                //var kkk = 0;
             }
             var allNewDist = kMersWithMaxDist(newKmer,maxMismatch);
 
@@ -2918,7 +2920,7 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,co
             progThreshold = 10;
             bestFreqArray.forEach(function(el,i) {
                 if (i == 4673) {
-                    var ggg = 0;
+                    //var ggg = 0;
                 }
                 if (progCallback) {
                     if ((i % progThreshold == 0) || i == bestFreqArray.length - 1) {
@@ -2974,11 +2976,11 @@ function delKmerFromTree(node,seq) {
 
         }
         else {
-            var aaa = 0;
+            //var aaa = 0;
         }
     }
     else {
-        var bbb = 0;
+        //var bbb = 0;
     }
     for (var i = 0;i < seq.length;++i) {
         for (var j = 0;j < currNode.subNodes.length;++j) {
@@ -3035,7 +3037,7 @@ function addSingleBaseToTree(justAddedPrev,baseNode,letter,posn,k) {
                     justAddedCurr.push(sn);
                 }
                 else {
-                    var newNode = new Node(letter);
+                    newNode = new Node(letter);
                     newNode.positions = [posn];
                     newNode.sequence = ja.sequence + newNode.letter;
                     ja.subNodes.push(newNode);
@@ -3062,7 +3064,7 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
 
 //fullpartialflag - indicates whether this section of the alignment is fully or partially on the path
 
-    var progThreshold = 1;
+    //var progThreshold = 1;
 
 
 
@@ -3086,8 +3088,8 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
         return;
     }
     else if (t.length == 0) {
-        var gap = '';
-        for (var i = 0;i < s.length; ++i) gap += '-';
+        gap = '';
+        for (i = 0;i < s.length; ++i) gap += '-';
         storeNodes.push([startTopOrder,[,,,,s,gap]]);
         return;
     }
@@ -3151,8 +3153,8 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
     else {
         //not on path. Try bottom half only
 
-        var newBottomS = s;
-        var newBottomT = t.substring(mid);
+        newBottomS = s;
+        newBottomT = t.substring(mid);
 
         alignHalf(newBottomS, newBottomT, startRow + mid, startCol, startTopOrder, e, storeNodes, progCallback,'P',bestScorePrev);
 
@@ -3183,7 +3185,7 @@ function convertStoreNodesToAlignment(g,e,storeNodes) {
     var endAlignedCoord;
 
     if (g) {
-        var testScore = g.scoreAlignment(sAligned, tAligned);
+        g.scoreAlignment(sAligned, tAligned);
         startAlignedCoord  = g.getNodeRowCol(storeNodes[0][0]);
         endAlignedCoord = g.getNodeRowCol(storeNodes[storeNodes.length-1][0]);
 
@@ -3248,7 +3250,7 @@ function alignLocalSpace(e,progCallback) {
 
         var tBottom = tAdj.substring(mid);
 
-        var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+        newG.findMiddleEdgeAllInOneQuick('P');
 
         if (newG.bestScoreThroughMid == bestScore) {
             foundMiddleOnPath = true;
@@ -3307,7 +3309,7 @@ function alignFittingSpace(e,progCallback) {
     var tBottom = tAdj.substring(mid);
 
    // var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
-    var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+    newG.findMiddleEdgeAllInOneQuick('P');
 
     // should write out mid edge here (ie first edge)
     storeNodes.push([newG.midNode.getTopOrder(), [newG.getNodeRow(newG.midNode),newG.getNodeCol(newG.midNode),newG.getNodeRow(newG.midEdge.targetNode), newG.getNodeCol(newG.midEdge.targetNode), newG.midEdge.edgeAction[0], newG.midEdge.edgeAction[1]]]);
@@ -3361,7 +3363,7 @@ function alignOverlapSpace(e,progCallback) {
     var tBottom = tAdj.substring(mid);
 
    
-    var midNodeData = newG.findMiddleEdgeAllInOneQuick('P');
+    newG.findMiddleEdgeAllInOneQuick('P');
 
     // should write out mid edge here (ie first edge)
     storeNodes.push([newG.midNode.getTopOrder(), [newG.getNodeRow(newG.midNode),newG.getNodeCol(newG.midNode),newG.getNodeRow(newG.midEdge.targetNode), newG.getNodeCol(newG.midEdge.targetNode), newG.midEdge.edgeAction[0], newG.midEdge.edgeAction[1]]]);
@@ -3515,7 +3517,7 @@ self.addEventListener('message', function(e) {
             maxMismatch = e.data.maxMismatch;
             debug = e.data.debug;
 
-            var freqCountArray = [];
+            //var freqCountArray = [];
             var debugInfo;
 
             startTime = Date.now();
@@ -3651,7 +3653,7 @@ self.addEventListener('message', function(e) {
 
         case 'bruteMotifSearch' :
 
-            var res = bruteMotifSearch(e.data.dnaStrings, e.data.k, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
+            res = bruteMotifSearch(e.data.dnaStrings, e.data.k, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             self.postMessage({'task': 'bruteMotifSearch','msgType' : 'result','txtStuff' : 'Score: ' + res[1],'indArray' : res[0]});
             break;
 
@@ -3659,14 +3661,9 @@ self.addEventListener('message', function(e) {
         case 'medianString' :
             //console.log('dist: ' + dist('ACGCGGTCGAGCGCGG','GCGCGGCGCGAGCGCGG'));
 
-            var dnaStrings = e.data.dnaStrings;
+            dnaStrings = e.data.dnaStrings;
             dnaStrings = dnaStrings.filter(function(el) {
-                if (el.length == 0) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                return el.length != 0;
             });
 
             startTime = Date.now();
@@ -3689,14 +3686,9 @@ self.addEventListener('message', function(e) {
         case 'greedyMotif' :
             //console.log('dist: ' + dist('ACGCGGTCGAGCGCGG','GCGCGGCGCGAGCGCGG'));
 
-            var dnaStrings = e.data.dnaStrings;
+            dnaStrings = e.data.dnaStrings;
             dnaStrings = dnaStrings.filter(function(el) {
-                if (el.length == 0) {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                return el.length != 0;
             });
             dnaStrings = dnaStrings.map(function(el) {
                 return el.trim();
@@ -3735,7 +3727,7 @@ self.addEventListener('message', function(e) {
         case 'seqCyclopeptide' :
 
             //var res = gibbsSampler(e.ata.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
-            var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
+            cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
             res = cyclopeptideSequencing(e.data.spectrum,cycFlag,countProgMostFreqWithStages,e.data.prefixSuffixOnly);
             self.postMessage({'task': 'seqCyclopeptide','msgType' : 'result','txtStuff' : res});
             break;
@@ -3743,11 +3735,11 @@ self.addEventListener('message', function(e) {
         case 'seqLeaderboardCyclopeptide' :
 
             //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
-            var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
-            var res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,false,cycFlag,null,countProgMostFreqWithStages);
+            cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
+            res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,false,cycFlag,null,countProgMostFreqWithStages);
            
 
-            var txt = '';
+            txt = '';
             /*
             res.forEach(function(pep) {
                 txt += '\n' + pep.toShortString('') + '\n' + pep.toWeightString();
@@ -3767,7 +3759,7 @@ self.addEventListener('message', function(e) {
 
             //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             var cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
-            var res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,true,cycFlag,e.data.useTheseAminos,countProgMostFreqWithStages);
+            res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,true,cycFlag,e.data.useTheseAminos,countProgMostFreqWithStages);
 
 
             var txt = '';
@@ -3789,7 +3781,7 @@ self.addEventListener('message', function(e) {
 
         case 'seqAssembly' :
 
-            var res = seqAssembly(e.data.input,e.data.seqInputType,e.data.seqType,e.data.seqMethod,e.data.k,e.data.makeCycle,e.data.pairDist,countProgMostFreqWithStages);
+            res = seqAssembly(e.data.input,e.data.seqInputType,e.data.seqType,e.data.seqMethod,e.data.k,e.data.makeCycle,e.data.pairDist,countProgMostFreqWithStages);
             //var grph = new DGraph(e.data.input,e.data.seqInputType,e.data.seqType,e.data.k,e.data.makeCycle,e.data.pairDist);
             break;
 
@@ -3797,7 +3789,7 @@ self.addEventListener('message', function(e) {
             //  var gg = e.data.graph;
 
             var sizeOfProblem = e.data.sAlign.length * e.data.tAlign.length;
-            var thresh = e.data.linSpaceThresh;
+            thresh = e.data.linSpaceThresh;
 
             if (e.data.uAlign.length > 0) {
                 //3 way sequence align - only simple, no linear space or affine
@@ -3813,7 +3805,7 @@ self.addEventListener('message', function(e) {
                 var sStr = alignData[1];
                 var tStr = alignData[2];
                 var lcsStr = alignData[3];
-                var uStr = alignData[9];
+                //var uStr = alignData[9];
 
                 self.postMessage({
                     'task': 'align',
@@ -3825,18 +3817,18 @@ self.addEventListener('message', function(e) {
             }
             else
             if (e.data.useAffine) {
-                var g = new DGAffineAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore,e.data.affineOpenGap);
+                g = new DGAffineAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore,e.data.affineOpenGap);
 
                 g.progressCallback = countProgMostFreqWithStages;
                 g.initGraph();
 
                 g.longestPathsDynamic();
 
-                var alignData = g.alignStrings();
-                var longest = alignData[0];
-                var sStr = alignData[1];
-                var tStr = alignData[2];
-                var lcsStr = alignData[3];
+                alignData = g.alignStrings();
+                longest = alignData[0];
+                sStr = alignData[1];
+                tStr = alignData[2];
+                lcsStr = alignData[3];
 
                 self.postMessage({
                     'task': 'align',
@@ -3850,25 +3842,25 @@ self.addEventListener('message', function(e) {
             }
 
             else if (sizeOfProblem  > thresh) {
-                var res = alignSpace(e,countProgMostFreqWithStages);
+                res = alignSpace(e,countProgMostFreqWithStages);
 
                 self.postMessage({'task': 'align','msgType' : 'result', 'alignType':e.data.alignType,'txtStuff' : res});
 
             }
 
             else {
-                var g = new DGAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
+                g = new DGAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
                 g.progressCallback = countProgMostFreqWithStages;
                 g.initGraph();
 
                 g.longestPathsDynamic();
 
-                var alignData = g.alignStrings();
-                var longest = alignData[0];
-                var sStr = alignData[1];
-                var tStr = alignData[2];
-                var lcsStr = alignData[3];
+                alignData = g.alignStrings();
+                longest = alignData[0];
+                sStr = alignData[1];
+                tStr = alignData[2];
+                lcsStr = alignData[3];
 
                 self.postMessage({
                     'task': 'align',
@@ -3884,10 +3876,10 @@ self.addEventListener('message', function(e) {
         case 'synteny':
             //  var gg = e.data.graph;
 
-            var sizeOfProblem = e.data.sbS.length * e.data.sbT.length;
+            sizeOfProblem = e.data.sbS.length * e.data.sbT.length;
             var thresh = 1;
 
-            var res = sharedKmers(e,countProgMostFreqWithStages);
+            res = sharedKmers(e,countProgMostFreqWithStages);
 
             self.postMessage({'task': 'synteny','msgType' : 'result', 'txtStuff' : res});
 

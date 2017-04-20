@@ -33,7 +33,7 @@ var sbReturned = null; //returned from background
 
 
 var pamScoringMatrix = null;
-var bloScoringMatrix = null;
+//var bloScoringMatrix = null;
 
 var loadedMiscPar1 = ''; //used for execute misc for loading from server
 var loadedMiscPar2 = ''; //used for execute misc for loading from server
@@ -63,9 +63,14 @@ var pGraphView = null;
 
 initialisePage();
 testStuff();
-
-var w = new Worker('js/worker.js');
-setUpWorkerListeners();
+var w;
+try {
+    w = new Worker('js/worker.js');
+    setUpWorkerListeners();
+}
+catch(e) {
+    console.log('Failed to construct worker. Background processes will be unavailable.\nError name: ' + e.name + '\nError message: ' + e.message);
+}
 
 
 function testStuff() {
@@ -3746,10 +3751,10 @@ function executeMisc(e) {
 
             bpGraph.initGraph();
             
-            var numBlocks = bpGraph.numBlocks();
-            var numCycles = bpGraph.numCycles();
+            bpGraph.numBlocks();
+            numCycles = bpGraph.numCycles();
 
-            var twoBreakDist  =  bpGraph.twoBreakDistance();
+            bpGraph.twoBreakDistance();
 
            // bpGraph.graphToGenome('red');
 
@@ -3981,7 +3986,7 @@ function executeMisc(e) {
 
             anchorsList.forEach(function(anch,i) {
                 var st = anch['end1'];
-                var lim = st + maxDist;
+                //var lim = st + maxDist;
                 for (var j = i+1;j < anchorsList.length;++j) {
                     var comp = anchorsList[j];
 
@@ -4039,7 +4044,7 @@ function executeMisc(e) {
                         gr.connectNodesUndirected(gr.nodes[anch['id']], gr.nodes[comp['id']]);
 
 
-                        var k = 0;
+                       // var k = 0;
                     }
                 }
 
@@ -4314,7 +4319,7 @@ function executeMisc(e) {
                 validDict[el] = {'ind':i,'numRem':valid.length - i - 1}; //excludes last element, as this is put in first
             });
 
-            var finished = false;
+            //var finished = false;
 
             var candidates = [];
             ind = 0;
@@ -4516,7 +4521,7 @@ function executeMisc(e) {
 
             builder = new DGraphUltraTreeFromDistBuilder(mat);
 
-            var minD = builder.minDistInMatrix(builder.matrix);
+            builder.minDistInMatrix(builder.matrix);
 
             gr = new DBTreeGraph(builder);
 
@@ -4545,7 +4550,7 @@ function executeMisc(e) {
 
             gr = new DBTreeGraph(builder);
 
-            var central = gr.centralNode();
+            gr.centralNode();
 
             //var copiedGr = gr.copyGraph();
 
@@ -4801,7 +4806,7 @@ function executeMisc(e) {
                 });
 
                 var uniqueDict = {};
-                var trio = [];
+                var trio;
                 for (var i = 0;i < ar.length;++i) {
                     for (j = i+1; j < ar.length; ++j) {
                         if ((ar[i] + ar[j]) in uniqueDict) {
@@ -4832,7 +4837,7 @@ function executeMisc(e) {
                 }
                 trios.push(trio);
 
-                var bb = 1;
+                //var bb = 1;
 
 
             });
@@ -5212,7 +5217,7 @@ function executeMisc(e) {
                 }
                 if (foundNonVisited) {
                     nd = gr.nodes[i];
-                    var conn = gr.getConnected(nd);
+                    gr.getConnected(nd);
                 }
                 else {
                     done = true;
@@ -5420,7 +5425,7 @@ function executeMisc(e) {
 
             nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
 
-            var edge;
+            var edge = null;
 
             nd.edges.forEach(function(el) {
 
@@ -5453,11 +5458,11 @@ function executeMisc(e) {
             
 
             var fromOneLab = neighb[edgeNum][0].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][0].targetNode.label : neighb[edgeNum][0].sourceNode.label;
-            var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
+            //var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
 
 
             var toOneLab = neighb[otherEdgeNum][0].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][0].targetNode.label : neighb[otherEdgeNum][0].sourceNode.label;
-            var toTwoLab = neighb[otherEdgeNum][1].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][1].targetNode.label : neighb[otherEdgeNum][1].sourceNode.label;
+            //var toTwoLab = neighb[otherEdgeNum][1].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][1].targetNode.label : neighb[otherEdgeNum][1].sourceNode.label;
 
 var fromSwapper = 1;
 //if ( parseInt(fromOneLab) > parseInt(fromTwoLab) ) {
@@ -5818,7 +5823,7 @@ case '81': //Spectral Alignment
 		  
 		  rows = pepWeight + 1;
 		  cols = vecAr.length + 1;
-		  var lays = k + 1;
+		  //var lays = k + 1;
 		  
 		  builder = new DGraphGridFromSpecAlignBuilder([pep,vecAr,k]);
 		  
@@ -5841,7 +5846,7 @@ case '81': //Spectral Alignment
 
             //check graph is acyclic
 
-            var params = par1El.value.split('\n');
+            params = par1El.value.split('\n');
 
             k = parseInt(params.shift());
 
@@ -5890,7 +5895,7 @@ case '81': //Spectral Alignment
 
                 var gr = new DBGraph(builder);
 
-                var done = false;
+                var done;
 
                 gr.resetNodesVisited();
 
@@ -6318,7 +6323,7 @@ function runSBBackground(e) {
 
         case 'sbSharedKmers':
 
-            var g;
+            //var g;
 
             sbReturned = {};
             sbReturned.inProgress = true;
@@ -6365,7 +6370,7 @@ function runAlignBackground(e) {
         case 'alignOverlap':
             
 
-            var g;
+            //var g;
 
             alignReturned = {};
             alignReturned.inProgress = true;
@@ -6486,8 +6491,8 @@ function runAlign(e) {
 
             var alignData = g.alignStrings();
             var longest = alignData[0];
-            var sStr = alignData[1];
-            var tStr = alignData[2];
+           // var sStr = alignData[1];
+           // var tStr = alignData[2];
             var lcsStr = alignData[3];
 
             alignGraph = g;
@@ -6781,6 +6786,9 @@ function greedyMotif(e) {
 
 function randomMotif(e) {
 
+    if (e) {
+
+    }
     initialiseResults();
 
     var paramObj = initialiseMotifParams();
@@ -6798,6 +6806,10 @@ function randomMotif(e) {
 
 function gibbsSampler(e) {
 
+    if (e) {
+
+    }
+
     initialiseResults();
 
     var paramObj = initialiseMotifParams();
@@ -6814,6 +6826,10 @@ function gibbsSampler(e) {
 }
 
 function bruteMotifSearch(e) {
+
+    if (e) {
+
+    }
 
     initialiseResults();
 
@@ -6974,7 +6990,7 @@ function initialiseAlignParams() {
 
     paramObj.alignRadioMethodSel = getSelectedRadioEl('alignMethod');
 
-    var scoreMat;
+    //var scoreMat;
     paramObj.scoreMatRadioSel = getSelectedRadioEl('alignScore');
     switch (paramObj.scoreMatRadioSel.id) {
         case 'alignPamScore':
@@ -7350,6 +7366,10 @@ function readsToMfk(grph) {
 
 function runSequencingBackground(e) {
 
+    if (e) {
+
+    }
+
     initialiseResults();
 
     var paramObj = initialiseSequencingParams();
@@ -7370,7 +7390,7 @@ function runSequencingBackground(e) {
 
     var reads, input;
 
-    var grph;
+    //var grph;
 
     var k;
 
@@ -7461,6 +7481,10 @@ function runSequencingBackground(e) {
 }
 
 function runSequencing(e) {
+
+    if (e) {
+
+    }
 
    // sequencingInput();
 
@@ -7644,6 +7668,11 @@ function runSequencing(e) {
 }
 
 function displayPeptideSeqGraph(g,debug) {
+
+    if (debug) {
+
+    }
+
     var canv = document.getElementById('peptideCanvas');
     var parent = document.getElementById('peptideGraphDiv');
     canv.width = parent.clientWidth * 2;
@@ -7689,8 +7718,8 @@ function displayPhylogenyGraph(g,debug) {
         //  document.getElementById('graphGraphDiv').style.height = '400px';
 
 
-        var ssss = g.nodes[0].getSuccessors();
-        var pppp = g.nodes[0].getPredecessors();
+        g.nodes[0].getSuccessors();
+        g.nodes[0].getPredecessors();
         // g.addRoot(g.nodes[4].getSuccessors()[0]);
 
         // var tmp = g.nodes[2].getSuccessors()[2].neighbouringEdges();
@@ -7741,6 +7770,10 @@ function displayPhylogenyGraph(g,debug) {
 
 function stepPhylogeny(e) {
 
+    if (e) {
+
+    }
+
     if (phylGraphMaster) {
         var parsScoreThisStep = phylGraphMaster.builder.progress[paramObj.phylStepNum].smallParsimony();
         var thisStep = paramObj.phylStepNum + 1;
@@ -7766,6 +7799,10 @@ function stepPhylogeny(e) {
 }
 
 function runPhylogeny(e) {
+
+    if (e) {
+
+    }
 
     // sequencingInput();
 
@@ -7853,7 +7890,7 @@ function runPhylogeny(e) {
 
                 }
                 else if (inType == 3) { //alignments
-                    var builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                    builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
                     if (builder.isAdditive) {
                         g = new DBTreeGraph(builder);
                     }
@@ -7869,14 +7906,14 @@ function runPhylogeny(e) {
             //      break;
                 case 'phylUltra':
                     if (inType == 2) { //dist mat
-                        var builder = new DGraphUltraTreeFromDistBuilder(dnaMasterStrings);
+                        builder = new DGraphUltraTreeFromDistBuilder(dnaMasterStrings);
 
                         g = new DBTreeGraph(builder);
                         break;
 
                     }
                     else if (inType == 3) { //alignments
-                        var builder = new DGraphUltraTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                        builder = new DGraphUltraTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
                         g = new DBTreeGraph(builder);
                         break;
 
@@ -7887,13 +7924,13 @@ function runPhylogeny(e) {
             case 'phylNeighbour':
                 if (inType == 2) { //dist mat
 
-                    var builder = new DGraphTreeNJFromDistBuilder(dnaMasterStrings);
+                    builder = new DGraphTreeNJFromDistBuilder(dnaMasterStrings);
                     g = new DBTreeGraph(builder, 'This is a neighbour join  graph built from mat');
                     break;
 
                 }
                 else if (inType == 3) { //alignments
-                    var builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                    builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
                     g = new DBTreeGraph(builder);
                     break;
 
@@ -7904,10 +7941,10 @@ function runPhylogeny(e) {
 
             case 'phylLargeParsimony':
 
-                var builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
+                builder = new DGraphTreeNJFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(dnaMasterStrings));
                 g = new DBTreeGraph(builder);
 
-                var parsimonyScore = g.largeParsimony(true);
+                parsimonyScore = g.largeParsimony(true);
                 if (debug) {
                     document.getElementById('debugText').value +='Parsimony score: '  + parsimonyScore + '\n';
                 }
@@ -8305,7 +8342,7 @@ function removeDups(e) {
         return;
     }
 
-    var outArr = [];
+    //var outArr = [];
     var strArr =  dnaMasterStrings.split('\n');
     strArr.sort();
     var prev = '';
@@ -8332,6 +8369,10 @@ function removeDups(e) {
 
 
 function runTrans(e) {
+
+    if (e) {
+
+    }
 
     transInput();
 
@@ -8395,7 +8436,9 @@ function runTrans(e) {
 
 function runPeptide(e) {
 
+    if (e) {
 
+    }
 
     peptideInput();
 
@@ -8431,7 +8474,7 @@ function runPeptide(e) {
             break;
         case Peptide.PepMethodSequenceBrute:
 
-        var res = cyclopeptideSequencing(spectrumMaster,false,null,paramObj.prefixSuffixOnly);
+        cyclopeptideSequencing(spectrumMaster,false,null,paramObj.prefixSuffixOnly);
         w.postMessage({
             'task': 'seqCyclopeptide',
             'spectrum': spectrumMaster,
@@ -8500,7 +8543,7 @@ function runPeptide(e) {
 				//var tst = pep.toPeptideVector();
 				var spec = pep.linearSpectrum(paramObj.prefixSuffixOnly);
 				var specStr = arrayToString(spec);
-				specs.push([protStr,specStr,specStr == spectrumMaster ? true : false]);
+				specs.push([protStr,specStr,specStr == spectrumMaster]);
                 if (specStr == spectrumMaster) {
                     gr.resetFreshNodesAndEdges();
                     var pth = paths[i];
@@ -8514,7 +8557,7 @@ function runPeptide(e) {
 			
 			
 		       if (document.getElementById('debugPS').checked) {
-                var resStr = '';
+                resStr = '';
                 resStr += '\nDebug pressed';
                 resStr += '\nSpectrum Graph processing';
 				
@@ -8566,14 +8609,14 @@ function runPeptide(e) {
 
 		case Peptide.PepMethodSequenceGraphVector:
 		
-            var builder = new DGraphFromSpectralVectorBuilder(spectrumMaster);
+            builder = new DGraphFromSpectralVectorBuilder(spectrumMaster);
       
-            var gr = new DBGraph(builder);
+            gr = new DBGraph(builder);
 			
 			var ret = gr.longestPathNodeWeighted();
 			
 			if (document.getElementById('debugPS').checked) {
-                var resStr = '';
+                resStr = '';
                 resStr += 'Debug pressed';
                 resStr += '\nSpectral Vector Graph processing:\n';
 				resStr += ret[0]; //protein
@@ -8583,6 +8626,16 @@ function runPeptide(e) {
 			
 			
 			document.getElementById('debugText').value = resStr;
+
+            if (gr) {
+                /*
+                 var canv = document.getElementById('peptideCanvas');
+                 initGraphCanvas(null,null,canv);
+                 graphCanvas(gr);
+                 */
+
+                displayPeptideSeqGraph(gr,document.getElementById('debugPS').checked);
+            }
 			
 			
 			break;
@@ -9669,12 +9722,12 @@ function colourAlignFromBackground() {
 
             var diff = unalignedSStart.length - unalignedTStart.length;
             if (diff > 0) {
-                for (var i = 0; i < diff; ++i) {
+                for (i = 0; i < diff; ++i) {
                     unalignedTStart = '&nbsp;' + unalignedTStart;
                 }
             }
             else if (diff < 0) {
-                for (var i = 0; i > diff; --i) {
+                for (i = 0; i > diff; --i) {
                     unalignedSStart = '&nbsp;' + unalignedSStart;
                 }
             }
@@ -9760,7 +9813,7 @@ function colourSBFromBackground() {
         sFormatted = sbS;
     }
     if (sbT.length > displayLim) {
-        var extra = sbT.length - displayLim;
+        extra = sbT.length - displayLim;
         tFormatted = sbT.substring(0,displayLim) + ' [... + ' + extra + ' more]';
     }
     else {
@@ -9838,7 +9891,7 @@ function colourAlign() {
     else {
         var sFormatted = '';
         var tFormatted = '';
-        for (var i = 0;i < alignGraph.sAligned.length;++i) {
+        for (i = 0;i < alignGraph.sAligned.length;++i) {
 
             if (alignGraph.sAligned.substring(i,i+1) === alignGraph.tAligned.substring(i,i+1)) {
                 sFormatted += '<b>' + alignGraph.sAligned.substring(i,i+1) + '</b>';
@@ -9868,7 +9921,7 @@ function colourAlign() {
 
 
 
-        for (var i = 0;i < alignGraph.rows + 1;++i) {
+        for (i = 0;i < alignGraph.rows + 1;++i) {
 
             for (var j = 0;j < alignGraph.cols + 1; ++j) {
                 if ((i == 0) && (j == 0)) {
@@ -11225,7 +11278,7 @@ function graphChanged(grph) {
         }
         else {
             recon =  grph.edgePathReconstructed();
-            var reconShort;
+
             if (recon.length > 300) {
                 reconShort = recon.substring(0,150) + '...' + recon.substring(recon.length-150);
             }
@@ -12017,14 +12070,14 @@ function sequencingInput(e,input) {
 
             }
             else if (val == 'seqPairedReads') {
-                var strArray = dnaMasterStrings.split('\n');
-                var splStrArray = strArray.map(function(el) {
+                strArray = dnaMasterStrings.split('\n');
+                splStrArray = strArray.map(function(el) {
                     var spl =  el.split('|');
                     spl[0] = squishString(spl[0],30);
                     spl[1] = squishString(spl[1],30);
                     return spl;
                 });
-                var more = strArray.length - 1;
+                more = strArray.length - 1;
                 if (strArray.length > 20) {
                     var filtered = splStrArray[0];
                     document.getElementById('graphReadsDiv').innerHTML = 'Reads: ' + '(' + filtered[0] + '|' + filtered[1] + ')' + ' + ' + more + ' more ';
@@ -12161,7 +12214,7 @@ function peptideInput(e,input) {
     }
 
     //auto detect contents
-    var xqd = 1;
+    //var xqd = 1;
     var detectedInput = autoDetectContents(source,'peptideInput');
     switch (detectedInput) {
         case DGraph.fromProtein:

@@ -6,7 +6,7 @@
 //Bioinformatics routines
 
 var c_Bases = ['A','C','G','T'];
-var c_Bases = ['A','C','G','T'];
+//var c_Bases = ['A','C','G','T'];
 var c_NumBases = 4;
 var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
@@ -40,12 +40,13 @@ function DGEdge(sourceNode,targetNode,edgeType) {
 
 DGEdge.prototype.edgeLabel = function() {
     return this.sourceNode.label + '->' + this.targetNode.label;
-}
+};
 
 DGEdge.prototype.setWeight = function(w) {
     this.edgeWeight = w;
-}
+};
 
+/*
 function DGFancyEdge(sNode,tNode,fLab) {
     DGEdge.apply(this,[sNode,tNode]);
     this.fancylab = fLab;
@@ -54,6 +55,7 @@ function DGFancyEdge(sNode,tNode,fLab) {
         return this.sourceNode.label + '->' + this.targetNode.label +  ' fancy: ' + this.fancylab;
     }
 }
+*/
 
 function DGNode(label,repeatNum) {
     this.label = label;
@@ -206,7 +208,7 @@ function DNode(dna,repeatNum) {
                 }
             }
             if (len < 1) {
-                done == true;
+                done = true;
             }
 
         }
@@ -243,7 +245,7 @@ function DNode(dna,repeatNum) {
                 }
             }
             if (len < 1) {
-                done == true;
+                done = true;
             }
 
         }
@@ -392,7 +394,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
                 curRowPointers.push('v');
             }
 
-            for (var c = 1; c < this.cols; ++c) {
+            for (c = 1; c < this.cols; ++c) {
 
 
                 if (this.scoreMat) {
@@ -742,8 +744,9 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
         this.midEdge = topG.longestEdgeToThisNode;
 
 
-        var topOrderMidPlusOneNode = topG.getTopOrder(mid,bestInd);
-        var midNode,midEdgeAction,midNodeRowCol;
+        //var topOrderMidPlusOneNode = topG.getTopOrder(mid,bestInd);
+        topG.getTopOrder(mid,bestInd);
+        var midEdgeAction,midNodeRowCol;
        // if (topG.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode) {
         if (topPointers[bestInd] != '*') {
             /*
@@ -820,7 +823,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
         this.bestBotScore = bestNodeBotScore;
 
         var topOrderMidPlusOneNode = topG.getTopOrder(mid,bestInd);
-        var midNode,midEdgeAction,midNodeRowCol;
+        var midEdgeAction,midNodeRowCol;
         if (topG.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode) {
             this.midNode = topG.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode.sourceNode;
             this.midEdge = topG.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode;
@@ -875,7 +878,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
         this.bestBotScore = bestNodeBotScore;
         
         var topOrderMidPlusOneNode = this.getTopOrder(this.rows -1,bestInd);
-        var midNode,midEdgeAction,midNodeRowCol;
+        var midEdgeAction,midNodeRowCol;
         if (this.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode) {
             this.midNode = this.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode.sourceNode;
             this.midEdge = this.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode;
@@ -1033,8 +1036,8 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
 
                             var predMiddle = this.getNodeTopOrder(i - 1, j, this.LevelMiddle);
                             matches = this.findNodes('' + predMiddle);
-                            var pred = matches[0];
-                            var ed = new DGEdge(pred, node);
+                            pred = matches[0];
+                            ed = new DGEdge(pred, node);
                             this.setEdgeActionAndWeight(i, j, ed, 'Ov');
                             //pred.successors.push(ed);
                             node.predecessors.push(ed);
@@ -1050,15 +1053,15 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
                         else {
                             var predLeft = this.getNodeTopOrder(i, j - 1, lev);
                             matches = this.findNodes('' + predLeft);
-                            var pred = matches[0];
-                            var ed = new DGEdge(pred, node);
+                            pred = matches[0];
+                            ed = new DGEdge(pred, node);
                             this.setEdgeActionAndWeight(i, j, ed, '>');
                             node.predecessors.push(ed);
 
                             var predMiddle = this.getNodeTopOrder(i, j - 1, this.LevelMiddle);
                             matches = this.findNodes('' + predMiddle);
-                            var pred = matches[0];
-                            var ed = new DGEdge(pred, node);
+                            pred = matches[0];
+                            ed = new DGEdge(pred, node);
                             this.setEdgeActionAndWeight(i, j, ed, 'O>');
                             //pred.successors.push(ed);
                             node.predecessors.push(ed);
@@ -1083,15 +1086,15 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
 
                         var predBottom = this.getNodeTopOrder(i, j, this.LevelBottom);
                         matches = this.findNodes('' + predBottom);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, ed, 'C');
                         node.predecessors.push(ed);
 
                         var predTop = this.getNodeTopOrder(i, j, this.LevelTop);
                         matches = this.findNodes('' + predTop);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, ed, 'C');
                         node.predecessors.push(ed);
 
@@ -1109,7 +1112,7 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
 
     }
 
-};
+}
 
 function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore) {
     var args = [s,t,alignType,scoreMat,indelPen,mismatchPen,matchScore];
@@ -1243,8 +1246,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predST = this.getNodeTopOrder(i - 1, j - 1, lev);
                         matches = this.findNodes('' + predST);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, 'MM-');
                         node.predecessors.push(ed);
 
@@ -1256,8 +1259,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predTU = this.getNodeTopOrder(i - 1, j, lev - 1);
                         matches = this.findNodes('' + predTU);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, '-MM');
                         node.predecessors.push(ed);
 
@@ -1269,8 +1272,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predSU = this.getNodeTopOrder(i, j - 1, lev - 1);
                         matches = this.findNodes('' + predSU);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, 'M-M');
                         node.predecessors.push(ed);
 
@@ -1282,8 +1285,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predT = this.getNodeTopOrder(i - 1, j, lev);
                         matches = this.findNodes('' + predT);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, '-M-');
                         node.predecessors.push(ed);
 
@@ -1295,8 +1298,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predS = this.getNodeTopOrder(i, j - 1, lev);
                         matches = this.findNodes('' + predS);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, 'M--');
                         node.predecessors.push(ed);
 
@@ -1308,8 +1311,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     else {
                         var predU = this.getNodeTopOrder(i, j, lev - 1);
                         matches = this.findNodes('' + predU);
-                        var pred = matches[0];
-                        var ed = new DGEdge(pred, node);
+                        pred = matches[0];
+                        ed = new DGEdge(pred, node);
                         this.setEdgeActionAndWeight(i, j, lev, ed, '--M');
                         node.predecessors.push(ed);
 
@@ -1324,7 +1327,7 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
 
 
 
-    }
+    };
     
     this.alignStrings = function() {
         /*
@@ -1384,7 +1387,7 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
         var uStr = '';
         var lcsStr = '';
         //edges.forEach(function(edge) {
-        for (var i = edges.length - 1;i >=0;--i) {
+        for (i = edges.length - 1;i >=0;--i) {
             var edge = edges[i];
             sStr += edge.edgeAction.substring(0,1);
             tStr += edge.edgeAction.substring(1,2);
@@ -1411,7 +1414,7 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
 
     }
 
-};
+}
 
 
 function DGAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScore) {
@@ -1642,7 +1645,7 @@ this.setEdgeActionAndWeight = function(row,col,ed,act) {
         var tStr = '';
         var lcsStr = '';
         //edges.forEach(function(edge) {
-        for (var i = edges.length - 1;i >=0;--i) {
+        for (i = edges.length - 1;i >=0;--i) {
             var edge = edges[i];
             sStr += edge.edgeAction.substring(0,1);
             tStr += edge.edgeAction.substring(1,2);
@@ -1659,7 +1662,7 @@ this.setEdgeActionAndWeight = function(row,col,ed,act) {
         var sExt = '-' + this.s;
         var tExt = '-' + this.t;
 
-        for (var i = 0;i < this.rows + 1;++i) {
+        for (i = 0;i < this.rows + 1;++i) {
 
             for (var j = 0;j < this.cols + 1; ++j) {
                 if ((i == 0) && (j == 0)) {
@@ -1947,7 +1950,7 @@ function DGGraph(source,sourceType,alignType) {
             var spl = adj.split('->');
             var pref = spl[0];
             var spl2 = spl[1].split(':');
-            var suf = spl2[0];
+            //var suf = spl2[0];
             var weight = spl2[1];
 
             //var weight = spl2[1];
@@ -2165,7 +2168,7 @@ function DGGraph(source,sourceType,alignType) {
             }
         }
         
-    }
+    };
     
     this.longestPathBacktrack = function(sinkLab,sourceLab) {
         
@@ -2209,20 +2212,20 @@ function DGGraph(source,sourceType,alignType) {
                 endPosU = coord[2] - 1; //level
             }
             else {
-                var coord = this.getNodeRowCol(parseInt(curNode.label));
+                coord = this.getNodeRowCol(parseInt(curNode.label));
                 endPosT = coord[0] - 1; //row
                 endPosS = coord[1] - 1; //col
             }
         }
         else  if (this.alignType == DGraph.alignTypeFitting) {
             curNode = this.bestNodeLastRow;
-            var coord = this.getNodeRowCol(parseInt(curNode.label));
+            coord = this.getNodeRowCol(parseInt(curNode.label));
             endPosT = coord[0] - 1; //row
             endPosS = coord[1] - 1; //col
         }
         else if (this.alignType == DGraph.alignTypeOverlap) {
             curNode = this.bestNodeLastCol;
-            var coord = this.getNodeRowCol(parseInt(curNode.label));
+            coord = this.getNodeRowCol(parseInt(curNode.label));
             endPosT = coord[0] - 1; //row
             endPosS = coord[1] -1; //col
         }
@@ -2264,13 +2267,13 @@ function DGGraph(source,sourceType,alignType) {
           || (this.alignType == DGraph.alignTypeOverlap) ){
             
             if (this.u.length > 0 ) {
-                var coord = this.getNodeRowColLevel(parseInt(curNode.label));
+                coord = this.getNodeRowColLevel(parseInt(curNode.label));
                 startPosS = coord[1]; //col
                 startPosT = coord[0]; //row
                 startPosU = coord[2]; //level
             }
             else {
-                var coord = this.getNodeRowCol(parseInt(curNode.label));
+                coord = this.getNodeRowCol(parseInt(curNode.label));
                 startPosS = coord[1]; //col
                 startPosT = coord[0]; //row
             }
@@ -3644,7 +3647,7 @@ function DBRect(x,y,w,h) {
 
     this.area = function() {
         return this.w * this.h;
-    }
+    };
 
     this.containsPoint = function(pos) {
         //assuming y goes down not up
@@ -3908,6 +3911,7 @@ function DBNodeView(ctx,r,style) {
                 break;
             case DGraph.styleSequencing:
                 nodeTo.startAngleRad = 0;
+                break;
             default:
                 nodeTo.startAngleRad = 0;
                 break;
@@ -3929,7 +3933,7 @@ function DBNodeView(ctx,r,style) {
 
         this.edgeViews.push(edge);
         //nodeTo.edges.push(edge);
-    }
+    };
 
 
     this.setR = function(centrePoint) {
@@ -4018,11 +4022,11 @@ function DBTestSimpleController() {
 
         return nvs;
         
-    }
+    };
 
     this.numNodes = function() {
         return 6;
-    }
+    };
     
     this.nodeViewOrder = function() {
         var pairs = [];
@@ -4058,7 +4062,7 @@ function DBGraphViewController(g,prefStyle) {
 
     this.numNodes = function() {
         return g.numNodes();
-    }
+    };
     
 
     this.nodeViews = function() {
@@ -4092,7 +4096,7 @@ function DBGraphViewController(g,prefStyle) {
         });
         return vNodes;
 
-    }
+    };
 
     /*
     this.nodeViewAtIndex = function(i) {
@@ -4207,7 +4211,7 @@ function DBGraphViewController(g,prefStyle) {
 
         return nodePairs;
 
-    }
+    };
 
     this.preferredStyle = function() {
 
@@ -4640,11 +4644,11 @@ function DBEdge(sourceNode,targetNode,w,dirFlag) {
     this.edgeLabel = function () {
         var joiner = this.directedEdge ? '->' : '<->';
         return this.sourceNode.label + joiner + this.targetNode.label;
-    }
+    };
 
     this.setWeight = function (w) {
         this.edgeWeight = w;
-    }
+    };
 
     this.setDirected = function (dirFlag,realignedTarg) {
         this.directedEdge = dirFlag;
@@ -4659,7 +4663,7 @@ function DBEdge(sourceNode,targetNode,w,dirFlag) {
                 this.realigned = true;
             }
         }
-    }
+    };
 
 
     this.isDirected = function () {
@@ -4682,7 +4686,7 @@ function DBEdge(sourceNode,targetNode,w,dirFlag) {
          */
         return this.directedEdge;
 
-    }
+    };
 
     this.getTargetNode = function(nodeStart) {
         //get target from viewpoint of start node - for undirected edges, could be "backward"
@@ -4694,7 +4698,7 @@ function DBEdge(sourceNode,targetNode,w,dirFlag) {
             return (nodeStart === this.sourceNode) ? this.targetNode : this.sourceNode;
         }
 
-    }
+    };
 
     this.getSourceNode = function(nodeEnd) {
         //get source from viewpoint of end node - for undirected edges, could be "backward"
@@ -4721,7 +4725,7 @@ function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
         }
         
         return false;
-    }
+    };
     
     this.isInternalEdge = function() {
         if  (sourceNode.isLeaf() || targetNode.isLeaf())  {
@@ -4729,7 +4733,7 @@ function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
             
         }
         return true;
-    }
+    };
 
     this.neighbouringEdges = function() {
         //return neighbouring edges
@@ -5014,14 +5018,14 @@ function DBNode(label) { //basic node
         }
         return false;
 
-    }
+    };
 
     this.connectsBothWaysTo = function (node2) {
         if (this.connectsTo(node2) && node2.connectsTo(this)) {
             return true;
         }
         return false;
-    }
+    };
     
     
     this.removeEdge = function(ed) {
@@ -5319,8 +5323,8 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
             }
         }
 
-        for (var i = node2.edges.length - 1;i >= 0;--i) {
-            var ed = node2.edges[i];
+        for (i = node2.edges.length - 1;i >= 0;--i) {
+            ed = node2.edges[i];
             if ((ed.getTargetNode(node2) === node1) ){
                 node2.edges.splice(i,1);
             }
@@ -5469,7 +5473,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
         var newNode = this.addNode(this.internalNodePrefix + nodeNum);
 
         return newNode;
-    }
+    };
     
     this.addNode = function(lab) {
       //  var node = new DBNode(lab);
@@ -5615,7 +5619,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
 
 
 
-    }
+    };
 
     this.saveProgress = function(freshNodes,freshEdges) {
 
@@ -5957,9 +5961,9 @@ function DGraphGridFromSpecAlignBuilder(source) {
 
         }
 
-        for (var l = 0;l < this.lays;++l) {
-            for (var r = 0; r < this.rows - 1; ++r) {
-                for (var c = 0; c < this.cols - 1; ++c) {
+        for (l = 0;l < this.lays;++l) {
+            for (r = 0; r < this.rows - 1; ++r) {
+                for (c = 0; c < this.cols - 1; ++c) {
                     if ((l == 2) && (r == 5) && (c == 516)) {
                         var ghs = 1;
                     }
@@ -6263,7 +6267,7 @@ function DGraphUltraTreeFromDistBuilder(source) {
             return row;
         });
         var clusters = {};
-        var svdThis = this;
+        svdThis = this;
         mat.forEach(function(el,i) {
            clusters[svdThis.leafLabels[i].split(';')[0]] = [i];
         });
@@ -6596,7 +6600,7 @@ function DGraphUltraTreeFromDistBuilder(source) {
          }
          return min;
 
-     }
+     };
 
      //this.parseSource();
 
@@ -6901,7 +6905,7 @@ function DBGraph(builder,comments) {
             });
             
         });
-    }
+    };
     
     this.getNodeFromLabel = function(lab) {
 
@@ -7187,7 +7191,7 @@ function DBGraph(builder,comments) {
         }
 
 
-    }
+    };
 
     this.deleteNode = function(node) {
         var svdThis = this;
@@ -7273,7 +7277,7 @@ function DBGraph(builder,comments) {
 		var sinkNodeNum = parseInt(sinkNode.label.split(':')[0]);
 		
 		for (var i = currNodeNum+1;i <= sinkNodeNum;++i) {
-			var currNode = this.nodes[i];
+			currNode = this.nodes[i];
 			var predNodes = currNode.getPredecessors();
 			var bestPred = DGraph.infinity * -1;
 			var bestNum = -1;
@@ -7345,7 +7349,7 @@ function DBGraph(builder,comments) {
 		 
 		 while (!done) {
 			 var newPaths = [];
-			 var done = true;
+			 done = true;
 			 
 			 paths.forEach(function(path) {
 				if (path[path.length-1].targetNode == svdThis.getSinkNode()) {
@@ -7409,7 +7413,7 @@ function DBTreeGraph(builder,comments) {
     this.internalEdges = function() {
         var iEdges = [];
         var svdThis = this;
-        var iEdges = this.edgeList().filter(function(ed) {
+        iEdges = this.edgeList().filter(function(ed) {
             if ( (ed.sourceNode.isLeaf(svdThis.checkDirected())
                     || (ed.targetNode.isLeaf(svdThis.checkDirected())))) {
                 return false;
@@ -7776,7 +7780,7 @@ function DBTreeGraph(builder,comments) {
         
         //do parsimony here
 
-        var svdThis = this;
+        svdThis = this;
 
 
         seqLength = this.prepareSmallParsimony(rooted,useAminos);
@@ -7923,7 +7927,7 @@ function DBTreeGraph(builder,comments) {
 
         }
 
-    }
+    };
     
     this.distanceMatrixFromTree = function() {
         
@@ -7991,7 +7995,7 @@ function DBGridGraph(builder,comments) {
         sourceNode.bestPathScore = 0;
 
         for (var i = currNodeNum+1;i <= sinkNodeNum;++i) {
-            var currNode = this.builder.findNodeWithOrderNum(i);
+            currNode = this.builder.findNodeWithOrderNum(i);
             var predNodes = currNode.getPredecessors();
             var bestPred = DGraph.infinity * -1;
             var bestNum = -1;
@@ -8044,7 +8048,7 @@ function DBGridGraph(builder,comments) {
         var massAr = [];
 
         var prevNode = null;
-        var currNode = this.builder.findNodeWithOrderNum(currNum);
+        currNode = this.builder.findNodeWithOrderNum(currNum);
         var prevTotMass = currNode.col;
         while ((currNum > sourceNodeNum)) {
             if (currNode.bestPathEdge) {
@@ -8206,14 +8210,14 @@ function DBasicGraph(source,sourceType) {
             node = this.nodes['' + nodeOtherEnd].successors[ind].targetNode;
             var nodeLabNum = Math.ceil(parseInt(node.label) / 2);
             while (nodeLabNum != startNodeLabNum) {
-                var nodeSign = (parseInt(node.label) % 2 == 0) ? '-' : '+';
+                nodeSign = (parseInt(node.label) % 2 == 0) ? '-' : '+';
                 genStr += ' ' + nodeSign + nodeLabNum;
-                var nodeOtherEnd = nodeSign == '-' ? parseInt(node.label) - 1 : parseInt(node.label) + 1;
+                nodeOtherEnd = nodeSign == '-' ? parseInt(node.label) - 1 : parseInt(node.label) + 1;
                 node.visited = true;
                 this.nodes['' + nodeOtherEnd].visited = true;
 
                 node = this.nodes['' + nodeOtherEnd].successors[ind].targetNode;
-                var nodeLabNum = Math.ceil(parseInt(node.label) / 2);
+                nodeLabNum = Math.ceil(parseInt(node.label) / 2);
             }
             genStr+=')';
 
@@ -9786,7 +9790,7 @@ function Aligner(p,t,m) {
 
         goodSuffs[p.length] = 0; //empty
 
-        for (var i = p.length-1;i >= 0;--i) {
+        for (i = p.length-1;i >= 0;--i) {
             var suff = p.substring(i,p.length);
             var latestMatch = -1;
             for (var j = 0;j < p.length - suff.length;++j) {
@@ -10407,12 +10411,12 @@ function Aligner(p,t,m) {
             return [highestScore,res];
         }
         else if (localFlag) {
-            var highestScore = -99999;
-            var highestCol = -99999;
+            highestScore = -99999;
+            highestCol = -99999;
             var highestRow = -99999;
             var highestPosns = [];
             for (var r = 0;r < this.p.length + 1;++r) {
-                for (var c = 0; c < this.t.length + 1; ++c) {
+                for (c = 0; c < this.t.length + 1; ++c) {
                     if (this.scoreMatrix[r][c] > highestScore) {
                         highestScore = this.scoreMatrix[r][c];
                         highestPosns = [[r,c]];
@@ -10422,8 +10426,8 @@ function Aligner(p,t,m) {
                     }
                 }
             }
-            var res = [];
-            var svdThis = this;
+            res = [];
+            svdThis = this;
             highestPosns.forEach(function(highestPos) {
                 res.push(svdThis.backtrack(highestPos[0], highestPos[1],localFlag,type));
             });
@@ -10434,7 +10438,7 @@ function Aligner(p,t,m) {
 
         }
         else {
-            var res = this.backtrack(this.p.length, this.t.length,localFlag,type);
+            res = this.backtrack(this.p.length, this.t.length,localFlag,type);
             return [this.scoreMatrix[this.p.length][this.t.length], res[0], res[1],res[2]];
 
         }
@@ -10482,7 +10486,7 @@ function Aligner(p,t,m) {
                   highestCols.push(c);
               }
           }
-          var res = [];
+          res = [];
           var svdThis = this;
           highestCols.forEach(function(highestCol) {
               res.push(svdThis.backtrack(svdThis.p.length, highestCol,localFlag));
@@ -12001,7 +12005,7 @@ function numBreakpointsGenome(g) {
     var newG = g.map(function(el) {
         return el;
     });
-    var top = newG.length + 1
+    var top = newG.length + 1;
     newG.push("+" + top);
     newG.unshift("+0");
 
@@ -12035,11 +12039,11 @@ function reverseGenome(g,st,end) {
         gRev.push(g[i]);
 
     }
-    for (var i = end;i >=st;--i) {
+    for (i = end;i >=st;--i) {
         var signRev = g[i][0] == '+' ? '-' : '+';
         gRev.push(signRev + g[i].substring(1));
     }
-    for (var i = end+1;i < g.length;++i) {
+    for (i = end+1;i < g.length;++i) {
         gRev.push(g[i]);
     }
     return gRev;
@@ -12082,7 +12086,7 @@ function greedyReversal(genome) {
         }
         else {
             var actualPos = findInGenome(genome,pos + 1,pos+1);
-            var genomeNew = reverseGenome(genome,pos,actualPos);
+            genomeNew = reverseGenome(genome,pos,actualPos);
             steps.push(genomeNew);
             genome = genomeNew.map(function(el) {
                 return el;
@@ -12092,7 +12096,7 @@ function greedyReversal(genome) {
                 //correct sign already
             }
             else {
-                var genomeNew = genome.map(function(el) {
+                genomeNew = genome.map(function(el) {
                     return el;
                 });
                 genomeNew[pos] = genomeNew[pos].replace('-','+');
@@ -12110,7 +12114,7 @@ function greedyReversal(genome) {
         //correct sign already
     }
     else {
-        var genomeNew = genome.map(function(el) {
+        genomeNew = genome.map(function(el) {
             return el;
         });
         genomeNew[genomeNew.length - 1] = genomeNew[genomeNew.length - 1].replace('-','+');
@@ -12178,8 +12182,8 @@ function partSharedKmers(k,tOffset,tNumToProcess,s,t,progressCallback) {
         }
         else {
             if (kmerRev in tDict) {
-                for (var j = 0;j < tDict[kmerRev].length;++j) {
-                    var el = tDict[kmerRev][j];
+                for (j = 0;j < tDict[kmerRev].length;++j) {
+                    el = tDict[kmerRev][j];
                     //  tDict[kmerRev].forEach(function (el) {
                     //sharedAr.push('(' + i + ', ' + el + ')');
                     sharedAr.push([i,el,'C:B']);
@@ -12423,7 +12427,7 @@ function lowestCoins(amt,coins) {
                 });
                 lowArr.push(bestCand);
             }
-            ;
+            
 
         }
 
@@ -12432,7 +12436,7 @@ function lowestCoins(amt,coins) {
 
     return lowArr[lowArr.length - 1];
 
-    var lowest = coins.reduce(function (a, b) {
+    lowest = coins.reduce(function (a, b) {
         return a < b ? a : b;
     });
 

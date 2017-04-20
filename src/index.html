@@ -141,10 +141,10 @@
                 <textarea name = "phylogenyStrings" placeholder = "Enter or paste DNA alignments / dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
                 <button type = "button" id="phylogenyInput" onclick="phylogenyInput(event)">Apply</button>
                 <label for="fileSequencingInput">Load Input :</label>
-                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
+                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "filePhylogenyInput">
                 <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
-                <input type = "number"  name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
-                <a href = "" id="downloadSeq" download="contigs.txt" onclick="downloadSeq()">Downl</a>
+                <input type = "number"  name = "numSequencingRand" id = "numPyhlogenyRand"  min=1 max=1000 value=20>
+                <a href = "" id="downloadPhyl" download="contigs.txt" onclick="downloadSeq()">Downl</a>
             </div>
         </div>
 
@@ -569,7 +569,7 @@
                         <input type = "checkbox" class="alignEl" name = "startCodTT"  id = "startCodTT" checked>
                         <label for ="stopCodTT"  class="alignLab" id="stopCodLabTT" >Use Stop Codon</label>
                         <input type = "checkbox" class="alignEl"  name = "stopCodTT" id = "stopCodTT" checked>
-                        <label for ="readFrameTT"  class="alignLab" id="readFrameLabTT" class="alignLab">All Reading Frames</label>
+                        <label for ="readFrameTT"   id="readFrameLabTT" class="alignLab">All Reading Frames</label>
                         <input type = "checkbox" class="alignEl" name = "readFrameTT" id = "readFrameTT">
                         <label for ="readFrameOffsetTT"  id="readFrameOffsetLabTT" class="alignLab">Frame offset</label>
                         <input type = "number" class = "sensibleNum alignEl" name = "readFrameOffsetTT" id = "readFrameOffsetTT" min = 0 max = 2 value = 0>
@@ -762,7 +762,7 @@
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugAL" id = "debugAL">
 
                     </div>
-                    <div class="midClump" id="midMotif">
+                    <div class="midClump" >
                         <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLCS" value="alignLCS" checked>LCS
                         <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignEditDist" value="alignEditDist">Edit Distance
                         <br>
@@ -774,7 +774,7 @@
                         <br>
 
                     </div>
-                    <div class="rightClump" id="rightMotif">
+                    <div class="rightClump" >
                         <button type = "button" class="fixedBut" onclick="runAlignBackground(event)">Run</button>
                         <br>
                         <label for ="spaceThreshAL"  id="spaceThreshLab" class="alignLab">Linear Space Thresh</label>
@@ -803,11 +803,11 @@
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugAL" id = "debugSB">
 
                     </div>
-                    <div class="midClump" id="midMotif">
+                    <div class="midClump" >
                         <input type="radio" name="sbMethod"  onclick = "sbRadClicked(event.target.id)" id ="sbSharedKmers" value="sbSharedKmers" checked>Shared k-mers<br>
 
                     </div>
-                    <div class="rightClump" id="rightMotif">
+                    <div class="rightClump" >
                         <button type = "button" class="fixedBut" onclick="runSBBackground(event)">Run</button>
                         <br>
 
@@ -910,7 +910,7 @@
                 <article id="art7">
                     <!--label for kmer>DNA strings:</label-->
                     <textarea name = "miscParam1" contenteditable="true"  placeholder = "Enter  param 1" rows = "6" cols = "14"  id = "miscParam1" ></textarea>
-                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" spellcheck="false" autocomplete = "off"></textarea>
+                    <textarea name = "miscParam2" placeholder = "Enter  param 2" rows = "6" cols = "12"  id = "miscParam2" spellcheck="false" ></textarea>
                     <textarea name = "miscParam3" placeholder = "Enter  param 3" rows = "6" cols = "12"  id = "miscParam3" ></textarea>
                     <div id = "miscRadioBox">
                     <input type="radio" name="miscRadio"  id ="miscFunc1" value="1" checked onclick = "miscRadioClicked(event.target.id)">Rev Comp
@@ -1064,7 +1064,7 @@
             <div id = "rightOne">
 
                 <span id = "rightOneLab">Results Selector</span>
-                <img class = "expCollImg"  id = "expMulti" onclick = "expCollClicked(event.target.id)"src = 'img/vector-expand.jpg'>
+                <img class = "expCollImg"  id = "expMulti" onclick = "expCollClicked(event.target.id)" src = 'img/expand_black.png'>
                 <br>
 
 
