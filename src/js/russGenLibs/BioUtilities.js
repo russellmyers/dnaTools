@@ -352,9 +352,9 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
         var curRowPointers = [];
 
-        var overallBestRowCol = [];
-        var overallBestLastRow = [];
-        var overallBestLastCol = [];
+        //var overallBestRowCol = [];
+        //var overallBestLastRow = [];
+        //var overallBestLastCol = [];
 
         var alType = (fullPartialFlag == 'F') ? DGraph.alignTypeGlobal : this.alignType;
 
@@ -1058,7 +1058,7 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
                             this.setEdgeActionAndWeight(i, j, ed, '>');
                             node.predecessors.push(ed);
 
-                            var predMiddle = this.getNodeTopOrder(i, j - 1, this.LevelMiddle);
+                            predMiddle = this.getNodeTopOrder(i, j - 1, this.LevelMiddle);
                             matches = this.findNodes('' + predMiddle);
                             pred = matches[0];
                             ed = new DGEdge(pred, node);
@@ -1951,7 +1951,7 @@ function DGGraph(source,sourceType,alignType) {
             var pref = spl[0];
             var spl2 = spl[1].split(':');
             //var suf = spl2[0];
-            var weight = spl2[1];
+            //var weight = spl2[1];
 
             //var weight = spl2[1];
 
@@ -1965,7 +1965,7 @@ function DGGraph(source,sourceType,alignType) {
             }
         });
 
-        adjList.forEach(function (adj,i) {
+        adjList.forEach(function (adj) {
 
             var spl = adj.split('->');
             var pref = spl[0];
@@ -2043,7 +2043,7 @@ function DGGraph(source,sourceType,alignType) {
 
 
 
-        var progThreshold = 100;
+        //var progThreshold = 100;
 
         
         for (var i = partStart;i < partEnd;++i) {
@@ -2207,27 +2207,27 @@ function DGGraph(source,sourceType,alignType) {
             curNode = this.bestNode;
             if (this.u.length > 0) {
                 var coord = this.getNodeRowColLevel(parseInt(curNode.label));
-                endPosT = coord[0] - 1; //row
-                endPosS = coord[1] - 1; //col
-                endPosU = coord[2] - 1; //level
+               // endPosT = coord[0] - 1; //row
+               // endPosS = coord[1] - 1; //col
+               // endPosU = coord[2] - 1; //level
             }
             else {
                 coord = this.getNodeRowCol(parseInt(curNode.label));
-                endPosT = coord[0] - 1; //row
-                endPosS = coord[1] - 1; //col
+              //  endPosT = coord[0] - 1; //row
+              //  endPosS = coord[1] - 1; //col
             }
         }
         else  if (this.alignType == DGraph.alignTypeFitting) {
             curNode = this.bestNodeLastRow;
             coord = this.getNodeRowCol(parseInt(curNode.label));
-            endPosT = coord[0] - 1; //row
-            endPosS = coord[1] - 1; //col
+            //endPosT = coord[0] - 1; //row
+            //endPosS = coord[1] - 1; //col
         }
         else if (this.alignType == DGraph.alignTypeOverlap) {
             curNode = this.bestNodeLastCol;
             coord = this.getNodeRowCol(parseInt(curNode.label));
-            endPosT = coord[0] - 1; //row
-            endPosS = coord[1] -1; //col
+           // endPosT = coord[0] - 1; //row
+           // endPosS = coord[1] -1; //col
         }
         else {
             curNode = matches[0]; //sink;
@@ -2268,14 +2268,14 @@ function DGGraph(source,sourceType,alignType) {
             
             if (this.u.length > 0 ) {
                 coord = this.getNodeRowColLevel(parseInt(curNode.label));
-                startPosS = coord[1]; //col
-                startPosT = coord[0]; //row
-                startPosU = coord[2]; //level
+                //startPosS = coord[1]; //col
+                //startPosT = coord[0]; //row
+               // startPosU = coord[2]; //level
             }
             else {
                 coord = this.getNodeRowCol(parseInt(curNode.label));
-                startPosS = coord[1]; //col
-                startPosT = coord[0]; //row
+                //startPosS = coord[1]; //col
+                //startPosT = coord[0]; //row
             }
         }
         
@@ -2533,7 +2533,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
     this.maximalNonBranchingPaths = function() {
 
 
-        var svdThis = this;
+        //var svdThis = this;
 
         var contigs = [];
 
@@ -2561,7 +2561,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
                         }
                         else {
                             cyc.push(curNode);
-                            edgePath.push(new DEdge(curNode,curNode.successors[0].targetNode))
+                            edgePath.push(new DEdge(curNode,curNode.successors[0].targetNode));
                             curNode = curNode.successors[0].targetNode;
 
                         }
@@ -3000,7 +3000,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
             else {
                 r = getRandomInt(0,this.nodes.length - 1);
                 return [this.nodes[r],null];
-                return [this.nodes[r],null];
+                //return [this.nodes[r],null];
             }
 
 
@@ -3376,7 +3376,9 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
         else {
 
             for (var key in this.nodesDict) {
-                this.nodes.push(this.nodesDict[key]);
+                if (this.nodesDict.hasOwnProperty(key)) {
+                    this.nodes.push(this.nodesDict[key]);
+                }
             }
         }
 
@@ -3828,7 +3830,7 @@ function DBNodeView(ctx,r,style) {
     this.text = "blah";
     this.tag = -1;
     this.ctx = ctx;
-    this.style = this.style ? this.style : DGraph.styleUnrooted;
+    this.style = style ? style : DGraph.styleUnrooted;
     this.startAngleRad = 0;
     this.incRad = 90 / 360 * 2 * Math.PI;
     this.isLeaf = false;
@@ -4010,7 +4012,7 @@ function DBNodeView(ctx,r,style) {
     };
 
 }
-
+/*
 function DBTestSimpleController() {
     this.nodeViews = function() {
         var nvs = [];
@@ -4043,6 +4045,7 @@ function DBTestSimpleController() {
     }
     
 }
+*/
 
 function DBGraphViewController(g,prefStyle) {
 
@@ -4153,7 +4156,7 @@ function DBGraphViewController(g,prefStyle) {
         // var ind = g.getNodeIndexForNode(centralNode);
 
         var done = false;
-        var startNode = g.getNodeFromLabel(startNodeLab);
+        startNode = g.getNodeFromLabel(startNodeLab);
 
         return startNode;
 
@@ -4242,7 +4245,7 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
 
     // graphDataSource "implements" DBGraphSourceIF
 
-    var svdThis = this;
+   // var svdThis = this;
 
     this.canv = canv;
     if (ctx) {
@@ -4316,7 +4319,7 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
         var leftest = this.findLeftmostNodeView();
         var lowest =  this.findLowestNodeView();
 
-        var amtToOffset = 0;
+        var amtToOffset;
         ///if (highest.r.y < this.margin) {
 
         //}
@@ -4451,12 +4454,13 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
        }
        var cols = 2;
        var rows = this.gvDataSource.numNodes() / cols;
-       var nodeSpacingX = (this.r.w - this.nodesOffset) / cols;
-       var nodeSpacingY = (this.r.h - this.nodesOffset) / rows;// this.gvDataSource.numNodes();
+       //var nodeSpacingX = (this.r.w - this.nodesOffset) / cols;
+       //var nodeSpacingY = (this.r.h - this.nodesOffset) / rows;// this.gvDataSource.numNodes();
        //nodeSpacing = 30;
 
        var order = this.gvDataSource.nodeViewOrder();
-       var row = 0;var col = 0;
+       //var row = 0;
+       //var col = 0;
 
        this.nvs = this.gvDataSource.nodeViews();
        var svdThis = this;
@@ -4608,7 +4612,11 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
 
     this.mouseClicked = function(e) {
 
-        var x = 1;
+        if (e) {
+
+        }
+
+        //var x = 1;
     };
 
 
@@ -4747,7 +4755,7 @@ function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
 
         var nFrom = this.sourceNode;
         var nTo = this.targetNode;
-        var edNodes = [nFrom,nTo];
+        //var edNodes = [nFrom,nTo];
 
         var fromNeighbours = nFrom.getSuccessors(nTo);
         var toNeighbours = nTo.getSuccessors(nFrom);
@@ -4788,8 +4796,8 @@ function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
 
         //remove all edges  from target node except this one
         targs = [];
-        for (var i = this.targetNode.edges.length -1;i >= 0;--i) {
-            var targ = this.targetNode.edges[i].getTargetNode(this.targetNode);
+        for (i = this.targetNode.edges.length -1;i >= 0;--i) {
+            targ = this.targetNode.edges[i].getTargetNode(this.targetNode);
             if (targ == this.sourceNode) {
 
             }
@@ -4835,6 +4843,11 @@ function DBNode(label) { //basic node
 
 
     this.getSuccessorNodes = function(onlyNonVisited) {
+
+        if (onlyNonVisited) {
+
+        }
+
          var succEdges = this.getSuccessors();
         var succNodes = [];
         var svdThis = this;
@@ -5470,9 +5483,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
             ++this.internalNodeNextNum;
         }
 
-        var newNode = this.addNode(this.internalNodePrefix + nodeNum);
-
-        return newNode;
+        return this.addNode(this.internalNodePrefix + nodeNum);
     };
     
     this.addNode = function(lab) {
@@ -5673,7 +5684,7 @@ function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
         if (this.copyFlag) {
 
 
-            var newNodes = [];
+            //var newNodes = [];
 
             var svdThis = this;
 
@@ -5681,11 +5692,11 @@ function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
             var newEdgeList = [];
 
             this.source.forEach(function (node) {
-                var newNode = svdThis.addNode(node.label);
+                svdThis.addNode(node.label);
 
             });
 
-            this.source.forEach(function (node, i) {
+            this.source.forEach(function (node) {
                 node.edges.forEach(function (edge) {
                     if (oldEdgeList.indexOf(edge) > -1) {
                         // svdThis.nodes[i].edges.push(newEdgeList[oldEdgeList.indexOf(edge)]);
@@ -5740,7 +5751,7 @@ function DGraphFromSpectrumBuilder(source) {
 
 
             srcAr.forEach(function (spec) {
-                var newNode = svdThis.addNode(spec);
+                svdThis.addNode(spec);
                 
 			});
 			
@@ -5965,7 +5976,7 @@ function DGraphGridFromSpecAlignBuilder(source) {
             for (r = 0; r < this.rows - 1; ++r) {
                 for (c = 0; c < this.cols - 1; ++c) {
                     if ((l == 2) && (r == 5) && (c == 516)) {
-                        var ghs = 1;
+                        //var ghs = 1;
                     }
 
                     if ((r == 0) && (c > 0)) {
@@ -5982,12 +5993,12 @@ function DGraphGridFromSpecAlignBuilder(source) {
                             }
                         }
                         var arbitraryNextRowNode = this.findNodeWithCoord(l,r + 1,c);
-                        var diff = parseInt(arbitraryNextRowNode.label.split('-')[3]);
+                        diff = parseInt(arbitraryNextRowNode.label.split('-')[3]);
                         var nextRow = r + 1;
                         for (var nextCol = c + 1; nextCol < this.cols; ++nextCol) {
                             var nextLay;
                             if (nextCol == 714) {
-                                var gsha = 1;
+                                //var gsha = 1;
                             }
                             if (nextCol - c == diff) {
                                 nextLay = l;
@@ -6033,7 +6044,7 @@ function DGraphTreeFromNodesBuilder(source,copyFlag) {
         if (this.copyFlag) {
 
 
-            var newNodes = [];
+            //var newNodes = [];
 
             var svdThis = this;
 
@@ -6046,7 +6057,7 @@ function DGraphTreeFromNodesBuilder(source,copyFlag) {
 
             });
 
-            this.source.forEach(function (node, i) {
+            this.source.forEach(function (node) {
                 node.edges.forEach(function (edge) {
                     if (oldEdgeList.indexOf(edge) > -1) {
                         // svdThis.nodes[i].edges.push(newEdgeList[oldEdgeList.indexOf(edge)]);
@@ -6171,7 +6182,7 @@ function DGraphTreeFromDistMatrixBuilder(source) {
         // var ind = m.length - 1;
 
         //var lab = '' + ind; //pick last row
-        var lab = leafLabs[ind];
+        //var lab = leafLabs[ind];
 
         //var limLen = this.limbLength(lab,m,leafLabs);
 
@@ -6617,6 +6628,11 @@ function DGraphTreeNJFromDistBuilder(source) {
 
 
     this.neighbourJoiningMatrix = function(mat,leafLabs) {
+
+      if (leafLabs) {
+
+      }
+
       var n = mat.length;  
         
         var totDists = mat.map(function(el) {
@@ -6644,7 +6660,7 @@ function DGraphTreeNJFromDistBuilder(source) {
         var newLine;
         mat.forEach(function(row,r) {
             newLine = [];
-            row.forEach(function(col,c) {
+            row.forEach(function(col) {
                 newLine.push(col);
             });
             if ((r == iLeaf) || (r == jLeaf)) {
@@ -6767,7 +6783,7 @@ function DGraphTreeNJFromDistBuilder(source) {
 
 DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
     var alArray = alignments.split('\n');
-    var alDict = {};
+    //var alDict = {};
     
     var labs = '';
     var seqs = [];
@@ -6778,7 +6794,7 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
         }
     });
     
-    alArray.forEach(function(el,i) {
+    alArray.forEach(function(el) {
         seqs.push(el.split(' ')[1]);
         
     });
@@ -6921,8 +6937,7 @@ function DBGraph(builder,comments) {
 
     this.getNodeIndexForNode = function(node) {
 
-        var ind = this.nodes.indexOf(node);
-        return ind;
+        return this.nodes.indexOf(node);
 
     };
     
@@ -7047,7 +7062,7 @@ function DBGraph(builder,comments) {
         }
 
         var adjList = '';
-        var svdThis = this;
+        //var svdThis = this;
 
         /*
         this.nodes.forEach(function(node,i) {
@@ -7267,7 +7282,7 @@ function DBGraph(builder,comments) {
 			sinkNode = this.getSinkNode();
 		}
 		
-		var done = false;
+		//var done = false;
 		
 		var bests = [[0,0]];
 		
@@ -7390,7 +7405,7 @@ function DBTreeGraph(builder,comments) {
 
 
     this.leaves = function() {
-        var lvs = [];
+        var lvs;
         var svdThis = this;
         lvs = this.nodes.filter(function(node) {
             return (node.isLeaf(svdThis.checkDirected()));
@@ -7401,7 +7416,7 @@ function DBTreeGraph(builder,comments) {
     };
     
     this.internalNodes = function() {
-        var iNodes = [];
+        var iNodes;
         var svdThis = this;
         iNodes = this.nodes.filter(function(node) {
            return (!node.isLeaf(svdThis.checkDirected())); 
@@ -7411,7 +7426,7 @@ function DBTreeGraph(builder,comments) {
     };
     
     this.internalEdges = function() {
-        var iEdges = [];
+        var iEdges;
         var svdThis = this;
         iEdges = this.edgeList().filter(function(ed) {
             if ( (ed.sourceNode.isLeaf(svdThis.checkDirected())
@@ -7457,12 +7472,7 @@ function DBTreeGraph(builder,comments) {
     };
     
     this.isRooted = function() {
-        if (this.findRoot() == null) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return this.findRoot() != null;
         
         
     };
@@ -7499,7 +7509,7 @@ function DBTreeGraph(builder,comments) {
 
         this.deleteNode(root);
 
-        var svdThis = this;
+       // var svdThis = this;
         this.nodes.forEach(function(node) {
             node.edges.forEach(function(ed) {
                 ed.setDirected(false);
@@ -7532,7 +7542,7 @@ function DBTreeGraph(builder,comments) {
         
       var rootNode = this.builder.addNodeBetween(edge.sourceNode,edge.targetNode,edge.edgeWeight /2 , edge.edgeWeight / 2);
 
-      var done = false;
+      //var done = false;
       //rootNode.predecessors = [];
       //rootNode.
 
@@ -7657,8 +7667,8 @@ function DBTreeGraph(builder,comments) {
                     neighb[1][1].getTargetNode(ed.targetNode)];
 
 
-                var fromNode1 = ed.sourceNode;
-                var fromNode2 = ed.targetNode;
+                //var fromNode1 = ed.sourceNode;
+                //var fromNode2 = ed.targetNode;
 
                 var score = DGraph.infinity;
 
@@ -7780,7 +7790,7 @@ function DBTreeGraph(builder,comments) {
         
         //do parsimony here
 
-        svdThis = this;
+        //svdThis = this;
 
 
         seqLength = this.prepareSmallParsimony(rooted,useAminos);
@@ -7809,7 +7819,7 @@ function DBTreeGraph(builder,comments) {
 
         var totParsimonyScore = 0;
 
-        var edgesProcessed = [];
+        //var edgesProcessed = [];
 
         nodeList.forEach(function(node,n) {
             var seq = '';
@@ -7839,7 +7849,7 @@ function DBTreeGraph(builder,comments) {
             rooted.unRoot();
         }
 
-        var svdThis = this;
+        //var svdThis = this;
         this.nodes.forEach(function(node) {
            var rootedNode =  rooted.getNodeFromLabel(node.label);
             node.sequence = rootedNode.sequence;
@@ -7977,15 +7987,15 @@ function DBGridGraph(builder,comments) {
             sinkNode = this.getSinkNode();
         }
 
-        var done = false;
+        //var done = false;
 
-        var bests = [[0,0]];
+       // var bests = [[0,0]];
 
         var currNode = sourceNode;
         
-        var currRow = currNode.row;
-        var currCol = currNode.col;
-        var currLay = currNode.lay;
+       // var currRow = currNode.row;
+        //var currCol = currNode.col;
+       // var currLay = currNode.lay;
 
         var sourceNodeNum = currNode.orderNum();
         var currNodeNum = currNode.orderNum();
@@ -8016,7 +8026,7 @@ function DBGridGraph(builder,comments) {
             });
 
             if (currNodeNum == 14102) {
-                var xxxy = 1;
+                //var xxxy = 1;
             }
             var thisNodeWeight = currNode.nodeWeight;
             if (bestPred == DGraph.infinity * -1) {
@@ -8208,7 +8218,7 @@ function DBasicGraph(source,sourceType) {
             var nodeLabNum = Math.ceil(parseInt(node.label) / 2);
             genStr += nodeSign + nodeLabNum;
             node = this.nodes['' + nodeOtherEnd].successors[ind].targetNode;
-            var nodeLabNum = Math.ceil(parseInt(node.label) / 2);
+            nodeLabNum = Math.ceil(parseInt(node.label) / 2);
             while (nodeLabNum != startNodeLabNum) {
                 nodeSign = (parseInt(node.label) % 2 == 0) ? '-' : '+';
                 genStr += ' ' + nodeSign + nodeLabNum;
@@ -8229,7 +8239,7 @@ function DBasicGraph(source,sourceType) {
         
         var genStages = [];
         
-        var edgeInd = 1; //blue edge
+       // var edgeInd = 1; //blue edge
 
 
         var genStr = this.graphToGenome('red');
@@ -8245,8 +8255,8 @@ function DBasicGraph(source,sourceType) {
             else {
                 var otherNode = blueEdge.targetNode;
                 var otherRedEdge = otherNode.successors[0];
-                var pair1 = [node,otherNode]; // makes trivial edge
-                var pair2 = [redEdge.targetNode,otherRedEdge.targetNode];
+                //var pair1 = [node,otherNode]; // makes trivial edge
+               // var pair2 = [redEdge.targetNode,otherRedEdge.targetNode];
                 //create new red edges:
                 var newRedEdge1 = new DGEdge(node,otherNode,'red');
                 var newRedEdge2 = new DGEdge(redEdge.targetNode,otherRedEdge.targetNode);
@@ -8288,7 +8298,7 @@ function DBasicGraph(source,sourceType) {
                    minLength = 0;  // min number of nodes in a cycle, otherwise doesn't count as a cycle
                 }
 
-                var visitedNodes = [];
+               // var visitedNodes = [];
 
                 this.resetNodesVisited();
 
@@ -8301,6 +8311,7 @@ function DBasicGraph(source,sourceType) {
                 
                 for (var node in this.nodes) {
                 //keys.forEach(function(node) {
+
                     if (this.nodes[node].visited) {
 
                     }
@@ -8328,7 +8339,7 @@ function DBasicGraph(source,sourceType) {
 
 
 
-            };
+            }
 
 
             this.connectNodesUndirected = function(node1,node2,edgeType,replaceFlag) {
@@ -8368,7 +8379,7 @@ function DBasicGraph(source,sourceType) {
                 var svdThis = this;
 
                 //      p[0].forEach(function(el,i) { //assumes only 1 p chromosome
-                p.forEach(function(pChr,a) { //assumes could be multiple q chromosomes
+                p.forEach(function(pChr) { //assumes could be multiple q chromosomes
                     pChr.forEach(function (el, i) {
 
                         var sign = el[0];
@@ -8409,7 +8420,7 @@ function DBasicGraph(source,sourceType) {
 
                 this.numNodes = Object.keys(this.nodes).length;
 
-                q.forEach(function(qChr,b) { //assumes could be multiple q chromosomes
+                q.forEach(function(qChr) { //assumes could be multiple q chromosomes
                     qChr.forEach(function(el,i) {
                         var sign = el[0];
                         var num = parseInt(el.substring(1));
@@ -8466,7 +8477,7 @@ function DBasicGraph(source,sourceType) {
 
 
 
-    }
+    };
 
 
 
@@ -8611,6 +8622,7 @@ function DBasicGraph(source,sourceType) {
     }
     */
 
+/*
 function stringFromGenomePath(path) {
     // not very useful - assumes as input array of kmers which all overlap previous by 1
 
@@ -8630,7 +8642,7 @@ function stringFromGenomePath(path) {
     return str;
 
 }
-
+*/
 
 
 function Amino(amino) {
@@ -8670,7 +8682,7 @@ function Amino(amino) {
             else {
                 return parseInt(this.short);
             }
-            
+
         }
 
     };
@@ -9756,7 +9768,7 @@ function Aligner(p,t,m) {
         //this.badChars = [];
         var badChars = [];
         for (var i = 0; i < p.length;++i) {
-            var thisChar = p[i];
+            //var thisChar = p[i];
             var shiftDict = {};
             c_Bases.forEach(function(el) {
                 shiftDict[el] = i+1;
@@ -10295,7 +10307,7 @@ function Aligner(p,t,m) {
         var svdThis = this;
 
         this.parts.forEach(function(prt,i) {
-            var posns = svdThis.bmFind(prt,i);
+            posns = svdThis.bmFind(prt,i);
             posns.forEach(function(pos) {
                var tStart = pos - svdThis.partOffsets[i];
                 var tEnd = tStart + svdThis.p.length;
@@ -12025,8 +12037,7 @@ function numBreakpointsGenome(g) {
 
     });
 
-    var numBP = n + 1 - numAdj;
-    return numBP;
+    return n + 1 - numAdj;
 
 }
 
@@ -12409,7 +12420,7 @@ function lowestCoins(amt,coins) {
                     //lowCands.push(-1);
                 }
                 else {
-                    var tmp = i - el;
+                    //var tmp = i - el;
 
                     lowCands.push(lowArr[i - el] + 1);
 

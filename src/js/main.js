@@ -1665,6 +1665,10 @@ function skTimeoutLoop(dna,numAtATime) {
 }
 
 function mostFrequentKmersBrute(e,variant) {
+    
+    if (e) {
+        
+    }
 
     initialiseResults();
 
@@ -1978,6 +1982,10 @@ function runLTClump() {
 }
 
 function searchKmer(e) {
+    
+    if (e) {
+        
+    }
 
     initialiseResults();
 
@@ -2337,6 +2345,10 @@ function miscRadioClicked(id) {
 
 
 function executeMisc(e) {
+    
+    if (e) {
+        
+    }
 
     initialiseResults();
 
@@ -3678,14 +3690,16 @@ function executeMisc(e) {
 
            });
            
-           var earliestTarget = 99999;
+           //var earliestTarget = 99999;
             target.forEach(function(t) {
+                /*
                 var pos = topList.indexOf(t);
                 if (pos > -1) {
                     if (pos < earliestTarget) {
                         pos = earliestTarget;
                     }
                 }
+                */
                 
             });
             
@@ -3929,12 +3943,7 @@ function executeMisc(e) {
             anchorsList.shift();
 
             anchorsList = anchorsList.filter(function(el) {
-                if (el == '') {
-                    return false;
-                }
-                else {
-                    return true;
-                }
+                return el != '';
             });
 
             anchorsList = anchorsList.map(function(el) {
@@ -4068,7 +4077,7 @@ function executeMisc(e) {
 
 
 
-            var synPoints = anchorsList.filter(function(el,ii) {
+            var synPoints = anchorsList.filter(function(el) {
 
                 if (el['id'] in gr.nodes) {
                     var node = gr.nodes[el['id']];
@@ -4197,12 +4206,7 @@ function executeMisc(e) {
             else {
                 synPoints = synPoints.filter(function (el, ii) {
 
-                    if ((ii < zoomStart) || (ii > zoomEnd)) {
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
+                    return !((ii < zoomStart) || (ii > zoomEnd));
                 });
             }
 
@@ -4261,7 +4265,7 @@ function executeMisc(e) {
             var turnDict = {};
             var maxCount = 0;
 
-            turnAr.forEach(function(el,i) {
+            turnAr.forEach(function(el) {
                 if (el == prev) {
                     ++count;
                     ++maxCount;
@@ -4575,7 +4579,7 @@ function executeMisc(e) {
 
             var n = parseInt(par1El.value);
 
-            var fibN = n + 1;
+            //var fibN = n + 1;
             var fibAr = [];
 
             fibAr.push(0);
@@ -4936,7 +4940,7 @@ function executeMisc(e) {
       
             gr = new DBGraph(builder);
 
-            var nodeAr = gr.nodes.map(function(el) {
+            var nodeAr = gr.nodes.map(function() {
                return 0;
             });
 
@@ -4961,7 +4965,7 @@ function executeMisc(e) {
 
             gr = new DBGraph(builder);
 
-            nodeAr = gr.nodes.map(function(el) {
+            nodeAr = gr.nodes.map(function() {
                 return 0;
             });
 
@@ -5567,12 +5571,11 @@ else {
 		});
 		 
 		  parseAr = parseAr.map(function(el) {
-			 var ar = el.filter(function(elel) {
-				 return (elel != ' ');
-				 
-				
-			 });
-			 return ar;
+              return el.filter(function (elel) {
+                 return (elel != ' ');
+
+
+             });
 		  });
 		   
 		  var centres = [];
@@ -5880,14 +5883,14 @@ case '81': //Spectral Alignment
 
                 var info = adjList.shift();
                 var numVertices = -1;
-                var numEdges = -1;
+                //var numEdges = -1;
                 if (info.length == 0) {
 
                 }
                 else {
                     var infoSplit = info.split(' ');
                     numVertices = parseInt(infoSplit[0]);
-                    numEdges = parseInt(infoSplit[1]);
+                    //numEdges = parseInt(infoSplit[1]);
                 }
 
                 adjList = adjList.join('\n');
@@ -5899,7 +5902,7 @@ case '81': //Spectral Alignment
 
                 gr.resetNodesVisited();
 
-                var order = [];
+               // var order = [];
 
 
                 done = false;
@@ -5954,7 +5957,7 @@ case '81': //Spectral Alignment
 
 
 
-            var resString = arrayToString(aCyclicFlags);
+            resString = arrayToString(aCyclicFlags);
 
 
             resEl.value =resString;
@@ -6128,15 +6131,17 @@ function turnpikeScore(candidates,turnDict) {
     return [scoreAr,maxScore,maxInd];
 
 }
+
+/*
 function boundTurnpikeDict(turnAr,candidates,turnDict) {
 
     console.log('bounding turnpike. Len: ' + candidates.length);
-    /*
-    var turnArCopy = [];
-    turnAr.forEach(function(el) {
-        turnArCopy.push(el);
-    });
-    */
+    
+    //var turnArCopy = [];
+    //turnAr.forEach(function(el) {
+   //     turnArCopy.push(el);
+    //});
+    
 
     var goodCandidates = [];
 
@@ -6145,12 +6150,12 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
         if (c % 1000 == 0) {
             console.log('c: ' + c);
         }
-        /*
-        turnArCopy = [];
-        turnAr.forEach(function(el) {
-            turnArCopy.push(el);
-        });
-        */
+        
+        //turnArCopy = [];
+        //turnAr.forEach(function(el) {
+        //    turnArCopy.push(el);
+        //});
+        
 
         var diffAr = [];
         var good = true;
@@ -6192,19 +6197,19 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
                 //  }
             }
         }
-        /*
-        for (var d = 0;d < diffAr.length;++d) {
-            var ind = turnArCopy.indexOf(diffAr[d]);
-            if (ind > -1) {
-                turnArCopy.splice(ind,1);
-            }
-            else {
-                good = false;
-                break;
+       
+       // for (var d = 0;d < diffAr.length;++d) {
+        //    var ind = turnArCopy.indexOf(diffAr[d]);
+         ///   if (ind > -1) {
+          //      turnArCopy.splice(ind,1);
+          //  }
+          //  else {
+           //     good = false;
+           //     break;
 
-            }
-        }
-        */
+            //}
+        //}
+        
 
         if (good) {
             goodCandidates.push(candidates[c]);
@@ -6217,8 +6222,9 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
     return goodCandidates;
 
 }
+*/
 
-
+/*
 function boundTurnpike(turnAr,candidates) {
 
     var turnArCopy = [];
@@ -6272,6 +6278,7 @@ function boundTurnpike(turnAr,candidates) {
     return goodCandidates;
 
 }
+*/
 
 
 function initialiseMotifParams() {
@@ -6313,6 +6320,10 @@ function initialiseMotifParams() {
 }
 
 function runSBBackground(e) {
+    
+    if (e) {
+        
+    }
 
     initialiseResults();
 
@@ -6354,6 +6365,10 @@ function runSBBackground(e) {
 
 
 function runAlignBackground(e) {
+    
+    if (e) {
+        
+    }
 
     initialiseResults();
 
@@ -6409,6 +6424,10 @@ function runAlignBackground(e) {
 
 
 function runAlign(e) {
+
+    if (e) {
+
+    }
 
     var alignRadioMethodSel = getSelectedRadioEl('alignMethod');
 
@@ -6599,6 +6618,11 @@ function runMotif(e) {
 }
 
 function motifCompare(e) {
+
+    if (e) {
+
+    }
+
     initialiseResults();
 
     dnaMasterStrings =  document.getElementById('dnaStrings').value.split('\n');
@@ -6670,6 +6694,10 @@ function motifCompare(e) {
 
 function motifSearch(e) {
 
+    if (e) {
+
+    }
+
     initialiseResults();
 
     dnaMasterStrings =  document.getElementById('dnaStrings').value.split('\n');
@@ -6705,6 +6733,10 @@ function motifSearch(e) {
 
 function medianString(e) {
 
+    if (e) {
+
+    }
+
     initialiseResults();
 
     dnaMasterStrings =  document.getElementById('dnaStrings').value.split('\n');
@@ -6738,6 +6770,10 @@ function medianString(e) {
 }
 
 function greedyMotif(e) {
+
+    if (e) {
+
+    }
 
     initialiseResults();
 
@@ -8569,8 +8605,8 @@ function runPeptide(e) {
 					 var spl = el.split(':');
 					 var w = parseFloat(spl[1]).toFixed(0);
 					 spl[1] = w;
-					 var code = Amino.CodeForWeight(parseFloat(w));
-					 spl[1] = code;
+					 spl[1] = Amino.CodeForWeight(parseFloat(w));
+					 //spl[1] = code;
 					 return spl.join(':');
 				});
 				
@@ -11390,7 +11426,7 @@ function graphChanged(grph) {
         });
     }
 
-    var avgContigLen = totContigLen  * 1.0 /  nbps.length;
+    var avgContigLen = totContigLen /  nbps.length;
 
     document.getElementById('debugText').value += '\nNum  contigs: ' + nbps.length;
     document.getElementById('debugText').value += '\nNum contigs  with len > ' + thresh + ' : ' + numOverThresh;
@@ -11738,6 +11774,10 @@ function cleanContents(contents,contentType) {
 }
 
 function dnaInput(e) {
+
+    if (e) {
+
+    }
     var inDNA = document.getElementById('dnaInput');
 
 
@@ -11754,6 +11794,10 @@ function dnaInput(e) {
 }
 
 function motifsInput(e) {
+
+    if (e) {
+
+    }
 
     var dnaStrings = document.getElementById('dnaStrings').value.split('\n');
 
@@ -11778,6 +11822,10 @@ function motifsInput(e) {
 
 
 function alignInput(e,contents,seqNum) {
+
+    if (e) {
+
+    }
 
     if (contents) { //loaded from file
 
@@ -11824,6 +11872,10 @@ function alignInput(e,contents,seqNum) {
 
 function sbInput(e,contents,seqNum) {
 
+    if (e) {
+
+    }
+
     if (contents) { //loaded from file
 
         switch (seqNum) {
@@ -11855,8 +11907,11 @@ function sbInput(e,contents,seqNum) {
 
 function phylogenyInput(e,input) {
 
-    var phylInp = getSelectedRadioEl('phylInput');
+    if (e) {
 
+    }
+
+    var phylInp;
 
 
     var source;
@@ -11971,6 +12026,10 @@ function phylogenyInput(e,input) {
 
 
 function sequencingInput(e,input) {
+
+    if (e) {
+
+    }
 
     var seqInp = document.getElementsByName('seqInput');
 
@@ -12137,6 +12196,10 @@ function downloadSeq() {
 
 function transInput(e) {
 
+    if (e) {
+
+    }
+
     var trInp = document.getElementsByName('trInput');
 
     var val = '';
@@ -12189,7 +12252,12 @@ function transInput(e) {
     }
 }
 
-function peptideInput(e,input) {
+function peptideInput(e,input)  {
+
+if (e) {
+
+}
+
 
 /*
     var pepInp = document.getElementsByName('pepInput');
@@ -12201,7 +12269,7 @@ function peptideInput(e,input) {
         }
     }
 */
-    var pepInp =  getSelectedRadioEl('pepInput');
+    var pepInp;
 
     var source;
     if (input) {
@@ -12338,6 +12406,10 @@ function restrictToACGT(event,allowNewline,otherCharsAllowed)
 }
 
 function stopPressed(e) {
+    
+    if (e) {
+        
+    }
     stop = true;
 
 }
@@ -12361,6 +12433,10 @@ function kMerLenChanged(e) {
     document.getElementById('numKmers').value = 1;
 }
 function numKmerChanged(e) {
+    
+    if (e) {
+        
+    }
 
     switch (myParams.tabActive) {
         case 3: //motif
@@ -12421,6 +12497,11 @@ function numKmerChanged(e) {
 
 
 function randPressed(event) {
+    
+    if (event) {
+        
+    }
+    
     var randN = document.getElementById('numRand');
     var randNVal = parseInt(randN.value);
 
@@ -12436,6 +12517,10 @@ function randPressed(event) {
 
 
 function randMotifPressed(event) {
+    
+    if (event) {
+        
+    }
 
     var numSequencesToGen = 10;
 
@@ -12537,6 +12622,10 @@ function debugSwitchClicked(e) {
 
 
 function alignRadClicked(id) {
+    
+    if (id) {
+        
+    }
 
     var alignTypeRadioSel = getSelectedRadioEl('alignMethod');
     var  scoreMatrixRadioSel = getSelectedRadioEl('alignScore');
@@ -12590,7 +12679,12 @@ function alignRadClicked(id) {
     alignMasterChanged();
 }
 
-function sbRadClicked(id) {
+function sbRadClicked(id)  {
+
+
+    if (id) {
+        
+    }
 
     var sbTypeRadioSel = getSelectedRadioEl('sbMethod');
  
@@ -13457,10 +13551,13 @@ function expStateChanged(elId,newVal) {
 
 
 function clickInDNA(e) {
+    
+    if (e) {
+        
+    }
     //alert('key down. Posn: ' + getCaretCharacterOffsetWithin(document.getElementById('dnaView')));
 
-    var pos = getCaretCharacterOffsetWithin(document.getElementById('dnaView')) + (dnaPage * basesPerPage) + 1;
-    document.getElementById('currPosInDNA').innerHTML =  pos;//getCaretCharacterOffsetWithin(document.getElementById('dnaView'));
+    document.getElementById('currPosInDNA').innerHTML =  getCaretCharacterOffsetWithin(document.getElementById('dnaView')) + (dnaPage * basesPerPage) + 1;//getCaretCharacterOffsetWithin(document.getElementById('dnaView'));
 }
 
 
