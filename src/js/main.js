@@ -7711,7 +7711,9 @@ function displayPeptideSeqGraph(g,debug) {
 
     var canv = document.getElementById('peptideCanvas');
     var parent = document.getElementById('peptideGraphDiv');
-    canv.width = parent.clientWidth * 2;
+    var scrollFactor = 1 + (Math.floor(g.nodes.length / 10));
+    scrollFactor = scrollFactor > 40 ? 40 : scrollFactor;
+    canv.width = parent.clientWidth * scrollFactor; //scrollFactor;
     canv.height = parent.clientHeight;
     var ctx = canv.getContext("2d");
     ctx.clearRect(0,0,canv.width,canv.height);
@@ -8650,6 +8652,13 @@ function runPeptide(e) {
             gr = new DBGraph(builder);
 			
 			var ret = gr.longestPathNodeWeighted();
+
+            gr.resetFreshNodesAndEdges();
+            ret[2].forEach(function(node) {
+               node.freshNode = true;
+            });
+
+
 			
 			if (document.getElementById('debugPS').checked) {
                 resStr = '';
@@ -9353,13 +9362,24 @@ function debruijnCanvas(deb) {
 
 function logoCanvas(motifs) {
 
+    var canv = document.getElementById("skewCanvas");
+
+    if (motifs) {
+        canv.style.display = "inline-block";
+    }
+    else {
+        canv.style.display = "none";
+        return;
+    }
+
+
 
     var charHeightMatrix = calcMotifLogo(motifs,false);
 
 
     var res = scoreMotifs(motifs,false);
 
-    var canv = document.getElementById("skewCanvas");
+
     var ctx = canv.getContext("2d");
     ctx.save();
     var H = canv.height;

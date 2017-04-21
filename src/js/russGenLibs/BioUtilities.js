@@ -3926,6 +3926,7 @@ function DBNodeView(ctx,r,style) {
             if (freshFlag) {
                 edge.highlight = true;
             }
+
         }
         else {
             if ((this.edgeHighlight) && (nodeTo.edgeHighlight)) { // highlight edge if connecting nodes both highlighted
@@ -4297,7 +4298,7 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
         if (gvDataSource.preferredStyle() == DGraph.styleSequencing) {
             var stX = 50;
             var xInc = 90;
-            var stY = 300;
+            var stY = 150;
             this.nvs.forEach(function(nv,i) {
                 nv.setR(new DBPos(stX + (i * xInc),stY));
                 nv.absPos = true;
@@ -7324,16 +7325,18 @@ function DBGraph(builder,comments) {
 		var currNum = bests.length - 1;
 		
 		var diffAr = [];
+        var currNodeAr = [this.nodes[currNum]];
 		
 		while (currNum > 0) {
 			var diff = currNum - bests[currNum][1];
 			diffAr.unshift(diff);
 			currNum = bests[currNum][1];
+            currNodeAr.unshift(this.nodes[currNum]);
 		}
 		
 		var pep = new Peptide(Peptide.AminoArrFromWeights(diffAr));
 		
-		return [pep.toShortString(''),bests];
+		return [pep.toShortString(''),bests,currNodeAr];
 	 
 	};
 	
