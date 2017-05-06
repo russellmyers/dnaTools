@@ -80,12 +80,14 @@ function testStuff() {
     tab_click(9,tabClickDone); //Phylog
     document.getElementById('phylogenyStrings').value = 'I J K L\n0 3 4 3\n3 0 4 5\n4 4 0 2\n3 5 2 0';
 
-    //var tst = autoDetectContents('\nA G  Chimp   \n 0   1 3\n1 2 3\n4 5 6  ');
-    //var xx = 1;
-
-
-
     phylogenyInput();
+	
+	tab_click(10,tabClickDone); //Misc
+    document.getElementById('miscFunc83').checked = true;
+	document.getElementById('miscParam1').value = '2 2';
+	document.getElementById('miscParam2').value = '1.3 1.1\n1.3 0.2\n0.6 2.8\n3.0 3.2\n1.2 0.7\n1.4 1.6\n1.2 1.0\n1.2 1.1\n0.6 1.5\n1.8 2.6\n1.2 1.3\n1.2 1.0\n0.0 1.9';
+
+	
 
    // var builder = new DGraphBuilder('0->1\n0->2\n7->8\n7->9\n4->8\n1->3\n1->4\n8->3',new DNodeBuilder(),new DEdgeBuilder());
   // var builder = new DGraphBuilder('0->1\n0->2\n2->1',new DNodeBuilder(),new DEdgeBuilder());
@@ -2322,6 +2324,18 @@ function miscRadioClicked(id) {
 	
 	switch (id) {
 		
+		case 'miscFunc74':
+		    par1El.placeholder = '<Enter space delimited k and m values>';
+			par2El.placeholder = '<Enter set of space delimited points, 1 per line>';
+			par3El.placeholder = 'Param 3\nnot used';
+		    break;	
+			
+		case 'miscFunc75':
+		    par1El.placeholder = '<Enter space delimited k and m values>';
+			par2El.placeholder = '<Enter set of space delimited centres, 1 per line>';
+			par3El.placeholder = '<Enter set of space delimited points, 1 per line>';
+		    break;	
+		
 		case 'miscFunc79':
 		    par1El.placeholder = 'Enter Spectral Vectors';
 			par2El.placeholder = 'Enter Proteome';
@@ -2346,6 +2360,12 @@ function miscRadioClicked(id) {
             par2El.placeholder = 'Param 2\nnot used';
             par3El.placeholder = 'Param 3\nnot used';
             break;
+			
+		case 'miscFunc83':
+		    par1El.placeholder = '<Enter space delimited k and m values>';
+			par2El.placeholder = '<Enter set of space delimited points, 1 per line>';
+			par3El.placeholder = 'Param 3\nnot used';
+		    break;
 		
 		default:
 		    par1El.placeholder = 'Enter param 1';
@@ -5567,80 +5587,71 @@ else {
 
             break;
 			
-		case '74': //BA8A Fartherst First Traversal
+		case '74': //BA8A Farthest First Traversal
 
 
        
   
-		  var parseAr = par1El.value.split('\n');
-		  var params = parseAr.shift();
+		  var params = par1El.value;
+		  //var params = parseAr.shift();
 		  console.log('params: ' + params);
 		  
 		  k = parseFloat(params.split(' ')[0]);
 		  
 		  
-		  parseAr = parseAr.map(function(el) {
-			var spl = el.split(' ');
-			spl = spl.map(function(splEl) {
-				return parseFloat(splEl).toFixed(1);
-			});
-			return spl;
-		});
-		 
-		  parseAr = parseAr.map(function(el) {
-              return el.filter(function (elel) {
-                 return (elel != ' ');
-
-
-             });
-		  });
-		   
+		  var pSpace = new PointSpace(par2El.value); 
+		  
+		  pSpace.movePointToCentres(pSpace.points[0],true);
+		  
+		   /*
 		  var centres = [];
 		  centres.push(parseAr.shift());
+		  */
 		  
 		  
-		  while (centres.length < k) {
+		  while (pSpace.centres.length < k) {
 			  
-			  maxDist = 0;
-			  maxInd = -1;
-			   parseAr.forEach(function(el,elInd) {
-
-				   var thisClosest = closestCentre(el,centres);
-				  
-			 
-					 // console.log('aha' + ' thisclosest: ' + thisClosest + ' el: ' + el + ' centres: ' + centres);
-				  
-			
-				  if (thisClosest[0] > maxDist) {
-		 
-					 maxDist = thisClosest[0];
-					 maxInd = elInd;
-				  }
-				});
-				var removed = parseAr.splice(maxInd,1);
-				centres.push(removed[0]);
-				
+			  var p = pSpace.findFarthestPointFromCentres();
+			  
+			  pSpace.movePointToCentres(p,true);
 			  
 		  }
-
-		  resString = '';
-		  centres.forEach(function(el) {
-			// console.log('el: ' + el);
-			 var thisStr = '';
-			 el.forEach(function(elel) {
-				thisStr += elel + ' ';
-			 });
-			 thisStr += '\n';
-			 resString += thisStr;
-			// console.log('resstr: ' + resString);
-		  });
-		 
+		
+		    pSpace.allocatePointsToClusters();
+			
+		    resStr = pSpace.centresToString(); //+ '\nSq distort: ' + dist;
 
 			
-            resEl.value =resString;
+            resEl.value =resStr;
 
             break;
 			
+		case '75': //BA8B Squared Distortion
+
+
+		  var params = par1El.value;
+		  //var params = parseAr.shift();
+		  console.log('params: ' + params);
+		  
+		  k = parseFloat(params.split(' ')[0]);
+		  
+		  var pSpace = new PointSpace(par3El.value); 
+		  
+		  var centAr = par2El.value.split('\n');
+		  centAr.forEach(function(str) {
+			 pSpace.addCentre(str); 
+		  });
+		  
+		  var dist = pSpace.sqDistortion();
+			
+		    resStr = 'Sq dist:\n' + dist;
+
+			
+            resEl.value =resStr;
+
+            break;
+	
+	
 
 		case '76': //Peptide Vector
 
@@ -5985,6 +5996,39 @@ case '81': //Spectral Alignment
             break;
 
 
+		case '83': //BA8C K-means clustering
+
+
+       
+  
+		  var params = par1El.value;
+		  //var params = parseAr.shift();
+		  console.log('params: ' + params);
+		  
+		  k = parseFloat(params.split(' ')[0]);
+		  
+		  
+		  var pSpace = new PointSpace(par2El.value); 
+		  
+		  /*
+		  for (var i = 0;i < k;++i) {
+		     pSpace.movePointToCentres(pSpace.points[i],true);
+		  }
+	
+		
+		  pSpace.allocatePointsToClusters();
+		  */
+		  
+		  pSpace.kMeans(k);
+		  var cog1 = pSpace.centres[0].centreOfGravity();
+		  var cog2 = pSpace.centres[1].centreOfGravity();
+		
+		  resStr = pSpace.centresToString(true); //+ '\nSq distort: ' + dist;
+
+			
+          resEl.value =resStr;
+
+            break;
 
         default:
             break;
@@ -13819,6 +13863,10 @@ function tabClickDone(tabNum) {
             expStateChanged('expDebug',true);
             expMultiState = false;
             expStateChanged('expMulti',false);
+			
+			var el = document.getElementById('miscRadioBox');
+			el.scrollTop = el.scrollHeight;
+			
             break;
 
 

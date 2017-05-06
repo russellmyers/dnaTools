@@ -10714,6 +10714,363 @@ Aligner.AlignBlo = 2;
 Aligner.AlignDNA = 3;
 Aligner.LCS = 4;
 
+
+function Point(coords) {
+	
+	this.coords = coords ? coords : [];
+	this.m = coords.length;
+	
+	this.toString = function() {
+		
+		var svdThis = this;
+		var str = '';
+		this.coords.forEach(function(el,i) {
+			str += el.toFixed(3);
+			if (i == svdThis.m - 1) {
+				
+			}
+			else {
+				str +=' ';
+			}
+		});
+		
+		return str;
+	};
+	
+	this.equalTo = function(p) {
+		var svdThis = this;
+		var eq = true;
+		for (var i = 0;i < this.coords.length;++i) {
+			 if (this.coords[i] == p.coords[i]) {
+				 
+			 }
+			 else {
+				 eq = false;
+				 break;
+
+			 }
+		}
+		return eq;
+	}
+	
+}
+
+
+function Centre(centrePoint)  {
+ 
+    
+    
+	this.centrePoint = centrePoint ? centrePoint : null;
+	
+	this.prevCentrePoint = null;
+	
+	this.clusterPoints = [];
+
+
+	this.centreOfGravity = function(setCentreFlag) {
+		
+		//if setCentreFlag is true, sets the centre based on the centre of gravity, otherwise just returns the cog
+		
+		var svdThis = this;
+		
+		
+		var totAr = this.clusterPoints[0].coords.map(function(el) {
+			return 0;
+		});
+		this.clusterPoints.forEach(function(p,i) {
+			 p.coords.forEach(function(coordVal,j) {
+				 totAr[j] += coordVal;
+			 });
+			 
+		});
+		totAr = totAr.map(function(el) {
+			return el  / svdThis.clusterPoints.length;
+		});
+		
+		var cogPoint = new Point(totAr);
+		if (setCentreFlag) {
+			
+			this.centrePoint = cogPoint;
+		}
+		
+		return cogPoint;
+		
+		
+	};
+	
+	
+	
+	this.toString = function(includeClusters) {
+		
+		var svdThis = this;
+		
+		if (includeClusters) {
+			var str = 'Centre: ' + this.centrePoint.toString() + '\n';
+			this.clusterPoints.forEach(function(el,i) {
+				str += el.toString();
+				if (i == svdThis.clusterPoints.length - 1) {
+					
+				}
+				else {
+                   str +='\n';
+				}				
+			});
+			
+			return str;
+		}
+		else { 
+		  return this.centrePoint ? this.centrePoint.toString() : '';
+		}
+
+    };
+	
+	this.addToCluster = function(p) {
+		this.clusterPoints.push(p);
+	};
+	
+}
+
+
+
+
+function PointSpace(points,centres) {
+	
+	//points is a string containing space-delimited point co-ordinates (one per line)
+	
+	
+	this.centres = centres ?  centres : [];
+	
+	this.initPoints = function(points) {
+		
+		  
+
+          var pointsAr = points.split('\n');
+		  
+		  pointsAr = pointsAr.map(function(el) {
+			var spl = el.split(' ');
+			spl = spl.map(function(splEl) {
+				return parseFloat(splEl);
+			});
+			return spl;
+	      });
+		 
+		 
+		  
+		  this.points = pointsAr.map(function(el) {
+			  return new Point(el);
+			  
+			  
+		  });
+		
+	};
+
+	this.dist = function(p1,p2) {
+		var d = 0;
+		p1.coords.forEach(function(coord1,i) {
+			var coord2 = p2.coords[i];
+			d += Math.pow((coord1 - coord2),2);
+			
+		});
+		d = Math.sqrt(d);
+		
+		return d;
+		
+	};
+	
+	this.sqDistortion = function() {
+		var svdThis = this;
+		var sqDistort = 0.0;
+		
+		this.points.forEach(function(p) {
+			var clo = svdThis.findClosestCentre(p);
+			var d = svdThis.dist(clo.centrePoint,p);
+			sqDistort += Math.pow(d,2);
+		
+		});
+		
+		if (this.points.length == 0) {
+			
+		}
+		else {
+		   sqDistort  = sqDistort * 1.0 / this.points.length;
+		
+		}
+		
+		return sqDistort;
+		
+		
+	};
+	
+	
+	
+	this.kMeans = function(k,initCentrePoints) {
+		//Uses first k points as initial centres
+		
+		var svdThis = this;
+		
+		if (initCentrePoints) {
+			initCentrePoints.forEach(function(el) {
+				svdThis.movePointToCentres(el,true);
+			});
+			
+		}
+		else {
+			for (var i = 0;i < k;++i) {
+				 this.movePointToCentres(this.points[i],true);
+			}
+		}
+		this.allocatePointsToClusters();
+		
+		var done = false;
+		
+		
+		
+		var iter = 0;
+		while (!done) {
+			var done = true;
+			console.log('Cogs...');
+			this.centres.forEach(function(cent,i) {
+				var prevCog = cent.centrePoint;
+				cent.centreOfGravity(true);
+				if (prevCog.equalTo(cent.centreOfGravity())) {
+				}
+				else {
+					done = false;
+				}
+				console.log('centre of gravity iter: ' + iter + ' '  + cent.centreOfGravity());
+			});
+			 
+			this.allocatePointsToClusters();
+			
+			++iter;
+			
+		}
+	
+		
+	};
+	
+	
+	
+	this.movePointToCentres = function(p,keepPoints) {
+		//used in farthest first traversal
+		//reallocate this point as a centre
+ 
+        var ind = this.points.indexOf(p);
+		var centrePoint;
+		if (keepPoints) {
+			centrePoint = [this.points[ind]];
+		}
+		else {
+			centrePoint = this.points.splice(ind,1);
+		}
+		var cent = new Centre(centrePoint[0]);
+		this.centres.push(cent);
+		//cent.addToCluster(centrePoint[0]); 
+		
+	};
+	
+	this.findClosestCentre = function(p) {
+		var minDist = DGraph.infinity;
+		var clo = null;
+		var svdThis = this;
+		this.centres.forEach(function(centre)  {
+		    var d = svdThis.dist(centre.centrePoint,p);
+			if (d < minDist) {
+				minDist = d;
+				clo = centre;
+			}
+		});
+		
+		return clo;
+		
+		
+	};
+	
+	this.addCentre = function(coordsStr) {
+		
+		var coordsAr = coordsStr.split(' ');
+		coordsAr = coordsAr.map(function(el) {
+				return parseFloat(el);
+		});
+		
+		var cent = new Centre(new Point(coordsAr));
+		this.centres.push(cent);
+		
+	};
+	
+	this.findFarthestPointFromCentres = function() {
+		
+		var farthestPoint = null;
+		var maxDist = 0;
+		
+		var svdThis = this;
+		
+		this.points.forEach(function(p) {
+			 var closestCentre = svdThis.findClosestCentre(p);
+			 var d = svdThis.dist(closestCentre.centrePoint,p);
+			 if (d > maxDist) {
+				 maxDist = d;
+				 farthestPoint = p;
+			 }
+			
+		});
+		
+		return farthestPoint;
+		
+		
+	};
+	
+	this.clearClusters = function() {
+		this.centres.forEach(function(cent) {
+			cent.clusterPoints = [];
+		});
+		
+	};
+	
+	this.allocatePointsToClusters = function() {
+		var svdThis = this;
+		
+		this.clearClusters();
+		
+		this.points.forEach(function(p) {
+			var cent = svdThis.findClosestCentre(p);
+			cent.addToCluster(p);
+		});
+	};
+	
+	this.centresToString = function(includeClusters) {
+         var str = '';
+
+		 var svdThis = this;
+		 
+		 
+		 
+         this.centres.forEach(function(el,i) {
+              str += el.toString(includeClusters);
+			  if (i == svdThis.centres.length - 1) {
+				  
+			  }
+			  else {
+				   str += '\n';
+			  }
+		 });
+
+         return str;		 
+	
+	};
+	
+	
+	if (points) {
+		this.initPoints(points);
+	}
+	else {
+		this.points = [];
+		
+	}
+	
+	
+}
+
 function allPossiblePeptidesWithWeight(w) {
 
     var i;
