@@ -83,7 +83,24 @@ function testStuff() {
     //var tst = autoDetectContents('\nA G  Chimp   \n 0   1 3\n1 2 3\n4 5 6  ');
     //var xx = 1;
 
+
+
     phylogenyInput();
+
+   // var builder = new DGraphBuilder('0->1\n0->2\n7->8\n7->9\n4->8\n1->3\n1->4\n8->3',new DNodeBuilder(),new DEdgeBuilder());
+  // var builder = new DGraphBuilder('0->1\n0->2\n2->1',new DNodeBuilder(),new DEdgeBuilder());
+  //  var builder = new DGraphBuilder('1<->2\n1<->5\n5<->9\n5<->10\n9<->10\n3<->4\n3<->7\n3<->8\n4<->8\n7<->11\n8<->11\n11<->12\n8<->12');
+  // var builder = new DGraphBuilder('0<->1\n0<->2',new DNodeBuilder(),new DEdgeBuilder());
+    var builder = new DGraphBuilder('0->1\n0->2\n1->3\n2->3',new DNodeBuilder(),new DEdgeBuilder());
+    var gr = new DBGraph(builder);
+
+    var conn = gr.checkAllConnected();
+    var xx = 1;
+
+
+
+
+
     /*
    var builder = new DGraphBuilder('A->B,C:1\nB->D,E:2\nE->H,I:4\nC->F,G:7',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
   //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());

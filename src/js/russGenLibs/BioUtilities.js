@@ -6942,6 +6942,88 @@ function DBGraph(builder,comments) {
 
     };
     
+    this.checkAllConnected = function() {
+        this.resetNodesVisited();
+        var done = false;
+
+        var connectedComponents = [];
+
+        while (!done) {
+
+            var foundNonVisited = false;
+            for (var i = 0; i < this.nodes.length; ++i) {
+                if (this.nodes[i].visited) {
+
+                }
+                else {
+                    foundNonVisited = true;
+                    break;
+                }
+            }
+            if (foundNonVisited) {
+                var nd = this.nodes[i];
+                var dfs = this.depthFirstSearch(nd,null,false);
+                connectedComponents.push(dfs);
+            }
+            else {
+                done = true;
+            }
+
+
+
+
+        }
+        return connectedComponents;
+    };
+    
+    this.depthFirstSearch = function(node,prevNode,clearAllVisited,nodesSoFar) {
+        if (!nodesSoFar) {
+            nodesSoFar = [];
+        }
+        if (clearAllVisited) {
+            this.resetNodesVisited();
+        }
+
+        var cycleFound = false;
+
+        if (nodesSoFar.indexOf(node) > -1){
+            cycleFound = true;
+            nodesSoFar.push(node);
+            return [nodesSoFar,cycleFound];
+        }
+
+        nodesSoFar.push(node);
+
+       // if (node.visited) {
+
+
+        node.visited = true;
+        //nodesSoFar.push(node);
+        var succs = node.getSuccessorNodes();
+        var svdThis = this;
+        succs.forEach(function(nd) {
+
+            if ((nd == prevNode) && (!svdThis.isDirected)) {
+                //for undirected graph, don't go straight back to predecessor
+
+            }
+            else {
+                var ret = svdThis.depthFirstSearch(nd,node,false, nodesSoFar);
+                if (ret[1]) {
+                    cycleFound = true;
+                }
+            }
+
+            
+            
+        });
+        
+        return [nodesSoFar,cycleFound];
+
+
+
+    };
+    
     this.checkCycle = function(node) {
         if (node.visited) {
             return true;
