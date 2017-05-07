@@ -2362,7 +2362,7 @@ function miscRadioClicked(id) {
             break;
 			
 		case 'miscFunc83':
-		    par1El.placeholder = '<Enter space delimited k and m values>';
+		    par1El.placeholder = '<Enter space delimited k and number of  runs values>';
 			par2El.placeholder = '<Enter set of space delimited points, 1 per line>';
 			par3El.placeholder = 'Param 3\nnot used';
 		    break;
@@ -6004,9 +6004,14 @@ case '81': //Spectral Alignment
 		  var params = par1El.value;
 		  //var params = parseAr.shift();
 		  console.log('params: ' + params);
-		  
-		  k = parseFloat(params.split(' ')[0]);
-		  
+
+          var spl =   params.split(' ');
+		  k = spl[0];
+          var runs = 1;
+          if (spl.length > 1) {
+              runs = parseInt(spl[1]);
+          }
+
 		  
 		  var pSpace = new PointSpace(par2El.value); 
 		  
@@ -6018,15 +6023,86 @@ case '81': //Spectral Alignment
 		
 		  pSpace.allocatePointsToClusters();
 		  */
-		  
-		  pSpace.kMeans(k);
-		  var cog1 = pSpace.centres[0].centreOfGravity();
-		  var cog2 = pSpace.centres[1].centreOfGravity();
-		
-		  resStr = pSpace.centresToString(true); //+ '\nSq distort: ' + dist;
 
+          resStr = '';
+          var lowestDist = DGraph.infinity;
+          var lowestRunNum = -1;
+
+          for (var i = 0;i < runs;++i) {
+              pSpace.kMeans(k,true);
+
+              var sqErr = pSpace.sqDistortion();
+
+              resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
+
+              resStr += '\nSq Err: ' + sqErr + '\n\n';
+              if (sqErr < lowestDist) {
+                  lowestDist = sqErr;
+                  lowestRunNum = i + 1;
+              }
+
+          }
+          if (i > 1) {
+              resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
+          }
 			
-          resEl.value =resStr;
+          resEl.value=resStr;
+
+            break;
+
+        case '84': //BA8D Soft K-means clustering
+
+
+            var params = par1El.value;
+            //var params = parseAr.shift();
+            console.log('params: ' + params);
+
+            var lines = params.split('\n');
+            var spl =   lines[0].split(' ');
+            k = spl[0];
+            var runs = 1;
+            if (lines.length > 1) {
+                runs = parseInt(lines[1]);
+            }
+            
+            var stiff = 1;
+            if (lines.length > 2) {
+                stiff = parseFloat(lines[2]);
+            }
+            
+            var maxItersPerRun = 1000;
+            if (lines.length > 3) {
+                maxItersPerRun = parseInt(lines[3]);
+            }
+
+            var pSpace = new PointSpace(par2El.value);
+
+
+            resStr = '';
+            var lowestDist = DGraph.infinity;
+            var lowestRunNum = -1;
+
+            var initCentres = [new Point([-2.5]),new Point([2.5])];
+
+            for (var i = 0;i < runs;++i) {
+                pSpace.softKMeans(k,false,null,stiff,maxItersPerRun);
+
+                var sqErr = pSpace.sqDistortion();
+
+                resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
+
+                resStr += '\nSq Err: ' + sqErr + '\n\n';
+                if (sqErr < lowestDist) {
+                    lowestDist = sqErr;
+                    lowestRunNum = i + 1;
+                }
+
+            }
+            if (i > 1) {
+                resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
+            }
+
+            resEl.value=resStr;
 
             break;
 
@@ -7874,7 +7950,13 @@ function stepPhylogeny(e) {
     }
 
     if (phylGraphMaster) {
-        var parsScoreThisStep = phylGraphMaster.builder.progress[paramObj.phylStepNum].smallParsimony();
+        var parsScoreThisStep = 0;
+        if (phylGraphMaster.nodes[0].sequence == '') {
+
+        }
+        else {
+            parsScoreThisStep = phylGraphMaster.builder.progress[paramObj.phylStepNum].smallParsimony();
+        }
         var thisStep = paramObj.phylStepNum + 1;
         var maxStep = phylGraphMaster.builder.progress.length;
         if (thisStep == 1) {
@@ -8008,6 +8090,23 @@ function runPhylogeny(e) {
                         builder = new DGraphUltraTreeFromDistBuilder(dnaMasterStrings);
 
                         g = new DBTreeGraph(builder);
+
+                        if (debug) {
+                            var children = g.getAllChildren(g.findRoot(),true);
+                            document.getElementById('debugText').value += '\nNode order added:';
+                            g.builder.orderNodesAdded.forEach(function(order) {
+                               // document.getElementById('debugText').value += '\n' + (parseInt(order[0].label) + 1) + ' ' + (parseInt(order[1].label) + 1);
+                                var children = g.getAllChildren(order[2],true);
+                                children = children.map(function(el) {
+                                   return parseInt(el) + 1;
+                                });
+                                document.getElementById('debugText').value += '\n' + arrayToString(children);
+                            });
+                            document.getElementById('debugText').value += '\n\n';
+
+                        }
+
+
                         break;
 
                     }

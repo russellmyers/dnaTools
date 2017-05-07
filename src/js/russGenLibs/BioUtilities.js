@@ -5281,7 +5281,8 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
     this.source = source;
 
     this.progress = []; //used to store state of graphs as being built
-    
+
+    this.orderNodesAdded = [];
 
     this.internalNodePrefix = 'I';
     this.internalNodeNextNum = 1;
@@ -6157,7 +6158,7 @@ function DGraphTreeFromDistMatrixBuilder(source) {
             r = r.replace(/\s\s+/g, ' ');
             var rowData = r.split(' ');
             var rowInts = rowData.map(function (rowEntry) {
-                return parseInt(rowEntry);
+                return parseFloat(rowEntry);
             });
             svdThis.matrix.push(rowInts);
         });
@@ -6301,6 +6302,8 @@ function DGraphUltraTreeFromDistBuilder(source) {
 
             this.connectNodes(newNode,node1,true,av - node1.age);
             this.connectNodes(newNode,node2,true,av - node2.age);
+
+            this.orderNodesAdded.push([node1,node2,newNode]);
 
             this.saveProgress([newNode,node1,node2]);
 
@@ -6846,7 +6849,7 @@ function DBGraph(builder,comments) {
     else {
         this.comments = '';
     }
-    
+
 
 
     this.checkDirected = function() {
@@ -7668,6 +7671,47 @@ function DBTreeGraph(builder,comments) {
         
         
       
+        
+    };
+    
+    
+    this.getAllChildren = function(node,leavesOnly) {
+       console.log('node =  ' + node.label);
+      //get all children of a node
+       var svdThis = this;
+        
+      if (node.isLeaf()) {
+          
+          return [];
+      }
+      if (!this.isRooted()) {
+          return [];
+      }  
+        
+      var childNodes = [];  
+
+      var succs =  node.getSuccessorNodes();
+      if (succs.length == 0) {
+          return [];
+      }
+
+      succs.forEach(function(suc) {
+         if (leavesOnly) {
+             if (suc.getSuccessorNodes().length == 0) {
+                 childNodes.push(suc.label);
+             }
+         }
+         else {
+             childNodes.push(suc.label);
+         }
+
+         var children = svdThis.getAllChildren(suc,leavesOnly);
+          console.log('node: ' + node.label + ' suc: ' + suc.label +  ' children of succ: ' + children);
+         childNodes = childNodes.concat(children);
+      });
+        
+      return childNodes;  
+        
         
     };
 
@@ -10766,13 +10810,65 @@ function Centre(centrePoint)  {
 	
 	this.clusterPoints = [];
 
+    this.responsibilityVector = [];
+
+    this.weightedCentreOfGravity = function(setCentreFlag) {
+        //if setCentreFlag is true, sets the centre based on the centre of gravity, otherwise just returns the cog
+
+        var svdThis = this;
+
+        if (this.clusterPoints.length == 0) {
+            return null;
+
+        }
+        var totAr = this.clusterPoints[0].coords.map(function(el) {
+            return 0;
+        });
+
+        var divisor = 0;
+
+        this.clusterPoints.forEach(function(p,i) {
+            divisor += svdThis.responsibilityVector[i];
+            p.coords.forEach(function(coordVal,j) {
+                totAr[j] += coordVal * svdThis.responsibilityVector[i];
+
+            });
+
+        });
+
+        if (divisor == 0) {
+            divisor = 1;
+        }
+
+        totAr = totAr.map(function(el) {
+            return el  / divisor; //svdThis.clusterPoints.length;
+        });
+
+        var cogPoint = new Point(totAr);
+        if (setCentreFlag) {
+
+            this.centrePoint = cogPoint;
+        }
+
+        return cogPoint;
+
+
+    };
+
+
+
+
 
 	this.centreOfGravity = function(setCentreFlag) {
 		
 		//if setCentreFlag is true, sets the centre based on the centre of gravity, otherwise just returns the cog
-		
+
 		var svdThis = this;
-		
+
+        if (this.clusterPoints.length == 0) {
+            return null;
+
+        }
 		
 		var totAr = this.clusterPoints[0].coords.map(function(el) {
 			return 0;
@@ -10824,8 +10920,12 @@ function Centre(centrePoint)  {
 
     };
 	
-	this.addToCluster = function(p) {
+	this.addToCluster = function(p,resp) {
 		this.clusterPoints.push(p);
+
+        if (resp != null) {
+           this.responsibilityVector.push(resp);
+        }
 	};
 	
 }
@@ -10901,24 +11001,113 @@ function PointSpace(points,centres) {
 		
 	};
 	
-	
-	
-	this.kMeans = function(k,initCentrePoints) {
-		//Uses first k points as initial centres
+    this.chooseInitialCentres = function(k) {
+          var chosen = [];
+          while (chosen.length < k) {
+              var r = getRandomInt(0,this.points.length - 1);
+              if (chosen.indexOf(this.points[r]) > -1) {
+                  //already chose this one
+              }
+              else {
+                  chosen.push(this.points[r]);
+              }
+              
+              
+          }
+        
+        return chosen;
+         
+    };
+
+    this.initCentres = function(k,initRandom,initCentrePoints) {
+        //Uses first k points as initial centres
+        // if initrandom is true, choose k points randomly as initial centres
+        // if initcentrepoints is populated, use these points as initial centres
+
+        var svdThis = this;
+
+        this.centres = [];
+
+        if (initRandom) {
+            var randPoints = this.chooseInitialCentres(k);
+            randPoints.forEach(function(el) {
+                svdThis.movePointToCentres(el,true);
+            });
+        }
+
+        else if (initCentrePoints) {
+            initCentrePoints.forEach(function(el) {
+                svdThis.movePointToCentres(el,true);
+            });
+
+        }
+        else {
+            for (var i = 0;i < k;++i) {
+                this.movePointToCentres(this.points[i],true);
+            }
+        }
+
+
+    };
+
+
+    this.softKMeans = function(k,initRandom,initCentrePoints,stiff,maxItersPerRun) {
+
+        var svdThis = this;
+
+        if (stiff == null) {
+            stiff = 1;
+        }
+
+        this.initCentres(k, initRandom, initCentrePoints);
+
+        this.softAllocatePointsToClusters(stiff);
+
+        var done = false;
+
+        var iter = 0;
+        while (!done) {
+            var done = true;
+            console.log('Cogs...');
+            this.centres.forEach(function(cent,i) {
+                var prevCog = cent.centrePoint;
+                cent.weightedCentreOfGravity(true);
+                if ((!prevCog) || (!cent.weightedCentreOfGravity())) {
+
+                }
+                else if (prevCog.equalTo(cent.weightedCentreOfGravity())) {
+                }
+                else {
+                    done = false;
+                }
+                console.log('centre of gravity iter: ' + iter + ' '  + cent.weightedCentreOfGravity());
+            });
+
+            this.clearClusters();
+            this.softAllocatePointsToClusters(stiff);
+
+            ++iter;
+            if (iter > maxItersPerRun) {
+                done = true;
+            }
+
+        }
+
+
+
+
+    };
+
+	this.kMeans = function(k,initRandom,initCentrePoints) {
+
+			//Uses first k points as initial centres
+            // if initrandom is true, choose k points randomly as initial centres
+            // if initcentrepoints is populated, use these points as initial centres
 		
 		var svdThis = this;
-		
-		if (initCentrePoints) {
-			initCentrePoints.forEach(function(el) {
-				svdThis.movePointToCentres(el,true);
-			});
-			
-		}
-		else {
-			for (var i = 0;i < k;++i) {
-				 this.movePointToCentres(this.points[i],true);
-			}
-		}
+
+        this.initCentres(k,initRandom,initCentrePoints);
+
 		this.allocatePointsToClusters();
 		
 		var done = false;
@@ -10932,7 +11121,10 @@ function PointSpace(points,centres) {
 			this.centres.forEach(function(cent,i) {
 				var prevCog = cent.centrePoint;
 				cent.centreOfGravity(true);
-				if (prevCog.equalTo(cent.centreOfGravity())) {
+                if ((!prevCog) || (!cent.centreOfGravity())) {
+
+                }
+				else if (prevCog.equalTo(cent.centreOfGravity())) {
 				}
 				else {
 					done = false;
@@ -10940,7 +11132,7 @@ function PointSpace(points,centres) {
 				console.log('centre of gravity iter: ' + iter + ' '  + cent.centreOfGravity());
 			});
 			 
-			this.allocatePointsToClusters();
+			svdThis.allocatePointsToClusters();
 			
 			++iter;
 			
@@ -10958,7 +11150,7 @@ function PointSpace(points,centres) {
         var ind = this.points.indexOf(p);
 		var centrePoint;
 		if (keepPoints) {
-			centrePoint = [this.points[ind]];
+			centrePoint = [p];
 		}
 		else {
 			centrePoint = this.points.splice(ind,1);
@@ -11023,10 +11215,57 @@ function PointSpace(points,centres) {
 	this.clearClusters = function() {
 		this.centres.forEach(function(cent) {
 			cent.clusterPoints = [];
+            cent.responsibilityVector =[];
 		});
 		
 	};
-	
+
+    this.calcPart = function(stiff,x) {
+        var part = Math.pow(Math.E, -1 * stiff * x);
+        return part;
+
+    };
+
+    this.softAllocatePointsToClusters = function(stiff) {
+
+        var svdThis = this;
+
+        this.points.forEach(function (p) {
+            var totPart = 0;
+            var parts = [];
+            svdThis.centres.forEach(function (cent) {
+                var d = svdThis.dist(p, cent.centrePoint);
+                //var part = Math.pow(Math.E, -1 * stiff * d);
+                var part = svdThis.calcPart(stiff,d);
+                parts.push(part);
+                totPart += part;
+
+            });
+            var indivPart = 0;
+            var useIndivPart = false;
+            if (totPart == 0) {  //nobody taking responsibility
+                totPart = 1;
+                indivPart = totPart/parts.length;
+                useIndivPart = true;
+            }
+            parts = parts.map(function (part) {
+                if (useIndivPart) {
+                    return indivPart / totPart;
+                }
+                else {
+                    return part / totPart;
+                }
+            });
+            svdThis.centres.forEach(function (cent, i) {
+                cent.addToCluster(p, parts[i]);
+            });
+
+        });
+
+
+
+    };
+
 	this.allocatePointsToClusters = function() {
 		var svdThis = this;
 		

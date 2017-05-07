@@ -171,7 +171,7 @@
 
         <div id = "pepTools">
 		    <br>
-            <div id = "pepInputTools">
+            <div id = "pepInputTools    ">
                 <label for = "pepInput">Enter Peptide/Spectrum:</label>
                 <input type = "text" name="pepInput"  onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
                 <button type = "button" id="peptideInput" onclick="peptideInput(event)">Apply</button>
@@ -1033,7 +1033,7 @@
                     <br><input type="radio" name="miscRadio" id = "miscFunc74"  value="74" onclick = "miscRadioClicked(event.target.id)">BA8A Farthest First Traversal
                     <br><input type="radio" name="miscRadio" id = "miscFunc75"  value="75" onclick = "miscRadioClicked(event.target.id)">BA8B Sq Distortion
                     <br><input type="radio" name="miscRadio" id = "miscFunc83"  value="83" onclick = "miscRadioClicked(event.target.id)">BA8C K-means Clustering
-
+                    <br><input type="radio" name="miscRadio" id = "miscFunc84"  value="84" onclick = "miscRadioClicked(event.target.id)">BA8D Soft K-means Clustering
                     </div>
 
                     <div id = "executeMiscDiv">
