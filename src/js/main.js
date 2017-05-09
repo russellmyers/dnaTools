@@ -688,6 +688,10 @@ function setUpWorkerListeners() {
 
 }
 
+/**
+ *
+ * @param e
+ */
 
 function outputProgress(e) {
     //console.log('most freq kmer prog: ' + e.data.soFar);
@@ -713,6 +717,11 @@ function outputProgress(e) {
 
 
     }
+
+/**
+ *
+ * @param e Event passed to the routine
+ */
 
 function processReturnedMotif(e) {
     mfMotif = e.data.indArray;
@@ -907,7 +916,7 @@ function readTextFileFromServer(fileName,fileId,onFinish) {
 function readPamScoringMatrix() {
     //read from server
     var client = new XMLHttpRequest();
-    client.open('GET', './pam250.txt');
+    client.open('GET', './data/pam250.txt');
     client.onreadystatechange = function() {
         var scoringArray = [];
         if (client.readyState == 4 && client.status == 200) {
@@ -949,7 +958,7 @@ function readPamScoringMatrix() {
 function readBlosum62ScoringMatrix() {
     //read from server
     var client = new XMLHttpRequest();
-    client.open('GET', './blosum62.txt');
+    client.open('GET', './data/blosum62.txt');
     client.onreadystatechange = function() {
         var scoringArray = [];
         if (client.readyState == 4 && client.status == 200) {

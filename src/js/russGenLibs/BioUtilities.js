@@ -4824,7 +4824,16 @@ function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
 
 }
 
-
+/**
+ * Node of a DBGraph
+ * @param label
+ * @constructor
+ * @property label Node label
+ * @property visited Has node been visited in a cycle
+ * @property nodeWeight Only used to find node weighted paths
+ * @property freshNode Used to highlight newly added nodes
+ *
+ */
 
 function DBNode(label) { //basic node
     this.label = label;
@@ -5056,6 +5065,14 @@ function DBNode(label) { //basic node
 
 }
 
+/**
+ *
+ * @param label
+ * @class
+ * @augments DBNode
+ * @property sequence DNA sequence
+ * @property parsimonyScore
+ */
 
 function DBTreeNode(label) {
     var labSplit = label.split(';');
@@ -6769,6 +6786,7 @@ function DGraphTreeNJFromDistBuilder(source) {
     };
 
 
+
     this.buildNodes = function() {
         //overriding parent
         var origLeafLabels = this.leafLabels.map(function(el) {
@@ -6838,6 +6856,16 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
     
 };
 
+/**
+ *
+ * @param builder
+ * @param comments
+ * @constructor
+ * @property {Array} nodes
+ * @property {DGraphBuilder} builder
+ * @property {string} comments
+ */
+
 function DBGraph(builder,comments) {
     this.nodes = builder.buildNodes();
     this.builder = builder;
@@ -6851,8 +6879,14 @@ function DBGraph(builder,comments) {
     }
 
 
+    /**
+     *      Checks whether graph is directed or undirected
+     *      @memberof DBGraph
+     *      @returns {boolean}
+     */
 
     this.checkDirected = function() {
+
         var undirected = false;
         
         for (var i = 0;i < this.nodes.length;++i) {
@@ -6892,6 +6926,11 @@ function DBGraph(builder,comments) {
         return (!undirected);
     };
 
+    /**
+     * Checks number of edges of all nodes in graph
+     * @memberof DBGraph
+     * @returns {number} Number of edges
+     */
 
     this.numEdges = function() {
         return this.nodes.map(function(el) {
@@ -10758,12 +10797,22 @@ Aligner.AlignBlo = 2;
 Aligner.AlignDNA = 3;
 Aligner.LCS = 4;
 
-
+/**
+ * Multi dimensional point
+ * @param coords array of space separated coordinates
+ * @constructor
+ * @property coords
+ * @property m number of dimensions
+ */
 function Point(coords) {
 	
 	this.coords = coords ? coords : [];
 	this.m = coords.length;
-	
+
+	/**
+     *  @memberof Point
+     *  @returns {string}
+     *  */
 	this.toString = function() {
 		
 		var svdThis = this;
@@ -10799,6 +10848,16 @@ function Point(coords) {
 	
 }
 
+/**
+ * Represents centre of a cluster. Contains a centre point along with all points belonging to the cluster nd their responsibilities
+ * @param {Point} centrePoint
+ * @constructor
+ * @property centrePoint
+ * @property prevCentrePoint Used in convergence
+ * @clusterPoints  {Array} All points belonging to the cluster
+ * @responsibilityVector {Array} Responsibilities of the centre for each point
+ *
+ */
 
 function Centre(centrePoint)  {
  
@@ -10812,6 +10871,11 @@ function Centre(centrePoint)  {
 
     this.responsibilityVector = [];
 
+    /**
+     *
+     * @param setCentreFlag If set sets the centre based on the weighted centre of gravity, otherwise just returns the weighted cog
+     * @returns {Point} weighted centre of gravity
+     */
     this.weightedCentreOfGravity = function(setCentreFlag) {
         //if setCentreFlag is true, sets the centre based on the centre of gravity, otherwise just returns the cog
 
@@ -10856,8 +10920,11 @@ function Centre(centrePoint)  {
     };
 
 
-
-
+    /**
+     *
+     * @param setCentreFlag If set, sets the centre based on the centre of gravity, otherwise just returns the cog
+     * @returns {Point} centre of gravity
+     */
 
 	this.centreOfGravity = function(setCentreFlag) {
 		
@@ -10893,9 +10960,13 @@ function Centre(centrePoint)  {
 		
 		
 	};
-	
-	
-	
+
+
+    /**
+     *
+     * @param includeClusters
+     * @returns {string}
+     */
 	this.toString = function(includeClusters) {
 		
 		var svdThis = this;
@@ -10919,6 +10990,12 @@ function Centre(centrePoint)  {
 		}
 
     };
+
+    /**
+     *
+     * @param p point to be added
+     * @param resp responsibility of centre for point
+     */
 	
 	this.addToCluster = function(p,resp) {
 		this.clusterPoints.push(p);
@@ -10931,7 +11008,15 @@ function Centre(centrePoint)  {
 }
 
 
-
+/**
+ * Represents a collecton of points and centres. Used for clustering
+ * @param {string} points string containing space-delimited point co-ordinates (one per line)
+ * @param {Array} centres cluster centres
+ * @constructor
+ * @property  {Array} points array of Points
+ * @property {Array} centes array of Centres
+ *
+ */
 
 function PointSpace(points,centres) {
 	
@@ -10939,7 +11024,11 @@ function PointSpace(points,centres) {
 	
 	
 	this.centres = centres ?  centres : [];
-	
+
+    /**
+     * Sets up Points array member variable
+     * @param points
+     */
 	this.initPoints = function(points) {
 		
 		  
@@ -10964,6 +11053,13 @@ function PointSpace(points,centres) {
 		
 	};
 
+    /**
+     * Calculates Euclidian distence between two points
+     * @param p1
+     * @param p2
+     * @returns {number}
+     */
+
 	this.dist = function(p1,p2) {
 		var d = 0;
 		p1.coords.forEach(function(coord1,i) {
@@ -10976,7 +11072,12 @@ function PointSpace(points,centres) {
 		return d;
 		
 	};
-	
+
+    /**
+     *
+     * @returns {number}
+     */
+
 	this.sqDistortion = function() {
 		var svdThis = this;
 		var sqDistort = 0.0;
@@ -11000,7 +11101,13 @@ function PointSpace(points,centres) {
 		
 		
 	};
-	
+
+    /**
+     * Randomly chooses k initial centres from points
+     * @param k
+     * @returns {Array}
+     */
+
     this.chooseInitialCentres = function(k) {
           var chosen = [];
           while (chosen.length < k) {
@@ -11019,6 +11126,14 @@ function PointSpace(points,centres) {
          
     };
 
+    /**
+     * Uses first k points as initial centres
+     * if initrandom is true, choose k points randomly as initial centres
+     * if initcentrepoints is populated, use these points as initial centres
+     * @param k
+     * @param initRandom
+     * @param initCentrePoints
+     */
     this.initCentres = function(k,initRandom,initCentrePoints) {
         //Uses first k points as initial centres
         // if initrandom is true, choose k points randomly as initial centres
@@ -11050,7 +11165,14 @@ function PointSpace(points,centres) {
 
     };
 
-
+    /**
+     *
+     * @param k
+     * @param initRandom
+     * @param initCentrePoints
+     * @param stiff
+     * @param maxItersPerRun
+     */
     this.softKMeans = function(k,initRandom,initCentrePoints,stiff,maxItersPerRun) {
 
         var svdThis = this;
@@ -11098,6 +11220,14 @@ function PointSpace(points,centres) {
 
     };
 
+
+    /**
+     *
+     * @param k
+     * @param initRandom
+     * @param initCentrePoints
+     */
+
 	this.kMeans = function(k,initRandom,initCentrePoints) {
 
 			//Uses first k points as initial centres
@@ -11140,12 +11270,15 @@ function PointSpace(points,centres) {
 	
 		
 	};
-	
-	
-	
+
+
+    /**
+     * Used in farthest first traversal - reallocate point p as a centre
+     * @param p
+     * @param keepPoints
+     */
 	this.movePointToCentres = function(p,keepPoints) {
-		//used in farthest first traversal
-		//reallocate this point as a centre
+
  
         var ind = this.points.indexOf(p);
 		var centrePoint;
@@ -11160,7 +11293,12 @@ function PointSpace(points,centres) {
 		//cent.addToCluster(centrePoint[0]); 
 		
 	};
-	
+
+    /**
+     * Find  closest centre of a point
+     * @param p
+     * @returns {*}
+     */
 	this.findClosestCentre = function(p) {
 		var minDist = DGraph.infinity;
 		var clo = null;
@@ -11177,7 +11315,11 @@ function PointSpace(points,centres) {
 		
 		
 	};
-	
+
+    /**
+     * Add new centre
+     * @param {string} coordsStr
+     */
 	this.addCentre = function(coordsStr) {
 		
 		var coordsAr = coordsStr.split(' ');
@@ -11189,7 +11331,11 @@ function PointSpace(points,centres) {
 		this.centres.push(cent);
 		
 	};
-	
+
+    /**
+     *
+     * @returns {Point}
+     */
 	this.findFarthestPointFromCentres = function() {
 		
 		var farthestPoint = null;
@@ -11211,8 +11357,12 @@ function PointSpace(points,centres) {
 		
 		
 	};
-	
-	this.clearClusters = function() {
+
+    /**
+     * Clears clusterPoints and responsibilityVecotr for each centre
+     */
+
+    this.clearClusters = function() {
 		this.centres.forEach(function(cent) {
 			cent.clusterPoints = [];
             cent.responsibilityVector =[];
@@ -11220,12 +11370,23 @@ function PointSpace(points,centres) {
 		
 	};
 
+    /**
+     *
+     * Partition function
+     * @param stiff
+     * @param x
+     * @returns {number}
+     */
     this.calcPart = function(stiff,x) {
         var part = Math.pow(Math.E, -1 * stiff * x);
         return part;
 
     };
 
+    /**
+     *
+     * @param stiff
+     */
     this.softAllocatePointsToClusters = function(stiff) {
 
         var svdThis = this;
@@ -11266,6 +11427,9 @@ function PointSpace(points,centres) {
 
     };
 
+    /**
+     * Allocate points to clusters (hard) based on closest centre
+     */
 	this.allocatePointsToClusters = function() {
 		var svdThis = this;
 		
@@ -11276,7 +11440,12 @@ function PointSpace(points,centres) {
 			cent.addToCluster(p);
 		});
 	};
-	
+
+    /**
+     *
+     * @param includeClusters
+     * @returns {string}
+     */
 	this.centresToString = function(includeClusters) {
          var str = '';
 
