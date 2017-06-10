@@ -27,19 +27,29 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * Created by RussellM on 20/01/2016.
+ * @file Bioinformatics routines
+ * @author RussellM on 20/01/2016
  */
 
 
-//Bioinformatics routines
-
-var c_Bases = ['A','C','G','T'];
+//Constants
+/** @type {array} */
+ var c_Bases = ['A','C','G','T'];
 //var c_Bases = ['A','C','G','T'];
+
+/** @type {number} */
 var c_NumBases = 4;
+
+/** @type {object} */
 var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
+/** type {array} */
 var c_Aminos = ['G','A','L','M','F','W','K','Q','E','S','P','V','I','C','Y','H','R','N','D','T','X'];
 
+/**
+ * @module BioUtilities: Old school Graph routines
+
+ */
 //  Alignment using Manhattan type grid
 
 function DGEdge(sourceNode,targetNode,edgeType) {
@@ -3625,6 +3635,11 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
 
 
 }
+
+/**
+ * @module BioUtilities: DBGraph classes
+ *
+ */
 
 DGraph.fromDna = 1;
 DGraph.fromReads = 2;
@@ -8840,6 +8855,11 @@ function stringFromGenomePath(path) {
 }
 */
 
+/**
+ * @module BioUtilities: DNA -> Protein classes
+ *
+ *
+ */
 
 function Amino(amino) {
 
@@ -10826,6 +10846,10 @@ Aligner.AlignDNA = 3;
 Aligner.LCS = 4;
 
 /**
+ * @module BioUtilities: Clustering classes
+ */
+
+/**
  * Multi dimensional point
  * @param coords array of space separated coordinates
  * @constructor
@@ -10882,8 +10906,8 @@ function Point(coords) {
  * @constructor
  * @property centrePoint
  * @property prevCentrePoint Used in convergence
- * @clusterPoints  {Array} All points belonging to the cluster
- * @responsibilityVector {Array} Responsibilities of the centre for each point
+ * @clusterPoints  {array} All points belonging to the cluster
+ * @responsibilityVector {array} Responsibilities of the centre for each point
  *
  */
 
@@ -11039,10 +11063,10 @@ function Centre(centrePoint)  {
 /**
  * Represents a collecton of points and centres. Used for clustering
  * @param {string} points string containing space-delimited point co-ordinates (one per line)
- * @param {Array} centres cluster centres
+ * @param {array} centres cluster centres
  * @constructor
- * @property  {Array} points array of Points
- * @property {Array} centes array of Centres
+ * @property  {array} points array of Points
+ * @property {array} centres array of Centres
  *
  */
 
@@ -11133,7 +11157,7 @@ function PointSpace(points,centres) {
     /**
      * Randomly chooses k initial centres from points
      * @param k
-     * @returns {Array}
+     * @returns {array}
      */
 
     this.chooseInitialCentres = function(k) {
@@ -11507,6 +11531,12 @@ function PointSpace(points,centres) {
 	
 }
 
+/**
+ *
+ * @module BioUtilities: Misc functions
+ */
+
+
 function allPossiblePeptidesWithWeight(w) {
 
     var i;
@@ -11630,6 +11660,14 @@ function allPossiblePeptidesWithWeight(w) {
     return wMatrix[w];
 }
 
+/**
+ *
+ * @param expSpectrum
+ * @param cyclicFlag
+ * @param progCallback
+ * @param prefSufOnly
+ * @returns {string}
+ */
 function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback,prefSufOnly) {
     //actually caters for linear peptide  (cyclic flag false) or cyclic peptide (cyclic flag true)
     
@@ -13653,13 +13691,13 @@ function numPeptidesWithSpectralVector(vecAr,grid,useToy) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Centre.html">Centre</a></li><li><a href="DBGraph.html">DBGraph</a></li><li><a href="DBNode.html">DBNode</a></li><li><a href="DBTreeNode.html">DBTreeNode</a></li><li><a href="Point.html">Point</a></li><li><a href="PointSpace.html">PointSpace</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addObserver">addObserver</a></li><li><a href="global.html#c_Bases">c_Bases</a></li><li><a href="global.html#outputProgress">outputProgress</a></li><li><a href="global.html#Params">Params</a></li><li><a href="global.html#processReturnedMotif">processReturnedMotif</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines.html">BioUtilities: Old school Graph routines</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes.html">BioUtilities: DBGraph classes</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes.html">BioUtilities: DNA -> Protein classes</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes-BioUtilities_%2520Clustering%2520classes.html">BioUtilities: Clustering classes</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes-BioUtilities_%2520Clustering%2520classes-BioUtilities_%2520Misc%2520functions.html">BioUtilities: Misc functions</a></li><li><a href="module-General%2520Utilities%2520module.html">General Utilities module</a></li><li><a href="module-Main%2520module.html">Main module</a></li><li><a href="module-Web%2520worker%2520background%2520controller.html">Web worker background controller</a></li></ul><h3>Classes</h3><ul><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes-BioUtilities_%2520Clustering%2520classes-Centre.html">Centre</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes-BioUtilities_%2520Clustering%2520classes-Point.html">Point</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-BioUtilities_%2520DNA%2520-_%2520Protein%2520classes-BioUtilities_%2520Clustering%2520classes-PointSpace.html">PointSpace</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-DBGraph.html">DBGraph</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-DBNode.html">DBNode</a></li><li><a href="BioUtilities_%2520Old%2520school%2520Graph%2520routines-BioUtilities_%2520DBGraph%2520classes-DBTreeNode.html">DBTreeNode</a></li></ul><h3>Global</h3><ul><li><a href="global.html#c_Aminos">c_Aminos</a></li><li><a href="global.html#c_BaseInds">c_BaseInds</a></li><li><a href="global.html#c_Bases">c_Bases</a></li><li><a href="global.html#c_NumBases">c_NumBases</a></li><li><a href="global.html#Params">Params</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 09 2017 12:11:44 GMT+1000 (AUS Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 09 2017 17:29:43 GMT+1000 (AUS Eastern Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

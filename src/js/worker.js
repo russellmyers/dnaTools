@@ -1,5 +1,11 @@
-/*
- * Created by RussellM on 16/12/2015.
+
+/**
+ * @file Web worker background processing  for bioinformatics routines
+ * @author RussellM on 16/12/2015
+ */
+
+/**
+ * @module Web worker background controller
  */
 
 /*

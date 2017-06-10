@@ -1,9 +1,16 @@
 /**
- * Created by RussellM on 12/08/2015.
+ * @file General utility routines
+ * @author RussellM on 12/08/2015
  */
+
+/**
+ * @module General Utilities module
+ */
+
 /* 19/4/16: Added ArrayMax and ArrayMin routines
  21/4/16: Added squishString
  4/3/17: Added binary search
+ 9/5/17: Added file jsdoc comment
  */
 
 function addObserver(subject, property, callbackHandler) {

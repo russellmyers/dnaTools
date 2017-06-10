@@ -1,17 +1,27 @@
 /**
- * Created by RussellM on 20/01/2016.
+ * @file Bioinformatics routines
+ * @author RussellM on 20/01/2016
  */
 
 
-//Bioinformatics routines
-
-var c_Bases = ['A','C','G','T'];
+//Constants
+/** @type {array} */
+ var c_Bases = ['A','C','G','T'];
 //var c_Bases = ['A','C','G','T'];
+
+/** @type {number} */
 var c_NumBases = 4;
+
+/** @type {object} */
 var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
+/** type {array} */
 var c_Aminos = ['G','A','L','M','F','W','K','Q','E','S','P','V','I','C','Y','H','R','N','D','T','X'];
 
+/**
+ * @module BioUtilities: Old school Graph routines
+
+ */
 //  Alignment using Manhattan type grid
 
 function DGEdge(sourceNode,targetNode,edgeType) {
@@ -3597,6 +3607,11 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
 
 
 }
+
+/**
+ * @module BioUtilities: DBGraph classes
+ *
+ */
 
 DGraph.fromDna = 1;
 DGraph.fromReads = 2;
@@ -8812,6 +8827,11 @@ function stringFromGenomePath(path) {
 }
 */
 
+/**
+ * @module BioUtilities: DNA -> Protein classes
+ *
+ *
+ */
 
 function Amino(amino) {
 
@@ -10798,6 +10818,10 @@ Aligner.AlignDNA = 3;
 Aligner.LCS = 4;
 
 /**
+ * @module BioUtilities: Clustering classes
+ */
+
+/**
  * Multi dimensional point
  * @param coords array of space separated coordinates
  * @constructor
@@ -10854,8 +10878,8 @@ function Point(coords) {
  * @constructor
  * @property centrePoint
  * @property prevCentrePoint Used in convergence
- * @clusterPoints  {Array} All points belonging to the cluster
- * @responsibilityVector {Array} Responsibilities of the centre for each point
+ * @clusterPoints  {array} All points belonging to the cluster
+ * @responsibilityVector {array} Responsibilities of the centre for each point
  *
  */
 
@@ -11011,10 +11035,10 @@ function Centre(centrePoint)  {
 /**
  * Represents a collecton of points and centres. Used for clustering
  * @param {string} points string containing space-delimited point co-ordinates (one per line)
- * @param {Array} centres cluster centres
+ * @param {array} centres cluster centres
  * @constructor
- * @property  {Array} points array of Points
- * @property {Array} centes array of Centres
+ * @property  {array} points array of Points
+ * @property {array} centres array of Centres
  *
  */
 
@@ -11105,7 +11129,7 @@ function PointSpace(points,centres) {
     /**
      * Randomly chooses k initial centres from points
      * @param k
-     * @returns {Array}
+     * @returns {array}
      */
 
     this.chooseInitialCentres = function(k) {
@@ -11479,6 +11503,12 @@ function PointSpace(points,centres) {
 	
 }
 
+/**
+ *
+ * @module BioUtilities: Misc functions
+ */
+
+
 function allPossiblePeptidesWithWeight(w) {
 
     var i;
@@ -11602,6 +11632,14 @@ function allPossiblePeptidesWithWeight(w) {
     return wMatrix[w];
 }
 
+/**
+ *
+ * @param expSpectrum
+ * @param cyclicFlag
+ * @param progCallback
+ * @param prefSufOnly
+ * @returns {string}
+ */
 function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback,prefSufOnly) {
     //actually caters for linear peptide  (cyclic flag false) or cyclic peptide (cyclic flag true)
     

@@ -1,4 +1,13 @@
 
+/**
+ * @file Foreground UI controller for bioinformatics routines
+ * @author RussellM on 20/01/2016
+ */
+
+/**
+ * @module Main module
+
+ */
 //Global Variables
 
 var k = 2;
@@ -689,8 +698,8 @@ function setUpWorkerListeners() {
 }
 
 /**
- *
- * @param e
+ * Show ticker with rolling update of progress of background process
+ * @param e e.data contains object with messages regarding progress
  */
 
 function outputProgress(e) {
@@ -719,7 +728,7 @@ function outputProgress(e) {
     }
 
 /**
- *
+ * Result routine - process motif returned from background
  * @param e Event passed to the routine
  */
 
