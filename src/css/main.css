@@ -145,8 +145,14 @@ body {
 
 }
 
+
+#errorMsgDiv {
+	color: red;
+	float:left;
+}
+
 #statsAndInputTools {
-    height: 125px;
+    height: 95px;
     background-color: beige;
     margin-bottom:5px;
 
@@ -219,8 +225,10 @@ body {
     display: inline-block;
    /* width: 65%;
     height: 100%;*/
-    width: 660px;
+	/*
+    width:  660px;	
     height: 150px;
+	*/
     background-color: white;
     vertical-align: top;
 
@@ -243,24 +251,31 @@ input[type=number] {
     word-wrap: break-word;
     width: 100%;
 
-    height: 100%;
+    height: 92%;
     padding:5px;
-
+    overflow: auto;
 
 }
+
+#dnaMessageDiv {
+	display: none;
+	color: blue;
+}
+
 #dnaviewer {
     display: inline-block;
     background-color: beige;
     width: 100%;
     height: 100%;
-    overflow:auto;
+    overflow:none;
    /* display:none;*/
 
 
 }
 
 #graphviewer {
-    background-color: firebrick;
+    /*background-color: firebrick;*/
+	background-color:  beige;
     width: 100%;
     height: 100%;
     overflow:auto;
@@ -278,15 +293,15 @@ input[type=number] {
 }
 
 #phylogenyGraphDiv {
-    width: 800px;
-    height: 550px;
+    width: 100%;/*800px;*/
+    height: 98%; /*550px;*/
     overflow:scroll;
 }
 
 #transViewer {
     background-color:  beige;
     width: 100%;
-    height: 25%;
+    height: 100%;
     overflow:auto;
     display:none;
     font-family: "Lucida Console", Monaco, monospace;
@@ -316,7 +331,8 @@ input[type=number] {
 
 #sbViewer {
 
-    background-color:  peachpuff;
+    /*background-color:  peachpuff;*/
+	background-color: beige;
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -334,34 +350,43 @@ input[type=number] {
 }
 
 #alignGridDiv {
-    background-color: darkolivegreen;
+    /*background-color: darkolivegreen;*/
     width: 100%;
     height: 50%;
 }
 
+#graphReconstructedDiv {
+    display: block;
+    /*background-color: #b3d4fc;*/
+    width: 100%;
+    height: 12%;
+	overflow:auto;
+}
 
 #graphDnaDiv {
     display: block;
-    background-color: #b3d4fc;
+    /*background-color: #b3d4fc;*/
     width: 100%;
     height: 7%;
+	overflow:auto;
 }
 #graphReadsDiv {
     display: block;
-    background-color: cadetblue;
+    /*background-color: cadetblue;*/
     width: 100%;
     height: 10%;
+	overflow:auto;
 }
 #graphAdjListDiv {
     display: block;
-    background-color: darkorchid;
+    /*background-color: darkorchid;*/
     width: 100%;
     height: 20%;
-    overflow: scroll;
+    overflow: auto;
 }
 #graphGraphDiv {
     display: block;
-    background-color: #e2d892;
+    background-color: white;/*#e2d892;*/
     width: 100%;
     height: 150px;
    overflow-x: scroll;
@@ -402,6 +427,24 @@ input[type=number] {
 }
 
 
+#runImg {
+	height: 30px;
+	width: 15px;
+	margin-left: 20px;
+	visibility: hidden;
+}
+
+#matchEls {
+	
+	display: none;
+	margin-right: 25px;
+}
+
+#pageEls {
+	display: inline-block;
+	margin-right: 25px;
+}
+
 .dnaChar {
     font-family: monospace;
     font-size: 16px;
@@ -439,6 +482,10 @@ input[type=number] {
 
 }
 
+.dnaCharSuperHighlight {
+	background-color: #0090FF;
+}
+
 
 
 #stats {
@@ -461,6 +508,7 @@ input[type=number] {
 #leftMainDiv {
     background-color: grey;
     width: 55%;
+    height: 100%;
     height: 100%;
     display: inline-block;
     margin-right: 0;
@@ -568,8 +616,14 @@ input[type=number] {
 
 
 #motifsInput {
-    vertical-align: baseline;
+    vertical-align: top;
 }
+
+.alTop {
+	vertical-align: top;
+	
+}
+
 
 
 #rightMainDiv {
@@ -586,10 +640,12 @@ input[type=number] {
     padding: 0 0 10px;
 
 }
-
+#runManDiv {
+  float:right;
+}
 
 #progressDiv {
-    clear: both;
+    /*clear: both;*/
     float:right;
 }
 
@@ -619,14 +675,15 @@ input[type=number] {
 
 }*/
 #rightTwo {
+	font-size: 12px;
     border: ridge;
-    height: 100px;
-    width: 220px;
+    height: 65px;
+    width: 250px;
     /*display: inline-block;*/
     float: right;
     text-align: center;
     vertical-align: top;
-    overflow: scroll;
+    overflow: auto;
 	background-color: white;
     display:none;
 	
@@ -653,8 +710,10 @@ input[type=number] {
 #skewCanvas {
     margin: 2px 0 0 6px;
     padding: 2px;
-    width: 18%; /*220px;*/
+	/*
+    width: 18%; //*220px;
     height: 134px;
+	*/
     background-color: white; /*#75aeb5; *//*was purple*/
     display: none; /* inline-block when switched on*/
     vertical-align: top;
@@ -729,7 +788,7 @@ input[type=number] {
 
 #midSeq {
      margin-left: 30px;
-     width: 15%;
+     width: 16%;
  }
 #rightSeq {
     width: 30%;
@@ -739,8 +798,17 @@ input[type=number] {
     margin-left: 30px;
     width: 15%;
 }
+#midAlign {
+    margin-left: 10px;
+    width: 25%;
+}
+
 #rightPep {
-    width: 50%;
+    width: 35%;
+}
+
+#rightAlign {
+    width: 30%;
 }
 
 #midTr {
@@ -779,6 +847,24 @@ input[type=number] {
 }
 
 
+.medInput {
+	width: 50px;
+	
+}
+
+
+.runBut {
+    /* background-color: lightgreen;
+	 color: white;*/
+	background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    /*font-size: 16px;*/
+}
 
 
 
@@ -830,13 +916,27 @@ input[type=number] {
     width: 60px;
 }
 
+.largeNum {
+	width: 90px;
+}
+
+.createdTableSelectedRow {
+	background-color: #0090FF;
+
+	
+}
+
+#extraParametersControl {
+	display: none;
+}
+
 /*tabs stuff*/
 #tabs {border-bottom:1px solid #ccc;height:42px; width: 100%; margin:10px 0 5px;padding-top:5px; background: white; /*#5f9ca3;*/ /*background:#fff;*/}
 #tabs a {float: left;margin-left:5px;border-radius:3px 3px 0 0;border:1px solid #eee;border-bottom-color:#ccc;color:#555;height:27px;line-height:32px;padding:0 12px;text-decoration:none;background-color: #ddd; } /*color #08c*/
 #tabs a:hover {background:#ddd;color:#09c;border-color:#ddd #ddd #ccc;} /*color #058 */
 #tabs a.active {background: #fff;color:#08c;border-color:#ccc #ccc #fff;} /*color #555*/
 #tabs a.active:hover {background:#fff;color:#08c;border-color:#ccc #ccc #fff;} /*color #555 */
-#tabs_data {clear: both; display: inline-block;  background-color:#75aeb5;padding: 2px; height:140px; width: 80% }
+#tabs_data {clear: both; display: inline-block; visibility: hidden;  background-color:#75aeb5;padding: 2px; height:140px; width: 80% }
 /*#tabs_data fieldset {margin: 5px; height: 80px;display:none;border:1px solid;color:black; background-color: white; }
 #tabs_data fieldset div {font-size:13px;}*/
 /*#tabs_data section {margin: 5px; height: 80px;display:none;border:1px solid;color:black; background-color: white; }

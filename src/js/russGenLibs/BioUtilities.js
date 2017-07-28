@@ -2205,7 +2205,7 @@ function DGGraph(source,sourceType,alignType) {
         var curNode;
         if (this.alignType == DGraph.alignTypeLocal) {
             curNode = this.bestNode;
-            if (this.u.length > 0) {
+            if (this.u && (this.u.length > 0)) {
                 var coord = this.getNodeRowColLevel(parseInt(curNode.label));
                // endPosT = coord[0] - 1; //row
                // endPosS = coord[1] - 1; //col
@@ -2266,7 +2266,7 @@ function DGGraph(source,sourceType,alignType) {
          || (this.alignType == DGraph.alignTypeFitting)
           || (this.alignType == DGraph.alignTypeOverlap) ){
             
-            if (this.u.length > 0 ) {
+            if (this.u && (this.u.length > 0 )) {
                 coord = this.getNodeRowColLevel(parseInt(curNode.label));
                 //startPosS = coord[1]; //col
                 //startPosT = coord[0]; //row

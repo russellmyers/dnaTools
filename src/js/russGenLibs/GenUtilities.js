@@ -4,6 +4,8 @@
 /* 19/4/16: Added ArrayMax and ArrayMin routines
  21/4/16: Added squishString
  4/3/17: Added binary search
+ 23/7/17: Added extra param to tab_click done (previous tab number)
+ 27/7/17: Added logic to createTable to allow for selected row
  */
 
 function addObserver(subject, property, callbackHandler) {
@@ -506,7 +508,7 @@ function createSpecialTable(tableData,headerData,tabType) {
     return table;
 }
 
-function createTable(tableData,headerData,editableCols,startEditableCol,keyPressCallback,onBlurCallback,onFocusCallback,tabIdPrefix,tabType) {
+function createTable(tableData,headerData,editableCols,startEditableCol,keyPressCallback,onBlurCallback,onFocusCallback,tabIdPrefix,tabType,selectedRow) {
     tabType = tabType || 'fixed';
     editableCols = editableCols || 0;
     startEditableCol = startEditableCol || null;
@@ -515,6 +517,7 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
     onFocusCallback = onFocusCallback || null;
     tabIdPrefix = tabIdPrefix || '';
     headerData = headerData || null;
+	
 
     var table = document.createElement('table')
         , tableBody = document.createElement('tbody');
@@ -541,6 +544,8 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
         else {
             row.className += ' createdTableOddRow';
         }
+		
+	
 
         rowData.forEach(function(cellData,colNum) {
             var cell = document.createElement('td');
@@ -562,6 +567,15 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
             }
             // cell.appendChild(document.createTextNode(cellData));
             cell.innerHTML = cellData;
+			if (selectedRow != null) {
+				if ((rowNum == selectedRow) && (colNum == 0)) {
+					cell.className += ' createdTableSelectedRow';
+				}
+			}
+		
+				
+		
+		
             row.appendChild(cell);
         });
 
@@ -607,6 +621,7 @@ function checkEnter(event)
 function tab_click(x,onComplete){
     var myParams = Params.getInstance();
     var tabActive=myParams.tabActive;
+	var prevTabActive = myParams.tabActive;
     var tabs=document.getElementById('tabs').getElementsByTagName('A');
    // var tabs_data=document.getElementById('tabs_data').getElementsByTagName('fieldset');
     var tabs_data=document.getElementById('tabs_data').getElementsByTagName('section');
@@ -629,7 +644,7 @@ function tab_click(x,onComplete){
 
         myParams.tabActive = tabActive;
         if (onComplete) {
-           onComplete(tabActive);
+           onComplete(tabActive,prevTabActive);
         }
 
     } return false;
