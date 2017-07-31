@@ -413,6 +413,7 @@ function initialisePage() {
 
     document.getElementById('phylDNA').checked = true;
     phylInputRadClicked('phylDNA');
+    document.getElementById('phylNeighbour').checked = true;
     phylRadClicked('phylNeighbour');
 
     phylRadClicked('allowStepPH');
@@ -423,7 +424,7 @@ function initialisePage() {
 	document.getElementById('trDNA').checked = true;
 	transInputRadClicked('trDNA');
 	
-	
+	useAffineClicked();
 	
 
     expDebugState = false;
@@ -472,7 +473,7 @@ function setUpWorkerListeners() {
                     expStateChanged('expMulti',true);
 					
                     mfk = [e.data.indArray];
-					mkfProcessed = true;
+					mfkProcessed = true;
                     //k = kmer.length;
                     document.getElementById('numKmers').value = 1;
                     numKmerChanged();
@@ -602,6 +603,10 @@ function setUpWorkerListeners() {
 
                     mfk = e.data.indArray;
 					mfkProcessed = true;
+
+                    document.getElementById('numKmers').value = 1;
+                    numKmerChanged();
+
 					
                     var clumps = e.data.clumps;
                     tot = 0;
@@ -2241,7 +2246,7 @@ function EdgePrinter(edge,nodePSt,nodePEnd,backNum,forwardNum) {
     if (this.nodePSt.linearNum > this.nodePEnd.linearNum) {
         this.stY += this.nodePSt.radius * 2;
         this.endY  += this.nodePEnd.radius * 2;
-        // this.point1 = this.stY + (NodePrinter.pointInc * this.numBackward);
+        this.point1 = this.stY + (NodePrinter.pointInc * this.numBackward);
         this.point2 = this.endY + (NodePrinter.pointInc * this.numBackward);
 
     }
@@ -7987,7 +7992,7 @@ function runSequencing(e) {
    
 		}
 	 }
-	if (paramObj.seqInput == DGraph.fromDNA) {
+	if (paramObj.seqInput == DGraph.fromDna) {
 		 if (dnaMaster == null || dnaMaster == '') {
 		   errMsg('Please enter/load DNA first, then Run!');
 		   return;
@@ -8086,7 +8091,7 @@ function runSequencing(e) {
     document.getElementById('debugText').value += 'Input length: ' + inputLen + '\n';
 
 
-    grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
+    grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist,null,paramObj.seqMethod);
 
 
     switch (paramObj.seqMethod) {
@@ -9496,9 +9501,11 @@ function initGraphCanvas(wid,hei,canv) {
 }
 
 function graphCanvas(grph) {
+    /*
     if (grph.nodes.length > 1000) {
         return;
     }
+    */
 
    // var ctx = initGraphCanvas(null,null,document.getElementById('peptideCanvas'));
    var ctx = initGraphCanvas();
@@ -9533,8 +9540,10 @@ function graphCanvas(grph) {
 
 
 
-    nodePrinters.forEach(function(nodeP) {
-        nodeP.print(ctx);
+    nodePrinters.forEach(function(nodeP,i) {
+        if (i < 1000) {
+            nodeP.print(ctx);
+        }
 
     });
 
@@ -9604,10 +9613,12 @@ function graphCanvas(grph) {
     //Print edges
 
     for (var j = 0;j < nodePrinters.length; ++j) {
-            nodePrinters[j].edgePrinters.forEach(function(edgeP) {
-                edgeP.print(ctx,0);
+            if (j < 1000) {
+                nodePrinters[j].edgePrinters.forEach(function (edgeP) {
+                    edgeP.print(ctx, 0);
 
-            });
+                });
+            }
 
     }
 
@@ -10176,6 +10187,8 @@ function skewCanvas(skewData) {
 function initialiseResults()  {
 	
 	errMsg('');
+
+    document.getElementById('progress').innerHTML = '';
 	
     //var hData = ['k-mers', 'Num found'];
 	var hData = ['', ''];
@@ -10279,8 +10292,12 @@ function colourAlignFromBackground() {
 
         }
         else {
+
             sFormatted += '<b>' + alignReturned.sAligned + '</b>';
             tFormatted += '<b>' + alignReturned.tAligned + '</b>';
+
+
+
             if (alignU.length > 0) {
                 uFormatted += '<b>' + alignReturned.uAligned + '</b>';
             }
@@ -10292,10 +10309,10 @@ function colourAlignFromBackground() {
 
         //add unaligned portion, but only for 2 way alignment
         if (alignU.length == 0) {
-            sFormatted += alignS.substring(alignReturned.endPosS + 1);
-            tFormatted += alignT.substring(alignReturned.endPosT + 1);
-            var unalignedSStart = alignS.substring(0, alignReturned.startPosS);
-            var unalignedTStart = alignT.substring(0, alignReturned.startPosT);
+            sFormatted += '<i>' + alignS.substring(alignReturned.endPosS + 1) + '</i>';
+            tFormatted += '<i>' + alignT.substring(alignReturned.endPosT + 1) + '</i>';
+            var unalignedSStart = '<i>' + alignS.substring(0, alignReturned.startPosS) + '</i>';
+            var unalignedTStart = '<i>' + alignT.substring(0, alignReturned.startPosT) + '</i>';
 
             var diff = unalignedSStart.length - unalignedTStart.length;
             if (diff > 0) {
@@ -11842,7 +11859,15 @@ function sbMasterChanged() {
 
 function graphChanged(grph) {
 
+    document.getElementById('moreCanvas').style.visibility = 'visible';
+
+    document.getElementById('graphReadsDiv').style.display = 'block';
+    document.getElementById('graphReconstructedDiv').style.display = 'block';
+    document.getElementById('graphAdjListDiv').style.visibility = 'block';
+
+
     if (grph.dna) {
+        document.getElementById('graphDnaDiv').style.display = 'block';
         document.getElementById('graphDnaDiv').innerHTML = 'DNA: ' + grph.dna;
 
     }
@@ -11931,7 +11956,7 @@ function graphChanged(grph) {
                 reconShort = recon;
            }
             document.getElementById('debugText').value += '\nReconstructed: \n' + reconShort;
-			document.getElementById('graphReconstructedDiv').innerHTML = 'Reconstructed: ' + reconShort;
+			document.getElementById('graphReconstructedDiv').innerHTML = 'Reconstructed: ' + recon;
             if (grph.dna === recon) {
                 document.getElementById('debugText').value += '\nMatch!';
 				document.getElementById('graphReconstructedDiv').innerHTML += ' Match!';
@@ -11944,7 +11969,6 @@ function graphChanged(grph) {
         }
         else {
             recon =  grph.edgePathReconstructed();
-
             if (recon.length > 300) {
                 reconShort = recon.substring(0,150) + '...' + recon.substring(recon.length-150);
             }
@@ -11952,7 +11976,7 @@ function graphChanged(grph) {
                 reconShort = recon;
             }
             document.getElementById('debugText').value += '\nReconstructed: \n' + reconShort;
-			document.getElementById('graphReconstructedDiv').innerHTML = 'Reconstructed: ' + reconShort;
+			document.getElementById('graphReconstructedDiv').innerHTML = 'Assembled: ' + recon;
         }
 
         if (dispMaxBranchRecon) document.getElementById('debugText').value += '\nEdges: ' + grph.edgePathToText();
@@ -12033,6 +12057,7 @@ function graphChanged(grph) {
         }
     }
 
+    document.getElementById('graphReconstructedDiv').innerHTML+= '<br>Contigs(' + contigs.length + '): ' + arrayToString(contigs);
 
 
     if (dispMaxBranchRecon) document.getElementById('debugText').value += '\nMaximal Non Branching reconstructed:';
@@ -12101,6 +12126,10 @@ function autoDetectContents(contents,area) {
         return (el.length != 0);
     });
 
+    if (spl.length == 0) {
+        return -1;
+    }
+
     if (spl.length == 1) {
         if (area == 'peptideInput') {
             if (spl[0].match("^[a-zA-Z]+$")) {
@@ -12165,6 +12194,10 @@ function cleanContents(contents,contentType) {
 
 
     var spl,parts,joined,newContents;
+
+    if (contents == '') {
+        return contents;
+    }
 
     if (contentType) { //new regime
 
@@ -12680,6 +12713,9 @@ function sequencingInput(e,input) {
 
     }
 
+    document.getElementById('moreCanvas').style.visibility = 'hidden';
+    document.getElementById('graphAdjListDiv').style.visibility = 'hidden';
+
     var seqInp = document.getElementsByName('seqInput');
 
     var val = '';
@@ -12744,17 +12780,25 @@ function sequencingInput(e,input) {
         document.getElementById('sequencingStrings').value = cleaned;
     }
 
+    document.getElementById('graphReconstructedDiv').style.display = 'none';
+
 
     switch (val) {
         case 'seqDNA':case 'seqPairedDNA':
             dnaMaster = cleaned;
             dnaMasterChanged();
+            document.getElementById('graphReadsDiv').style.display = 'none';
+            document.getElementById('graphDnaDiv').style.display = 'block';
             document.getElementById('graphDnaDiv').innerHTML = 'DNA: ' + dnaMaster;
             break;
         case 'seqReads':
+            document.getElementById('graphDnaDiv').style.display = 'none';
+            document.getElementById('graphReadsDiv').style.display = 'block';
             dnaMasterStrings = cleaned;
              break;
         case 'seqPairedReads':
+            document.getElementById('graphDnaDiv').style.display = 'none';
+            document.getElementById('graphReadsDiv').style.display = 'block';
             dnaMasterStrings = cleaned;
            break;
         case 'seqAdjList':
@@ -13210,37 +13254,154 @@ function randSequencingPressed(event) {
    if (event) {
         
     }
+
+    var seqRadioInputId = getSelectedRadioEl('seqInput').id;
     
-    var randN = document.getElementById('numSequencingRand');
-    var randNVal = parseInt(randN.value);
+    var randNVal = parseInt(document.getElementById('numSequencingRand').value);
 
-
-   // document.getElementById('dnaInput').value = randomDNA(randNVal);
-   // dnaInput();
-
-   
     var randDNA = randomDNA(randNVal);
-	
-	
-	var readLen = parseInt(document.getElementById('kmerLenSA').value);
-	
-	var reads = [];
-	
-	for (var i = 0;i < randDNA.length - readLen + 1;++i) {
-        var read = randDNA.substring(i,i+readLen);
-		reads.push(read);
-	}
-	
-	reads.sort();
-	   
-    document.getElementById('sequencingStrings').value = arrayToString(reads,'\n');
-   
-    sequencingInput();
-	
-    
 
+    if (seqRadioInputId == 'seqDNA') {
+        document.getElementById('sequencingStrings').value = randDNA;
+        sequencingInput();
+        return;
+
+    }
 	
-	}
+	if (seqRadioInputId == 'seqPairedReads') {
+
+        var readLen = parseInt(document.getElementById('kmerLenSA').value);
+
+        var pairGapLen = parseInt(document.getElementById('pairDistSA').value);
+
+        var totReadLen = readLen * 2 + pairGapLen;
+
+        var reads = [];
+
+        for (var i = 0; i < randDNA.length - totReadLen + 1; ++i) {
+            var read = randDNA.substring(i, i + totReadLen);
+            reads.push(read.substring(0,readLen) + '|' + read.substring(readLen+pairGapLen));
+
+        }
+
+        reads.sort();
+
+        document.getElementById('sequencingStrings').value = arrayToString(reads, '\n');
+
+        sequencingInput();
+        return;
+    }
+
+    if (seqRadioInputId == 'seqReads') {
+        var readLen = parseInt(document.getElementById('kmerLenSA').value);
+
+        var pairGapLen = parseInt(document.getElementById('pairDistSA'));
+
+        var reads = [];
+
+        for (var i = 0; i < randDNA.length - readLen + 1; ++i) {
+            var read = randDNA.substring(i, i + readLen);
+            reads.push(read);
+        }
+
+        reads.sort();
+
+        document.getElementById('sequencingStrings').value = arrayToString(reads, '\n');
+
+        sequencingInput();
+        return;
+    }
+
+
+
+
+
+}
+
+function randPhylogenyPressed(event) {
+
+    if (event) {
+
+    }
+
+    var phylRadioInputId = getSelectedRadioEl('phylInput').id;
+
+    var randNVal = parseInt(document.getElementById('numPhylogenyRand').value);
+
+    var randDNA = randomDNA(randNVal);
+
+    var sampleAlignment = '>Frog\nATCCAAA\n>Dog\nATAGACA\n>Snail\nATCATAA\n>Cat\nATAGAAT\n>Banana\nGAAAAAA';
+
+    if (phylRadioInputId == 'phylDNA') {
+        document.getElementById('phylogenyStrings').value = sampleAlignment;
+        phylogenyInput();
+        return;
+
+    }
+
+    if (phylRadioInputId == 'phylDistMat') {
+        document.getElementById('phylogenyStrings').value = 'I J K L\n0 3 4 3\n3 0 4 5\n4 4 0 2\n3 5 2 0';
+        phylogenyInput();
+        return;
+    }
+
+    if (phylRadioInputId == 'phylAdjList') {
+        document.getElementById('phylogenyStrings').value = '1->2;ACGTT\n2->3;ACGTA\n2->4;ACGAA\n1->5;AAGTT';
+        phylogenyInput();
+        return;
+    }
+
+
+    if (seqRadioInputId == 'seqPairedReads') {
+
+        var readLen = parseInt(document.getElementById('kmerLenSA').value);
+
+        var pairGapLen = parseInt(document.getElementById('pairDistSA').value);
+
+        var totReadLen = readLen * 2 + pairGapLen;
+
+        var reads = [];
+
+        for (var i = 0; i < randDNA.length - totReadLen + 1; ++i) {
+            var read = randDNA.substring(i, i + totReadLen);
+            reads.push(read.substring(0,readLen) + '|' + read.substring(readLen+pairGapLen));
+
+        }
+
+        reads.sort();
+
+        document.getElementById('sequencingStrings').value = arrayToString(reads, '\n');
+
+        sequencingInput();
+        return;
+    }
+
+    if (seqRadioInputId == 'seqReads') {
+        var readLen = parseInt(document.getElementById('kmerLenSA').value);
+
+        var pairGapLen = parseInt(document.getElementById('pairDistSA'));
+
+        var reads = [];
+
+        for (var i = 0; i < randDNA.length - readLen + 1; ++i) {
+            var read = randDNA.substring(i, i + readLen);
+            reads.push(read);
+        }
+
+        reads.sort();
+
+        document.getElementById('sequencingStrings').value = arrayToString(reads, '\n');
+
+        sequencingInput();
+        return;
+    }
+
+
+
+
+
+}
+
 
 
 function randAlignPressed(event) {
@@ -13446,6 +13607,12 @@ function debugSwitchClicked(e) {
 
 }
 
+function useAffineClicked() {
+    var useAffineFlag = document.getElementById('affineAL').checked;
+    document.getElementById('affineOpenGapAL').style.display = useAffineFlag ? 'block' : 'none';
+    document.getElementById('affineOpenGapALLab').style.display = useAffineFlag ? 'block' : 'none';
+}
+
 
 function alignRadClicked(id) {
     
@@ -13455,6 +13622,32 @@ function alignRadClicked(id) {
 
     var alignTypeRadioSel = getSelectedRadioEl('alignMethod');
     var  scoreMatrixRadioSel = getSelectedRadioEl('alignScore');
+
+    switch (alignTypeRadioSel.id) {
+        case 'alignLCS':
+            document.getElementById('indelPenAL').value = 0;
+            document.getElementById('mismatchPenAL').value = 0;
+            break;
+        case 'alignEditDist':
+            document.getElementById('indelPenAL').value = 1;
+            document.getElementById('mismatchPenAL').value = 1;
+            break;
+        default:
+
+
+            switch (scoreMatrixRadioSel.id) {
+                case  'alignNoScore':
+                    document.getElementById('indelPenAL').value = 1;
+                    document.getElementById('mismatchPenAL').value = 1;
+                    break;
+                default:
+                    document.getElementById('indelPenAL').value = 5;
+                    document.getElementById('mismatchPenAL').value = 5;
+                    break;
+            }
+            break;
+
+    }
 
     //Align method Radio Button
     switch (alignTypeRadioSel.id) {
@@ -13578,21 +13771,30 @@ function motifRadClicked(id) {
 }
 
 function phylInputRadClicked(id) {
-    //Motif Radio Button
+
+    document.getElementById('phylogenyStrings').value = '';
+    phylogenyInput();
+
     switch (id) {
         case 'phylDNA':
 
+            document.getElementById('phylogenyStrings').placeholder = "Enter/paste DNA alignments in FASTA format eg:\n>Frog\nACGTGCA\n>Dog\nCGTACTC etc";
 
             document.getElementById('phylAdd').hidden = false;
             document.getElementById('phylAddLab').hidden = false;
-            document.getElementById('phylUltra').hidden = false;
-            document.getElementById('phylUltraLab').hidden = false;
-            document.getElementById('phylNeighbour').hidden = false;
-            document.getElementById('phylNeighbourLab').hidden = false;
-            document.getElementById('phylDisplayTree').hidden = true;
-            document.getElementById('phylDisplayTreeLab').hidden = true;
-            document.getElementById('phylSmallParsimony').hidden = true;
-            document.getElementById('phylSmallParsimonyLab').hidden = true;
+            //document.getElementById('phylUltra').hidden = false;
+            //document.getElementById('phylUltraLab').hidden = false;
+            document.getElementById('phylUltraPlusBr').style.display = 'block';
+            document.getElementById('phylNeighbour').checked = true;
+            document.getElementById('phylNeighbPlusBr').style.display = 'block';
+            //document.getElementById('phylNeighbour').hidden = false;
+            //document.getElementById('phylNeighbourLab').hidden = false;
+            //document.getElementById('phylDisplayTree').hidden = true;
+            //document.getElementById('phylDisplayTreeLab').hidden = true;
+            document.getElementById('phylDisplayPlusBr').style.display = 'none';
+            //document.getElementById('phylSmallParsimony').hidden = true;
+            //document.getElementById('phylSmallParsimonyLab').hidden = true;
+            document.getElementById('phylSmallPlusBr').style.display = 'none';
             document.getElementById('phylLargeParsimony').hidden = false;
             document.getElementById('phylLargeParsimonyLab').hidden = false;
 
@@ -13601,16 +13803,23 @@ function phylInputRadClicked(id) {
 
         case 'phylDistMat':
 
+            document.getElementById('phylogenyStrings').placeholder = 'Enter/paste Distance Matrix';
+
             document.getElementById('phylAdd').hidden = false;
             document.getElementById('phylAddLab').hidden = false;
-            document.getElementById('phylUltra').hidden = false;
-            document.getElementById('phylUltraLab').hidden = false;
-            document.getElementById('phylNeighbour').hidden = false;
-            document.getElementById('phylNeighbourLab').hidden = false;
-            document.getElementById('phylDisplayTree').hidden = true;
-            document.getElementById('phylDisplayTreeLab').hidden = true;
-            document.getElementById('phylSmallParsimony').hidden = true;
-            document.getElementById('phylSmallParsimonyLab').hidden =  true;
+            //document.getElementById('phylUltra').hidden = false;
+            //document.getElementById('phylUltraLab').hidden = false;
+            document.getElementById('phylUltraPlusBr').style.display = 'block';
+            document.getElementById('phylNeighbour').checked = true
+            //document.getElementById('phylNeighbour').hidden = false;
+            document.getElementById('phylNeighbPlusBr').style.display = 'block';
+            //document.getElementById('phylNeighbourLab').hidden = false;
+            //document.getElementById('phylDisplayTree').hidden = true;
+            //document.getElementById('phylDisplayTreeLab').hidden = true;
+            document.getElementById('phylDisplayPlusBr').style.display = 'none';
+            //document.getElementById('phylSmallParsimony').hidden = true;
+            //document.getElementById('phylSmallParsimonyLab').hidden =  true;
+            document.getElementById('phylSmallPlusBr').style.display = 'none';
             document.getElementById('phylLargeParsimony').hidden = true;
             document.getElementById('phylLargeParsimonyLab').hidden = true;
 
@@ -13621,16 +13830,24 @@ function phylInputRadClicked(id) {
 
         case 'phylAdjList':
 
+            document.getElementById('phylogenyStrings').placeholder = 'Enter/paste Adjacency List';
+
             document.getElementById('phylAdd').hidden = true;
             document.getElementById('phylAddLab').hidden = true;
-            document.getElementById('phylUltra').hidden = true;
-            document.getElementById('phylUltraLab').hidden = true;
-            document.getElementById('phylNeighbour').hidden = true;
-            document.getElementById('phylNeighbourLab').hidden = true;
-            document.getElementById('phylDisplayTree').hidden = false;
-            document.getElementById('phylDisplayTreeLab').hidden = false;
-            document.getElementById('phylSmallParsimony').hidden = false;
-            document.getElementById('phylSmallParsimonyLab').hidden = false;
+            //document.getElementById('phylUltra').hidden = true;
+            //document.getElementById('phylUltraLab').hidden = true;
+            document.getElementById('phylUltraPlusBr').style.display = 'none';
+            //document.getElementById('phylNeighbour').hidden = true;
+            //document.getElementById('phylNeighbourLab').hidden = true;
+            document.getElementById('phylNeighbPlusBr').style.display = 'none';
+            document.getElementById('phylDisplayTree').checked = true;
+
+            //document.getElementById('phylDisplayTree').hidden = false;
+            //document.getElementById('phylDisplayTreeLab').hidden = false;
+            document.getElementById('phylDisplayPlusBr').style.display = 'block';
+            //document.getElementById('phylSmallParsimony').hidden = false;
+            //document.getElementById('phylSmallParsimonyLab').hidden = false;
+            document.getElementById('phylSmallPlusBr').style.display = 'block';
             document.getElementById('phylLargeParsimony').hidden = false;
             document.getElementById('phylLargeParsimonyLab').hidden = false;
 
@@ -13648,6 +13865,7 @@ function phylInputRadClicked(id) {
             document.getElementById('phylUltraLab').hidden = false;
             document.getElementById('phylNeighbour').hidden = false;
             document.getElementById('phylNeighbourLab').hidden = false;
+            document.getElementById('phylDisplayTree').checked = true;
             document.getElementById('phylDisplayTree').hidden = true;
             document.getElementById('phylDisplayTreeLab').hidden = true;
             document.getElementById('phylSmallParsimony').hidden = true;

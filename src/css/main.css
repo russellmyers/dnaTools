@@ -267,7 +267,7 @@ input[type=number] {
     background-color: beige;
     width: 100%;
     height: 100%;
-    overflow:none;
+    /*overflow: none;*/
    /* display:none;*/
 
 
@@ -359,7 +359,7 @@ input[type=number] {
     display: block;
     /*background-color: #b3d4fc;*/
     width: 100%;
-    height: 12%;
+    height: 20%;
 	overflow:auto;
 }
 
@@ -367,14 +367,14 @@ input[type=number] {
     display: block;
     /*background-color: #b3d4fc;*/
     width: 100%;
-    height: 7%;
+    height: 10%;
 	overflow:auto;
 }
 #graphReadsDiv {
     display: block;
     /*background-color: cadetblue;*/
     width: 100%;
-    height: 10%;
+    height: 15%;
 	overflow:auto;
 }
 #graphAdjListDiv {
@@ -542,6 +542,71 @@ input[type=number] {
 
 }
 
+#mfkEnterPaste {
+    display:inline-block;
+    /*background-color: green;*/
+    vertical-align:top;
+}
+
+#mfkLoad {
+    margin-left: 20px;
+    display:inline-block;
+    /*background-color: purple;*/
+
+}
+
+#motifEnterPaste {
+    display:inline-block;
+    /*background-color: green;*/
+    vertical-align:top;
+}
+
+#motifLoad {
+    margin-left: 20px;
+    display:inline-block;
+    /*background-color: purple;*/
+
+}
+
+#sequencingEnterPaste {
+    display:inline-block;
+    /*background-color: green;*/
+    vertical-align:top;
+}
+
+#sequencingLoad {
+    margin-left: 20px;
+    display:inline-block;
+    /*background-color: purple;*/
+
+}
+
+#transEnterPaste {
+    display:inline-block;
+    /*background-color: green;*/
+    vertical-align:top;
+}
+
+#transLoad {
+    margin-left: 20px;
+    display:inline-block;
+    /*background-color: purple;*/
+
+}
+
+.inputEnterPaste {
+    display:inline-block;
+    /*background-color: green;*/
+    vertical-align:top;
+}
+
+.inputLoad {
+    margin-left: 20px;
+    display:inline-block;
+    /*background-color: purple;*/
+}
+
+
 #motifTools {
 
     display:none;
@@ -584,6 +649,7 @@ input[type=number] {
 
 #alignInputFileArea {
     display: inline-block;
+    margin-left: 20px;
 }
 
 #alignInputOther {
@@ -608,6 +674,7 @@ input[type=number] {
 
 #sbInputFileArea {
     display: inline-block;
+    margin-left: 20px;
 }
 
 #sbInputOther {
@@ -641,12 +708,15 @@ input[type=number] {
 
 }
 #runManDiv {
+  clear: both;
   float:right;
+  height: 5px;
 }
 
 #progressDiv {
     /*clear: both;*/
     float:right;
+    height: 5px;
 }
 
 #rightOne {

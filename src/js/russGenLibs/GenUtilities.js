@@ -4,6 +4,8 @@
 /* 19/4/16: Added ArrayMax and ArrayMin routines
  21/4/16: Added squishString
  4/3/17: Added binary search
+ 23/7/17: Added extra param to tab_click done (previous tab number)
+ 27/7/17: Added logic to createTable to allow for selected row
  */
 
 function addObserver(subject, property, callbackHandler) {
@@ -36,7 +38,7 @@ function addObserver(subject, property, callbackHandler) {
 
 function removeObserver(subject, property) {
     //Delete the changeHandler
-   // delete subject.changeHandler;
+    // delete subject.changeHandler;
 
     //Reset the getter and setter
     Object.defineProperty(subject, property, {
@@ -75,7 +77,7 @@ function normaliseProbDist(probDist) {
     }
 
     var normed = probDist.map(function(el) {
-       return el * 1.0 / tot;
+        return el * 1.0 / tot;
     });
 
     return normed;
@@ -135,13 +137,13 @@ Date.prototype.yyyymmdd = function() {
 
 
 function glowEnded(el) {
-  //  setTimeout(function() {
-        el.style.animation = null;
-        console.log('glow ended: ' + el.innerHTML);
-        el.offsetWidth = el.offsetWidth;
+    //  setTimeout(function() {
+    el.style.animation = null;
+    console.log('glow ended: ' + el.innerHTML);
+    el.offsetWidth = el.offsetWidth;
 
 
-  //  },10);
+    //  },10);
 
 }
 
@@ -346,19 +348,19 @@ function stripTags(inTag) {
 }
 
 function updateSpecialTable(table,tableData) {
-   // console.log('xxx   start updatespec table');
+    // console.log('xxx   start updatespec table');
 
 
 
-   // table.rows.forEach(function(row,i) {
-      //  row.cells.forEach(function(cell,j) {
+    // table.rows.forEach(function(row,i) {
+    //  row.cells.forEach(function(cell,j) {
     for (var i = 0;i < table.rows.length; ++i) {
-      //  console.log('update spec: ' + i);
+        //  console.log('update spec: ' + i);
         if (i == 0) continue; //header
 
         var row = table.rows[i];
         for (var j = 0; j < row.cells.length; ++j) {
-           // console.log('i: ' + i + ' j: ' + j + ' row cells: ' + row.cells.length);
+            // console.log('i: ' + i + ' j: ' + j + ' row cells: ' + row.cells.length);
             var cell = row.cells[j];
             if (j == 0)  {
                 cell.childNodes[0].value = tableData[i-1][j];
@@ -368,8 +370,8 @@ function updateSpecialTable(table,tableData) {
             else {
 
                 var sel = cell.children[0];
-               // console.log(cell.id);
-               // var cr = createStudDropDown(cName + '_' + r + '_' + cNum,true);
+                // console.log(cell.id);
+                // var cr = createStudDropDown(cName + '_' + r + '_' + cNum,true);
                 //cr.value = 3;
                 //var optGrp =  createStudOptGrp(true);
                 /* restore this to update if students change
@@ -441,7 +443,7 @@ function createSpecialTable(tableData,headerData,tabType) {
                 var cr = createStudDropDown(cName + '_' + r + '_' + cNum,true);
                 //cr.value = 3;
                 if (!cellData) {
-                   //alert('not cell data r: ' + r + ' c: ' + c);
+                    //alert('not cell data r: ' + r + ' c: ' + c);
                 }
                 var stripped = stripTags(cellData);
                 //cr.selectedIndex = stripTags(cellData)[0] - 1;
@@ -506,7 +508,7 @@ function createSpecialTable(tableData,headerData,tabType) {
     return table;
 }
 
-function createTable(tableData,headerData,editableCols,startEditableCol,keyPressCallback,onBlurCallback,onFocusCallback,tabIdPrefix,tabType) {
+function createTable(tableData,headerData,editableCols,startEditableCol,keyPressCallback,onBlurCallback,onFocusCallback,tabIdPrefix,tabType,selectedRow) {
     tabType = tabType || 'fixed';
     editableCols = editableCols || 0;
     startEditableCol = startEditableCol || null;
@@ -515,6 +517,7 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
     onFocusCallback = onFocusCallback || null;
     tabIdPrefix = tabIdPrefix || '';
     headerData = headerData || null;
+
 
     var table = document.createElement('table')
         , tableBody = document.createElement('tbody');
@@ -542,6 +545,8 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
             row.className += ' createdTableOddRow';
         }
 
+
+
         rowData.forEach(function(cellData,colNum) {
             var cell = document.createElement('td');
             cell.id =  tabIdPrefix + rowNum + 'c' + colNum;
@@ -562,6 +567,15 @@ function createTable(tableData,headerData,editableCols,startEditableCol,keyPress
             }
             // cell.appendChild(document.createTextNode(cellData));
             cell.innerHTML = cellData;
+            if (selectedRow != null) {
+                if ((rowNum == selectedRow) && (colNum == 0)) {
+                    cell.className += ' createdTableSelectedRow';
+                }
+            }
+
+
+
+
             row.appendChild(cell);
         });
 
@@ -607,8 +621,9 @@ function checkEnter(event)
 function tab_click(x,onComplete){
     var myParams = Params.getInstance();
     var tabActive=myParams.tabActive;
+    var prevTabActive = myParams.tabActive;
     var tabs=document.getElementById('tabs').getElementsByTagName('A');
-   // var tabs_data=document.getElementById('tabs_data').getElementsByTagName('fieldset');
+    // var tabs_data=document.getElementById('tabs_data').getElementsByTagName('fieldset');
     var tabs_data=document.getElementById('tabs_data').getElementsByTagName('section');
 
     if(x > -1 && x < tabs.length && x < tabs_data.length) {
@@ -629,7 +644,7 @@ function tab_click(x,onComplete){
 
         myParams.tabActive = tabActive;
         if (onComplete) {
-           onComplete(tabActive);
+            onComplete(tabActive,prevTabActive);
         }
 
     } return false;
@@ -697,22 +712,22 @@ function getSelectedRadioEl(name) {
         }
     }
     return selected;
-    
+
 }
 
 
 //added 4/3/17
 function binarySearch(el,ar) {
     //assumes sorted array
-    
+
     var N = ar.length;
-    
+
     var bottom = 0;
     var top = N -1;
     var curr;
-    
+
     var done = false;
-    
+
     while (!done) {
         if (top == bottom) {
             if (el == ar[bottom]) {
@@ -728,32 +743,32 @@ function binarySearch(el,ar) {
         }
         if (el > ar[curr]) {
             bottom = curr + 1;
-            
+
         }
         else {
             top = curr;
         }
-        
+
     }
-    
-    
+
+
 
 }
 
 //added 4/3/17
 function insertionSort(ar,numSwapsFlag) {
     //if numSwapsFlag is true, also returns number of swaps required
-    
-    
+
+
     if (numSwapsFlag == null) {
         numSwapsFlag = false;
     }
-    
+
     var totSwaps = 0;
     var swapsThisPass = 0;
-    
+
     var done = false;
-    
+
     while (!done) {
         swapsThisPass = 0;
         for (var i = 1;i < ar.length;++i) {
@@ -762,7 +777,7 @@ function insertionSort(ar,numSwapsFlag) {
                 var tmp = ar[i];
                 ar[i] = ar[i-1];
                 ar[i-1] = tmp;
-                
+
             }
         }
         totSwaps+= swapsThisPass;
@@ -770,7 +785,7 @@ function insertionSort(ar,numSwapsFlag) {
             done = true;
         }
     }
-    
+
     return numSwapsFlag ? [ar,totSwaps] : ar;
 }
 
@@ -811,9 +826,9 @@ function majorityElement(ar) {
     var majElFound = false;
     if ((end - st + 1) > (sortedAr.length / 2) ) {
         majElFound = true;
-        
+
     }
-    
+
 
     return [majElFound,potential,st,end];
 
@@ -883,10 +898,10 @@ function mergeSort(ar) {
     if (ar.length == 1) {
         return ar;
     }
-    
+
     var halfPoint = Math.ceil(ar.length / 2);
     var leftSide = ar.splice(0,halfPoint);
-    
+
     var leftSorted = mergeSort(leftSide);
     var rightSorted = mergeSort(ar);
     return mergeSorted(leftSorted,rightSorted);
@@ -915,12 +930,12 @@ function countInversions(ar) {
         for (var j = i;j < ar.length;++j) {
             if (ar[i] > ar[j]) {
                 ++invs;
-                
+
             }
         }
     }
     return invs;
-    
+
 }
 
 //added 7/3/17:
@@ -928,19 +943,19 @@ function Heap(ar) {
     this.inputArray = ar;
 
     this.heapAr = [];
-    
+
     this.swapElements = function(ind1,ind2) {
         var  tmp = this.heapAr[ind1];
         this.heapAr[ind1] = this.heapAr[ind2];
         this.heapAr[ind2] = tmp;
-        
+
     };
 
     this.orderChildren = function(ch1,ch2) {
-      //default largest val first, ie max heap
+        //default largest val first, ie max heap
         return (this.heapAr[ch1] >  this.heapAr[ch2]) ? [ch1,ch2] : [ch2,ch1];
     };
-    
+
     this.childrenInds = function(parentInd) {
         var childInd1 = (parentInd + 1) * 2 - 1; //zero based
         var childInd2 = (parentInd + 1) * 2;
@@ -965,11 +980,11 @@ function Heap(ar) {
             }
             */
         }
-        
-        
+
+
     };
-    
-  
+
+
 
     this.siftNeedToSwap = function(curInd,childInd) {
         //default max heap
@@ -992,7 +1007,7 @@ function Heap(ar) {
                 break;
             }
             else {
-               // if (svdThis.heapAr[curInd] < this.heapAr[childInds[0]]) {
+                // if (svdThis.heapAr[curInd] < this.heapAr[childInds[0]]) {
                 if (this.siftNeedToSwap(curInd,childInds[0])) {
                     svdThis.swapElements(curInd, childInds[0]);
                     curInd = childInds[0];
@@ -1003,7 +1018,7 @@ function Heap(ar) {
                 }
 
             }
-            
+
 
         }
 
@@ -1023,9 +1038,9 @@ function Heap(ar) {
         }
 
         var sorted = [];
-        
+
         var svdHeap = this.heapAr.map(function(el) {
-           return el; 
+            return el;
         });
 
         while (this.heapAr.length > 1) {
@@ -1065,7 +1080,7 @@ function Heap(ar) {
                 done = true;
                 break;
             }
-           // if (svdThis.heapAr[curInd] > svdThis.parentVal(curInd)) {
+            // if (svdThis.heapAr[curInd] > svdThis.parentVal(curInd)) {
             if (svdThis.bubbleNeedToSwap(curInd)) {
                 svdThis.swapElements(curInd,svdThis.parentInd(curInd));
                 curInd = svdThis.parentInd(curInd);
@@ -1092,19 +1107,19 @@ function Heap(ar) {
         });
 
     }
-        
+
     this.parentInd = function(ind) {
-            return Math.floor((ind+1)/2) - 1;
-            
+        return Math.floor((ind+1)/2) - 1;
+
     };
-        
+
     this.parentVal = function(ind) {
-            return this.heapAr[this.parentInd(ind)];
-            
+        return this.heapAr[this.parentInd(ind)];
+
     };
-        
-    
-    
+
+
+
 
 }
 
@@ -1120,7 +1135,7 @@ function MinHeap(ar) {
     this.siftNeedToSwap = function(curInd,childInd) {
         return this.heapAr[curInd] > this.heapAr[childInd];
     };
-    
+
     this.bubbleNeedToSwap = function(curInd) {
         return this.heapAr[curInd] < this.parentVal(curInd);
     };
@@ -1143,7 +1158,7 @@ function twoWayPartition(ar) {
             ++higher;
             //push to end
             ar.push(ar.splice(i,1)[0]);
-            
+
         }
     }
 
@@ -1185,10 +1200,10 @@ function threeWayPartition(ar,v) {
 
 
 
-     return [ar.length - higher - numVs,numVs,higher];
+    return [ar.length - higher - numVs,numVs,higher];
 
 
-    
+
 }
 //added 9/3/17
 
@@ -1266,10 +1281,10 @@ function quickSort(ar) {
     var leftSorted = quickSort(ar.slice(0,inds[0]));
     var mid = ar.slice(inds[0],inds[0] + inds[1]);
     var rightSorted = quickSort(ar.slice(inds[0] + inds[1]),ar.length);
-    
+
     var sorted = leftSorted.concat(mid);
     sorted = sorted.concat(rightSorted);
-    
+
     return sorted;
 
 
@@ -1282,7 +1297,7 @@ function kthSmallest(ar,k) {
     if ((k > ar.length) || (k <= 0)) {
         return -1;
     }
-    
+
     var r = getRandomInt(0,ar.length-1);
     var v = ar[r];
     var inds = threeWayPartition(ar,v);
@@ -1302,8 +1317,8 @@ function kthSmallest(ar,k) {
     }
 
 
-    
-    
+
+
 }
 
 //added 12/3/17:
@@ -1315,8 +1330,8 @@ function deltaTurnpike(inAr) {
             if (inAr[j] - inAr[i] == 1264) {
                 var ggg = 1;
             }
-                delta.push(inAr[j] - inAr[i]);
-           // }
+            delta.push(inAr[j] - inAr[i]);
+            // }
         }
     }
     delta.sort(function(a, b) {
@@ -1328,9 +1343,9 @@ function deltaTurnpike(inAr) {
         delta.unshift(0);
     }
     */
-    
+
     return delta;
-    
+
 }
 
 //added: 13/3/17:
@@ -1350,11 +1365,11 @@ function findBacktrack(turns,inputAr) {
         else { //only one possible, no other choice, keep trying backwards
             turns.pop();
             inputAr.pop();
-            
+
         }
     }
-    
-    
+
+
 }
 
 function turnpikeBacktrack(turn) {
@@ -1367,7 +1382,7 @@ function turnpikeBacktrack(turn) {
     var numDone = 0;
 
     turn = turn.filter(function(el) {
-       return (el > 0);
+        return (el > 0);
     });
 
     turns = [];
@@ -1417,7 +1432,7 @@ function turnpikeBacktrack(turn) {
             newTurn = turns[turns.length-1][0].map(function(el) {
                 return el;
             });
-            
+
         }
 
         else {
@@ -1464,7 +1479,7 @@ function turnpikeBacktrack(turn) {
     inputAr.sort(function(a,b) {
         return a-b;
     });
-    
+
     return inputAr;
 
 }
@@ -1484,7 +1499,7 @@ function turnpikeRecursive(turn) {
     //var lessTurn =
 
 
-    
+
 }
 
 //added: 11/3/17
@@ -1499,9 +1514,9 @@ function turnpike(turn) {
 
     var inputAr = [];
 
-   // turn.shift(); // remove zero diff to zero
+    // turn.shift(); // remove zero diff to zero
 
-  //  var highest = turn.pop();
+    //  var highest = turn.pop();
     var highest = turn[turn.length - 1];
 
     inputAr.push(highest);
@@ -1510,7 +1525,7 @@ function turnpike(turn) {
 
     inputArs.push(inputAr);
 
-   // turn.shift(); //remove zero diff to highest
+    // turn.shift(); //remove zero diff to highest
 
     /*
     countDict = {};
@@ -1611,7 +1626,7 @@ function turnpike(turn) {
             for (var i = 0;i < workingTurn.length;++i) {
 
                 el = workingTurn[i];// workingTurn.forEach(function (el, wInd) {
-            // if ((workingTurn.length < 1000) || (wInd % 1000 == 0)) {
+                // if ((workingTurn.length < 1000) || (wInd % 1000 == 0)) {
 
                 if ((el == lastEl) || (inputAr.indexOf(el) > -1) || (el <= inputAr[inputAr.length - 1])) { // only put in greater nus
 
@@ -1655,7 +1670,7 @@ function turnpike(turn) {
                 }
             }//});
 
-           // }
+            // }
 
 
         });
@@ -1688,9 +1703,9 @@ function turnpike(turn) {
     var next = possibleNums[0];
     inputAr.push(next);
     inputAr.forEach(function(el) {
-       var diff = Math.abs(el - next);
-       var ind = turn.indexOf(diff);
-       turn.splice(ind,1);
+        var diff = Math.abs(el - next);
+        var ind = turn.indexOf(diff);
+        turn.splice(ind,1);
     });
 
 
@@ -1757,7 +1772,7 @@ function arrayToString(ar,sep) {
     if (sep == null) {
         sep = ' ';
     }
-    
+
     ar.forEach(function(el,i) {
         if (i == ar.length - 1) {
             str += el;
@@ -1765,9 +1780,9 @@ function arrayToString(ar,sep) {
         else {
             str += el + sep;
         }
-        
+
     });
-    
+
     return str;
-    
+
 }

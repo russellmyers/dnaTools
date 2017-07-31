@@ -886,7 +886,7 @@ function gibbsSampler(dnaStrings,k,numIters,d,laplace,progCallback,runCallback) 
 function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback,runCallback) {
 
 
-    var progThreshold = 50000;
+    var progThreshold = 5000;
 
     var k = kmer.length;
     indexArray = [];
@@ -906,8 +906,8 @@ function countKMer(kmer,dna,inclRevCompl,maxMismatch,progCallback,runCallback) {
 
     for (var j = 0; j < dna.length - k + 1; ++j) {
         if (progCallback) {
-            if (j % progThreshold == 0) {
-                progCallback(j, dna.length - k + 1);
+            if ((j % progThreshold == 0) || (j == dna.length - k)) {
+                progCallback(j + 1, dna.length - k + 1);
 				runCallback(updateRunImage());
             }
         }

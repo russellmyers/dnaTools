@@ -2296,11 +2296,13 @@ function DGGraph(source,sourceType,alignType) {
 }
 
 //
-function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap) {
+function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap,seqMethod) {
 
     this.sourceType = sourceType;
 
     this.graphType = graphType;
+
+    this.seqMethod = seqMethod;
 
     switch (this.sourceType)  {
         case DGraph.fromDna:
@@ -2751,7 +2753,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
                 str += currEdgePath[i].edgeLabel();
             }
            // else if ((this.makeCycle) && (i >= this.edgePath.length - this.k + 1)) {
-            else if ((this.isBalanced()) && (i >= currEdgePath.length - this.k + 1)) {
+            else if ((this.isBalanced()) && (i >= currEdgePath.length - this.k + 1) && (this.seqMethod == DGraph.seqTypeCycle)) {
 
 
             }
@@ -3004,7 +3006,19 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
                     return [f, null];
                 }
                 else {
-                    return [null, null]; // no definite first. Won't work
+                    if (this.isBalanced()) {
+                        //Actually shouldn't be balanced - but this can happen when last node of path matches first
+                       //If this happens, return first as start
+                        return [this.nodes[0],null];
+
+                    }
+                    else if (this.graphType == DGraph.hamGraph) {
+                        return [this.nodes[0],null]; //return any
+                    }
+
+                    else {
+                        return [null, null]; // no definite first. Won't work
+                    }
                 }
             }
             else {
@@ -3873,13 +3887,20 @@ function DBNodeView(ctx,r,style) {
        return new DBPos(this.r.x + (this.r.w/2),this.r.y + (this.r.h/2));
     };
 
-    this.addEdge = function(nodeTo,w,lenFactor,freshFlag) {
+    this.addEdge = function(nodeTo,w,lenFactor,freshFlag,firstEdge) {
         var ang = 0;
         var leafAdj = 0;
 
+        if (firstEdge == null) {
+            firstEdge = false;
+        }
 
-        if ((this.style == DGraph.styleRooted) && nodeTo.isLeaf) {
+
+        if ((this.style == DGraph.styleRooted) && nodeTo.isLeaf && (!firstEdge)) {
             leafAdj = 20 / 360 * 2 * Math.PI;
+        }
+        else if ((this.style == DGraph.styleRooted) && nodeTo.isLeaf && (firstEdge)) {
+            leafAdj = -50 / 360 * 2 * Math.PI;
         }
 
         if (this.edgeViews.length == 0) {
@@ -4108,7 +4129,7 @@ function DBGraphViewController(g,prefStyle) {
                 vNode.text += seq;
             }
             vNode.tag = i;
-            if ((svdThis.preferredStyle() == 'DGraph.styleRooted') || (svdThis.preferredStyle() == 'DGraph.styleUnrooted')) {
+            if ((svdThis.preferredStyle() == DGraph.styleRooted) || (svdThis.preferredStyle() == DGraph.styleUnrooted)) {
                 vNode.isLeaf = el.isLeaf(svdThis.g.checkDirected());
             }
             vNodes.push(vNode);
@@ -4322,8 +4343,10 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
         }
 
 
-        order.forEach(function(pair) {
-            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3]);
+        order.forEach(function(pair,i) {
+            var firstEdge;
+            if (i == 0)  {firstEdge = true} else {firstEdge = false};
+            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3],firstEdge);
         });
 
         if (gvDataSource.preferredStyle() == DGraph.styleSequencing) {
@@ -4349,8 +4372,9 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
             nv.edgeViews = [];
         });
 
-        order.forEach(function(pair) {
-            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3]);
+        order.forEach(function(pair,i) {
+            if (i == 0)  {firstEdge = true} else {firstEdge = false};
+            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3],firstEdge);
         });
 
         //this.arrange(order);
@@ -4369,8 +4393,9 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
             nv.edgeViews = [];
         });
 
-        order.forEach(function(pair) {
-            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3]);
+        order.forEach(function(pair,i) {
+            if (i == 0)  {firstEdge = true} else {firstEdge = false};
+            svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]],pair[2],lenFactor,pair[3],firstEdge);
         });
         //this.arrange(order);
 
@@ -4392,8 +4417,9 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
                 nv.edgeViews = [];
             });
 
-            order.forEach(function (pair) {
-                svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]], pair[2],lenFactor,pair[3]);
+            order.forEach(function (pair,i) {
+                if (i == 0)  {firstEdge = true} else {firstEdge = false};
+                svdThis.nvs[pair[0]].addEdge(svdThis.nvs[pair[1]], pair[2],lenFactor,pair[3],firstEdge);
             });
         }
 
