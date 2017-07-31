@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>GenEvol - DNA Analysis Tools</title>
+        <title>GenEvol - DNA Analysis Workbench</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -25,7 +25,7 @@
             <div id = "leftBannerDiv">
                 <h2>
                     <img style="margin-left: 20px" src = 'img/logo_cropped.png'>
-                    Genetics and Evolution - DNA Analysis Tools</h2>
+                    Genetics and Evolution - DNA Analysis Workbench</h2>
 
             </div>
             <div id = "rightBannerDiv">
@@ -42,27 +42,36 @@
             <a href="#" onclick="tab_click(6,tabClickDone);">Peptide Seq</a>
             <a href="#" onclick="tab_click(7,tabClickDone);">Align</a>
             <a href="#" onclick="tab_click(8,tabClickDone);">Synteny Blocks</a>
-            <a href="#" onclick="tab_click(9,tabClickDone);">Phylog</a>
+            <a href="#" onclick="tab_click(9,tabClickDone);">Phylogeny</a>
             <a href="#" onclick="tab_click(10,tabClickDone);">Misc</a>
             <!--a href="#tabs" onclick="tab_click(2);">tab 3</a-->
         </div>
-
+	
+		<div id = "errorMsgDiv">
+		  
+		</div>
        <div id = "statsAndInputTools">
+	  
 
         <div id = "rightTwo">DNA Stats</div>
         
+		<div id = "runManDiv">
+		  <img src = "img/runman1.png" id = "runImg"></img>
+		</div>
         <div id = "progressDiv">
             <span id="currPosInDNA"></span>
             <span id = "progress"></span>
 
         </div>
+	
+		
         <div id = "mfkTools">
 		<br>
         <div id = "mfkInputTools">
             <label for="dnaInput">Enter DNA:</label>
-            <input type = "text" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
+            <input type = "text" spellcheck="false" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
             <button type = "button" onclick="dnaInput(event)">Apply</button>
-            <label for ="fileInput">Load DNA :</label>
+            <label for ="fileInput">&nbsp;&nbsp;Load DNA :</label>
             <input type = "file" name="fileInput" onclick = "clearFileName(event)" id = "fileInput">
             <button type = "button" onclick="randPressed(event)" class="spacedBut">Random DNA</button>
             <input type = "number"  name = "numRand" id = "numRand"  min=1 max=1000000 value=50000>
@@ -83,6 +92,7 @@
 
         </div>
 
+
         <div id = "stats">
             Kmer: <span id = "kMerMostFreq"></span>
             Rev Compl: <span id = "kMerRevCompl"></span>
@@ -92,33 +102,21 @@
 
         </div>
         <br>
-        <div id = "navDiv">
-            <button type = "button" onclick="pagePressed(-1000)" >|&lt</button>
-            <button type = "button" onclick="pagePressed(-1)">&lt</button>
-            <span id="currRangeDNA"></span>
-            <button type = "button" onclick="pagePressed(1)">&gt</button>
-            <button type = "button" onclick="pagePressed(1000)">&gt|</button>
-            <button type ="button" onclick="jumpToPressed()">Jump to:</button>
-            <input type = "number"  name = "jumpToBase" id = "jumpToBase"  min=0 value=0>
-            <button type = "button" onclick="trimPressed()">Trim to:</button>
-            <input type = "number"  name = "trimToBase" id = "trimToBase"  min=0 value=0>
-
-
-        </div>
+    
 
         </div>
         <div id = "motifTools">
 		    <br>
             <div id = "motifInputTools">
-                <textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
-                <button type = "button" id="motifsInput" onclick="motifsInput(event)">Apply</button>
+                <textarea name = "dnaStrings" spellcheck = "false" placeholder = "Enter/paste DNA sequences to analyse(one per line) eg&#10;ACGTT&#10;GCACGAC&#10;AAAACG" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
+                <button type = "button" id="motifsInput"  class="alTop" onclick="motifsInput(event)">Apply</button>
                 <!--label for sequencesInput>Enter sequences:</label-->
                 <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
                 <button type = "button" onclick="sequencesInput(event)">Apply</button-->
-                <label for="fileMotifInput">Load Sequences :</label>
-                <input type = "file" onclick = "clearFileName(event)" name="fileMotifInput" id = "fileMotifInput">
-                <button type = "button" onclick="randMotifPressed(event)" class="spacedBut">Random seq length</button>
-                <input type = "number"  name = "numMotifRand" id = "numMotifRand"  min=1 max=1000 value=20>
+                <label for="fileMotifInput" class="alTop">&nbsp;&nbsp;Load Sequences :</label>
+                <input type = "file" class="alTop" onclick = "clearFileName(event)" name="fileMotifInput" id = "fileMotifInput">
+                <button type = "button"  class="alTop" onclick="randMotifPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number" class="alTop"  name = "numMotifRand" id = "numMotifRand"  min=1 max=1000 value=20>
                 <!--span id = "dnaLengthText">DNA Sequence Len: </span>
                 <span id = "dnaLength"></span-->
 
@@ -127,25 +125,25 @@
         <div id = "sequencingTools">
 		    <br>
             <div id = "sequencingInputTools">
-                <textarea name = "sequencingStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true,'|')"  id = "sequencingStrings" ></textarea>
-                <button type = "button" id="sequencingInput" onclick="sequencingInput(event)">Apply</button>
-                <label for="fileSequencingInput">Load Input :</label>
-                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
-                <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
-                <input type = "number"  name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
-                <a href = "" id="downloadSeq" download="contigs.txt" onclick="downloadSeq()">Downl</a>
+                <textarea name = "sequencingStrings" spellcheck="false" placeholder = "Enter or paste Reads&#10;(one per line), eg:&#10;ACGT&#10;GACG&#10;OR &#10;DNA sequence (single line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true,'|')"  id = "sequencingStrings" ></textarea>
+                <button type = "button" id="sequencingInput" class="alTop" onclick="sequencingInput(event)">Apply</button>
+                <label for="fileSequencingInput" class="alTop">&nbsp;&nbsp;Load Input :</label>
+                <input type = "file" class="alTop" onclick = "clearFileName(event)" name="fileSequencingInput" id = "fileSequencingInput">
+                <button type = "button" class="alTop" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
+                <input type = "number" class="alTop" name = "numSequencingRand" id = "numSequencingRand"  min=1 max=1000 value=20>
+                <a href = "" id="downloadSeq" download="contigs.txt" class="alTop" onclick="downloadSeq()">Downl</a>
             </div>
         </div>
         <div id = "phylogenyTools">
 		    <br>
             <div id = "phylogenyInputTools">
-                <textarea name = "phylogenyStrings" placeholder = "Enter or paste DNA alignments / dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
-                <button type = "button" id="phylogenyInput" onclick="phylogenyInput(event)">Apply</button>
-                <label for="fileSequencingInput">Load Input :</label>
-                <input type = "file" onclick = "clearFileName(event)" name="fileSequencingInput" id = "filePhylogenyInput">
-                <button type = "button" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
-                <input type = "number"  name = "numSequencingRand" id = "numPyhlogenyRand"  min=1 max=1000 value=20>
-                <a href = "" id="downloadPhyl" download="contigs.txt" onclick="downloadSeq()">Downl</a>
+                <textarea name = "phylogenyStrings" spellcheck="false" placeholder = "Enter/paste DNA alignments in FASTA format eg:&#10;>Frog&#10;ACGTGCA&#10;>Dog&#10;CGTACTC etc&#10; OR dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
+                <button type = "button" id="phylogenyInput" class="alTop" onclick="phylogenyInput(event)">Apply</button>
+                <label for="fileSequencingInput" class="alTop">&nbsp;&nbsp;Load Input :</label>
+                <input type = "file" class="alTop" onclick = "clearFileName(event)" name="fileSequencingInput" id = "filePhylogenyInput">
+                <button type = "button" class="alTop" onclick="randSequencingPressed(event)" class="spacedBut">Random seq length</button>
+					<input type = "number" class="alTop" name = "numSequencingRand" id = "numPyhlogenyRand"  min=1 max=1000 value=20>
+                <a href = "" id="downloadPhyl" download="contigs.txt" class="alTop" onclick="downloadSeq()">Downl</a>
             </div>
         </div>
 
@@ -153,12 +151,12 @@
 		    <br>
             <div id = "transInputTools">
                 <label for = "transInput">Enter DNA/RNA/Protein:</label>
-                <input type = "text" name="transInput" onkeypress = "return restrictToACGT(event,false,'Uu')" onchange="transInput(event)" id = "transInput">
+                <input type = "text" name="transInput" spellcheck="false" onkeypress = "return restrictToACGT(event,false,'Uu')" onchange="transInput(event)" id = "transInput">
                 <button type = "button" onclick="transInput(event)">Apply</button>
-                <label for="fileTransInput">Load DNA/RNA/Protein :</label>
+                <label for="fileTransInput">&nbsp;&nbsp;Load DNA/RNA/Protein :</label>
                 <input type = "file" name="fileTransInput" onclick = "clearFileName(event)" id = "fileTransInput">
-                <button type = "button" onclick="randPressed(event)" class="spacedBut">Random</button>
-                <input type = "number"  name = "numRand" id = "numRandTT"  min=1 max=1000000 value=50000>
+                <button type = "button" onclick="randTransPressed(event)" class="spacedBut">Random</button>
+                <input type = "number"  name = "numTransRand" id = "numTransRandTT"  min=1 max=1000000 value=50000>
 
                 <!--span id = "dnaLengthText">DNA Sequence Len: </span>
                 <span id = "dnaLength"></span-->
@@ -173,9 +171,9 @@
 		    <br>
             <div id = "pepInputTools    ">
                 <label for = "pepInput">Enter Peptide/Spectrum:</label>
-                <input type = "text" name="pepInput"  onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
+                <input type = "text" name="pepInput" spellcheck="false" onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
                 <button type = "button" id="peptideInput" onclick="peptideInput(event)">Apply</button>
-                <label for="filePepInput">Load Peptide/Spectrum:</label>
+                <label for="filePepInput">&nbsp;&nbsp;Load Peptide/Spectrum:</label>
                 <input type = "file" name="filePepInput" onclick = "clearFileName(event)" id = "filePepInput">
                 <button type = "button" onclick="randPressed(event)" class="spacedBut">Random</button>
                 <input type = "number"  name = "numRand" id = "numRandPS"  min=1 max=1000000 value=50000>
@@ -201,20 +199,20 @@
 		    <br>
             <div id = "alignInputTools">
                 <div id = "alignInputManual">
-                <textarea name = "alignStrings" placeholder = "Enter or paste DNA sequences to align (one per line)" rows = "4" cols = "30"  id = "alignStrings" ></textarea>
-                <button type = "button" id="alignInput" onclick="alignInput(event)">Apply</button>
+                <textarea name = "alignStrings" spellcheck="false" placeholder = "Enter or paste DNA sequences to align (one per line),eg:&#10;GAAAAACT&#10;CTCTAAAAACG" rows = "4" cols = "30"  id = "alignStrings" ></textarea>
+                <button type = "button" id="alignInput" class="alTop" onclick="alignInput(event)">Apply</button>
                 </div>
                 <!--label for sequencesInput>Enter sequences:</label-->
                 <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
                 <button type = "button" onclick="sequencesInput(event)">Apply</button-->
-                <div id = "alignInputFileArea">
-                <label for="fileAlignInput">Load Sequence 1:</label>
-                <input type = "file" onclick = "clearFileName(event)" name="fileAlignInput" id = "fileAlignInput">
+                <div id = "alignInputFileArea" class="alTop">
+                <label for="fileAlignInput" >Load Sequence 1:</label>
+                <input type = "file" onclick = "clearFileName(event)" name="fileAlignInput"  id = "fileAlignInput">
                 <br>
                 <label for="fileAlignInput2">Load Sequence 2:</label>
                 <input type = "file" onclick = "clearFileName(event)" name="fileAlignInput2" id = "fileAlignInput2">
                 </div>
-                <div id = "alignInputOther">
+                <div id = "alignInputOther" class="alTop">
                 <button type = "button" onclick="randAlignPressed(event)" class="spacedBut">Random seq length</button>
                 <input type = "number"  name = "numAlignRand" id = "numAlignRand"  min=1 max=1000 value=20>
                 <!--span id = "dnaLengthText">DNA Sequence Len: </span>
@@ -228,10 +226,10 @@
 		    <br>
             <div id = "sbInputTools">
                 <div id = "sbInputManual">
-                <textarea name = "sbStrings" placeholder = "Enter or paste DNA sequences to compare (one per line)" rows = "4" cols = "30"  id = "sbStrings" ></textarea>
-                <button type = "button" id="sbInput" onclick="sbInput(event)">Apply</button>
+                <textarea name = "sbStrings" spellcheck="false" placeholder = "Enter or paste DNA sequences to compare (one per line)" rows = "4" cols = "30"  id = "sbStrings" ></textarea>
+                <button type = "button" id="sbInput"  class="alTop" onclick="sbInput(event)">Apply</button>
                 </div>
-                <div id = "sbInputFileArea">
+                <div id = "sbInputFileArea" class="alTop">
                   <label for="fileSBInput">Load Sequence 1:</label>
                   <input type = "file" onclick = "clearFileName(event)" name="fileSBInput" id = "fileSBInput">
                   <br>
@@ -239,7 +237,7 @@
                   <input type = "file" onclick = "clearFileName(event)" name="fileSBInput2" id = "fileSBInput2">
 
                 </div>
-                <div id = "sbInputOther">
+                <div id = "sbInputOther" class="alTop">
                 <button type = "button" onclick="randSBPressed(event)" class="spacedBut">Random seq length</button>
                 <input type = "number"  name = "numSBRand" id = "numSBRand"  min=1 max=1000 value=20>
                 </div>
@@ -258,33 +256,36 @@
                 <article id="art2">
                     <div id = "leftFreq" class="leftClump">
                         <label for="kMerLenMF" class="alignLab">k-mer Len</label>
-                        <input type = "number" class="alignEl" name = "kMerLenMF" onchange="kMerLenChanged(event)" id = "kMerLenMF" value = 3 min = 1 max = 100>
+                        <input type = "number" class="alignEl medInput" name = "kMerLenMF" onchange="kMerLenChanged(event)" id = "kMerLenMF" value = 4 min = 1 max = 100>
                         <label for="maxMismatchMF" class="alignLab">Max Mismatches:</label>
-                        <input type = "number" class="alignEl" name = "maxMismatchMF"   id = "maxMismatchMF" value = 0 min = 0 max = 10>
+                        <input type = "number" class="alignEl medInput" name = "maxMismatchMF"   id = "maxMismatchMF" value = 0 min = 0 max = 10>
 
                         <label for="includeRevComplMF" class="alignLab">Include rev compls?</label>
                         <input type = "checkbox" class="alignEl" name = "includeRevComplMF" id = "includeRevComplMF">
-                         <label for="debugMF" class="alignLab">Debug</label>
+                         <label for="debugMF" id = "debugMFLab" class="alignLab">Debug</label>
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugMF" id = "debugMF">
 
                     </div>
                     <div id = "midFreq" class ="midClump">
 
-                        <input type="radio" name="most"  id ="mostMost" value="most" checked>Most Freq k-mers only
+                        <input type="radio" name="most"  id ="mostMost" value="most" checked>Most Freq k-mers
                         <br>
-                        <input type="radio" name="most" id = "mostAll"  value="all">All k-mers w/
-                        <label for ="mfThresh">Threshold frequency(t)</label>
+                        <input type="radio" name="most" id = "mostAll"  value="all">All k-mers >= Threshold
+						<br>
+						<br>
+                        <label for ="mfThresh">Thresh freq(t)</label>
 
-                        <input type = "number" name = "mfThresh" id = "mfThresh" value = 2 min = 1 max = 50>
+                        <input type = "number" name = "mfThresh" id = "mfThresh" value = 3 min = 1 max = 50>
 
                     </div>
                     <div id="rightFreq" class="rightClump">
-                    <button type = "button" onclick="mostFrequentKmersBrute(event,1)">Brute Force</button>
-                    <button type = "button" onclick="mostFrequentKmersBrute(event,2)">Freq Array</button>
-                    <button type = "button" onclick="mostFrequentKmersBrute(event,4)">Object</button>
-                    <button type = "button" onclick="mostFrequentKmersBrute(event,3)">Sort</button>
-                    <button type = "button" onclick = "mostFrequentKmersTree()">Run Tree</button>
+					<button type = "button" id="runObjectMF" class="runBut" onclick="mostFrequentKmersBrute(event,4)">Object</button>
+                    <button type = "button" id ="runBruteMF" class="runBut" onclick="mostFrequentKmersBrute(event,1)">Brute Force</button>
+                    <button type = "button" id = "runFreqMF" class="runBut" onclick="mostFrequentKmersBrute(event,2)">Freq Array</button>
+                    <button type = "button" id="runSortMF" class="runBut" onclick="mostFrequentKmersBrute(event,3)">Sort</button>
+                    <button type = "button" id="runTreeMF" class="runBut" onclick = "mostFrequentKmersTree()">Run Tree</button>
                     <BR>
+					
                         </div>
 
 
@@ -307,16 +308,16 @@
                   <div id = "leftClump" class = "leftClump">
 
                     <label for="kMerLenLT" class = "alignLab">k-mer Len</label>
-                    <input type = "number" class = "alignEl" name = "kMerLenLT" onchange="kMerLenChanged(event)" id = "kMerLenLT" value = 3 min = 1 max = 100>
+                    <input type = "number" class = "alignEl medInput" name = "kMerLenLT" onchange="kMerLenChanged(event)" id = "kMerLenLT" value = 4 min = 1 max = 100>
 
 
 
                     <label for = "ltClumpThresh" class="alignLab">Clump size(L)</label>
-                    <input type = "number" class = "alignEl" name = "ltClumpSize" id = "ltClumpSize" value = 500 min = 1 max = 10000>
+                    <input type = "number" class = "alignEl medInput" name = "ltClumpSize" id = "ltClumpSize" value = 500 min = 1 max = 10000>
                     <label for = "ltClumpThresh" class="alignLab">Threshold frequency(t)</label>
-                    <input type = "number" class="alignEl" name = "ltClumpThresh" id = "ltClumpThresh" value = 2 min = 1 max = 50>
+                    <input type = "number" class="alignEl medInput" name = "ltClumpThresh" id = "ltClumpThresh" value = 2 min = 1 max = 50>
                     <label for = "maxMismatchLT" class="alignLab">Max Mismatches:</label>
-                    <input type = "number" class="alignEl" name = "maxMismatchLT"   id = "maxMismatchLT" value = 0 min = 0 max = 10>
+                    <input type = "number" class="alignEl medInput" name = "maxMismatchLT"   id = "maxMismatchLT" value = 0 min = 0 max = 10>
                       <label for = "includeRevComplLT" class="alignLab">Include rev compls?</label>
 
                       <input type = "checkbox" class="alignEl" name = "includeRevComplLT" id = "includeRevComplLT">
@@ -333,9 +334,9 @@
                       <label>Method:</label>
                       <br>
 
-                    <input type="radio"  name="bruteOrTreeLT"  id ="bruteLT" value="bruteLT" checked>Brute
+                    <input type="radio"  name="bruteOrTreeLT"  id ="bruteLT" value="bruteLT">Brute
 
-                    <input type="radio"  name="bruteOrTreeLT" id = "treeLT"  value="treeLT">Tree
+                    <input type="radio"  name="bruteOrTreeLT" id = "treeLT"  value="treeLT" checked>Tree
 
                       <br>
                       <br>
@@ -343,7 +344,7 @@
 
                   </div>
                     <div id = "rightClump" class="rightClump">
-                        <button class="alignBut" type = "button" onclick="runLTClump()">LT Clump</button>
+                        <button class="alignBut runBut" type = "button" onclick="runLTClump()">Search</button>
                         <br>
                         <button class = "alignBut" type = "button" onclick="stopPressed(event)">Stop</button>
 
@@ -363,20 +364,20 @@
                 <article id="art5">
                     <div class="leftClump" id="leftKmer">
                         <label for = "kmer" class="alignLab">k-mer:</label>
-                        <input type = "text" class="alignEl" name = "kmer"  onkeypress="return restrictToACGT(event)" id = "kmer" onchange="kmerChanged(event)">
+                        <input type = "text" class="alignEl" spellcheck="false" name = "kmer"  onkeypress="return restrictToACGT(event)" id = "kmer" onchange="kmerChanged(event)">
                         <label for = "maxMismatchKS" class="alignLab">Max Mismatches:</label>
                         <input type = "number" class="alignEl" name = "maxMismatchKS"   id = "maxMismatchKS" value = 0 min = 0 max = 10>
                         <label for ="includeRevComplKS" class="alignLab">Include rev compls?</label>
                         <input type = "checkbox" class="alignEl" name = "includeRevComplKS" id = "includeRevComplKS">
-                        <label for ="debugKS" class="alignLab">Debug</label>
+                        <label for ="debugKS" id="debugKSLab" class="alignLab">Debug</label>
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugKS" id = "debugKS">
-
+	
 
                     </div>
                     <div class="rightClump" id="rightKmer">
-                        <button type = "button" onclick="searchKmer(event)">Search for k-mer</button>
+                        <button type = "button" class="runBut" id="runKS" onclick="searchKmer(event)">Search for k-mer</button>
                         <br>
-                        <button type = "button" onclick = "kMerRevComplPressed()">k-mer Rev Compl</button>
+                        <button type = "button" class="runBut" id="runRevComplKS" onclick = "kMerRevComplPressed()">k-mer Rev Compl</button>
                         <br>
                         <label id="revComplKmerLabel">ACGTTG</label>
 
@@ -426,15 +427,32 @@
                     <input type = "checkbox" class="alignEl"checked name = "laplaceMS" id = "laplaceMS">
                     <label for debugKS class="alignLab">Debug</label>
                     <input type = "checkbox" class="alignEl" name = "debugMS" id = "debugMS"-->
-                    <input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
-                    <br>
-                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifBrute" value="motifBrute" checked>Brute
-                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifMedian" value="motifMedian" >Median String
-                    <br>
-                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy">Greedy Motif
-                    <br>
-                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">Random Motif
+                    
+  
+  
+                    <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy" checked>
+                    
+					<label for "motifGreedy" id = "motifGreedyLab">Greedy Motif method</label>
+					<br>
+			
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler
+					<input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">
+					<label for "motifRandom" id = "motifRandomLab">Random Method</label>	
+					<br>
+					<input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifMedian" value="motifMedian" >Median String method
+                    
+                    
+					<input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifBrute" value="motifBrute" >
+                    <label for "motifBrute" id = "motifBruteLab">Brute method</label>
+					<br>
+					<input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" >k d Motifs (allow d mismatches only)
+					
+			
+					
+					
+ 
+
+					<br>
                 </div>
                 <div class="rightClump" id="rightMotif">
                     <!--input type="radio" name="motifMethod"  onclick = "motifRadClicked(event.target.id)" id ="motifKD" value="motifKD" checked>k d Motifs
@@ -444,8 +462,8 @@
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGreedy" value="motifGreedy">Greedy Motif
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifRandom" value="motifRandom">Random Motif
                     <input type="radio" name="motifMethod" onclick = "motifRadClicked(event.target.id)" id ="motifGibbs" value="motifGibbs">Gibbs Sampler-->
-                    <button type = "button" class="fixedBut" onclick="runMotif(event)">Run</button>
-                    <button type = "button"  onclick="motifCompare(event)">Score Motifs</button>
+                    <button type = "button" class="fixedBut runBut" onclick="runMotif(event)">Search for Motifs</button>
+                    <button type = "button" class="runBut"  id="scoreMotifs" onclick="motifCompare(event)">Score Motifs</button>
                 </div>
 
 
@@ -504,22 +522,24 @@
 
                 </div>
                 <div class="midClump" id = "midSeq"> <!--id = "midMotif"-->
-                    <input type="radio"  name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqDNA" value="seqDNA" checked  >DNA
+				    
+					<input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqReads" value="seqReads" checked >Input: Reads
                     <br>
-                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqReads" value="seqReads"  >Reads
+                    <input type="radio"  name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqDNA" value="seqDNA"  >Input: DNA
                     <br>
-                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqAdjList" value="seqAdjList" >Adjacency List                            <br>
+ 
+                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedReads" value="seqPairedReads" >Input:	 Paired Reads                           <br>
+ 
+                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedDNA" value="seqPairedDNA" >Input: Paired DNA                            <br>
 
-                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedDNA" value="seqPairedDNA" >Paired DNA                            <br>
-
-                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqPairedReads" value="seqPairedReads" >Paired Reads                            <br>
+                    <input type="radio" name="seqInput"  onclick = "sequencingInputRadClicked(event.target.id)" id ="seqAdjList" value="seqAdjList" >Input: Adj List                            <br>
 
 
 
                 </div>
                 <div class="rightClump" id = "rightSeq"> <!-- id="rightMotif"-->
 
-                    <button type = "button" class="fixedBut" id="runSequencing" onclick="runSequencing(event)">Run</button>
+                    <button type = "button" class="fixedBut runBut" id="runSequencing" onclick="runSequencing(event)">Run</button>
                     <br>
 
                     <input type="radio"  name="seqMethod"  onclick = "sequencingRadClicked(event.target.id)" id ="seqComp" value="seqComp"  >Graph
@@ -572,9 +592,9 @@
                         <!--textarea name = "dnaStrings" placeholder = "Enter or paste DNA sequences (one per line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
                         <button type = "button" onclick="motifsInput(event)">Apply</button-->
 
-                        <label for ="startCodTT"  class="alignLab" id="startCodLabTT" >Use Start Codon</label>
+                        <label for ="startCodTT"  class="alignLab" id="startCodLabTT" >Check for Start Codon</label>
                         <input type = "checkbox" class="alignEl" name = "startCodTT"  id = "startCodTT" checked>
-                        <label for ="stopCodTT"  class="alignLab" id="stopCodLabTT" >Use Stop Codon</label>
+                        <label for ="stopCodTT"  class="alignLab" id="stopCodLabTT" >Check for Stop Codon</label>
                         <input type = "checkbox" class="alignEl"  name = "stopCodTT" id = "stopCodTT" checked>
                         <label for ="readFrameTT"   id="readFrameLabTT" class="alignLab">All Reading Frames</label>
                         <input type = "checkbox" class="alignEl" name = "readFrameTT" id = "readFrameTT">
@@ -584,7 +604,7 @@
                         <label for ="revComplTT" id="revComplLabTT" class="alignLab">Reverse</label>
                         <input type = "checkbox" class="alignEl" name = "revComplTT" id = "revComplTT">
 
-                        <label for ="debugTT" class="alignLab">Debug</label>
+                        <label for ="debugTT" id="debugTTLab" class="alignLab">Debug</label>
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugTT" id = "debugTT">
 
 
@@ -604,14 +624,18 @@
                     </div>
                     <div class="rightClump" id = "rightTr"> <!-- id="rightMotif"-->
 
-                        <button type = "button" class="fixedBut" onclick="runTrans(event)">Run</button>
+                        <button type = "button" class="fixedBut runBut" onclick="runTrans(event)">Run</button>
                         <br>
 
-                        <input type="radio"  name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trTranscribe" value="seqComp"   >Transcribe/Translate
+                        <input type="radio"  name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trTranscribe" value="seqComp">
+						<label for="trTranscribe" id = "trTranscribeLab">Transcribe/Translate</label>
                         <br>
-                        <input type="radio" name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trTranslate" value="seqPath" checked >Translate
-                        <br>
-                        <input type="radio" name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trRetro" value="seqCycle" >Retro                            <br>
+                        <input type="radio" name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trTranslate" value="seqPath" checked >
+                        <label for="trTranslate" id = "trTranslateLab">Translate</label>
+						<br>
+                        <input type="radio" name="trMethod"  onclick = "transRadClicked(event.target.id)" id ="trRetro" value="seqCycle" > 
+						<label for="trRetro" id = "trRetroLab">Retro</label>
+						<br>
 
                         <!--button type = "button"  onclick="motifCompare(event)">Score Motifs</button-->
                     </div>
@@ -678,6 +702,7 @@
                     <div class="midClump" id = "midPep"> <!--id = "midMotif"-->
                         <label>Input:</label>
                         <br>
+                        <br>
                         <input type="radio"  name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepPeptide" value="pepPeptide" checked  >Peptide
                         <br>
                         <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectrum" value="pepSpectrum"  >Exp Spectrum
@@ -688,7 +713,7 @@
                     </div>
                     <div class="rightClump" id = "rightPep"> <!-- id="rightMotif"-->
 
-                        <button type = "button" class="fixedBut" onclick="runPeptide(event)">Run</button>
+                        <button type = "button" class="fixedBut runBut" onclick="runPeptide(event)">Run</button>
                         <br>
 
 						<label  id = "pepIdealSpectrumLab" >
@@ -769,22 +794,23 @@
                         <input type = "checkbox" class="alignEl" onclick="debugSwitchClicked(event)" name = "debugAL" id = "debugAL">
 
                     </div>
-                    <div class="midClump" >
-                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLCS" value="alignLCS" checked>LCS
-                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignEditDist" value="alignEditDist">Edit Distance
-                        <br>
-                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignGlobal" value="alignGlobal">Global Align
+                    <div class="midClump" id = "midAlign">
+					    <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignGlobal" value="alignGlobal" checked>Global Align
                         <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLocal" value="alignLocal">Local Align
                         <BR>
                         <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignFitting" value="alignFitting">Fitting Align
                         <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignOverlap" value="alignOverlap">Overlap Align
                         <br>
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignLCS" value="alignLCS">LCS
+                        <input type="radio" name="alignMethod"  onclick = "alignRadClicked(event.target.id)" id ="alignEditDist" value="alignEditDist">Edit Distance
+                        <br>
+                       
 
                     </div>
-                    <div class="rightClump" >
-                        <button type = "button" class="fixedBut" onclick="runAlignBackground(event)">Run</button>
+                    <div class="rightClump" id = "rightAlign" >
+                        <button type = "button" class="fixedBut runBut" onclick="runAlignBackground(event)">Run</button>
                         <br>
-                        <label for ="spaceThreshAL"  id="spaceThreshLab" class="alignLab">Linear Space Thresh</label>
+                        <label for ="spaceThreshAL"  id="spaceThreshLab" class = "alignLab" >Linear Space Thresh</label>
                         <input type = "number" class = "sensibleNum alignEl" name = "spaceThreshAL" id = "spaceThreshAL" value = 10000>
                         <br>
                         <label for ="affineAL" class="alignLab">Affine</label>
@@ -815,7 +841,7 @@
 
                     </div>
                     <div class="rightClump" >
-                        <button type = "button" class="fixedBut" onclick="runSBBackground(event)">Run</button>
+                        <button type = "button" class="fixedBut runBut" onclick="runSBBackground(event)">Run</button>
                         <br>
 
 
@@ -846,10 +872,10 @@
 
                     </div>
                     <div class="midClump" id = "midPhyl"> <!--id = "midMotif"-->
-
-                        <input type="radio" name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDistMat" value="phylDistMat" checked >Distance Matrix                            <br>
-                         <input type="radio"  name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDNA" value="phylDNA"  >DNA alignments
-                        <br>
+                        <input type="radio"  name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDNA" value="phylDNA"  checked >DNA alignments
+						<br>
+                        <input type="radio" name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylDistMat" value="phylDistMat" >Distance Matrix                            <br>
+                        
                         <input type="radio" name="phylInput"  onclick = "phylInputRadClicked(event.target.id)" id ="phylAdjList" value="phylAdjList" >Adjacency List
                         <br>
 
@@ -859,22 +885,26 @@
 
 
 
-                        <button type = "button" class="fixedBut" id="runPhylogeny" onclick="runPhylogeny(event)">Run</button>
+                        <button type = "button" class="fixedBut runBut" id="runPhylogeny" onclick="runPhylogeny(event)">Run</button>
 
-                        <button type = "button" class="fixedBut" id="stepPhylogeny" onclick="stepPhylogeny(event)">Step</button>
+                        <button type = "button" class="fixedBut runBut" id="stepPhylogeny" onclick="stepPhylogeny(event)">Step</button>
                         <br>
                         <label for ="phylAdd" id="phylAddLab">Additive</label>
                         <input type="radio"  name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylAdd" value="phylAdd" checked  >
+						
                         <label for ="phylUltra" id="phylUltraLab">Ultramet</label>
                         <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylUltra" value="phylUltra"  >
+						
                         <label for ="phylNeighbour" id="phylNeighbourLab">N/b join</label>
                         <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylNeighbour" value="phylNeighbour" >
-                        <br>
+                        
                         <label for ="phylDisplayTree" id="phylDisplayTreeLab">Display</label>
                         <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylDisplayTree" value="phylDisplayTree" checked>
-                        <label for ="phylSmallParsimony" id="phylSmallParsimonyLab">Small Pars</label>
+                        
+						<label for ="phylSmallParsimony" id="phylSmallParsimonyLab">Small Pars</label>
 
                         <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylSmallParsimony" value="phylSmallParsimony">
+                        
                         <label for ="phylLargeParsimony" id="phylLargeParsimonyLab">Large Pars</label>
                         <input type="radio" name="phylMethod"  onclick = "phylRadClicked(event.target.id)" id ="phylLargeParsimony" value="phylLargeParsimony">
 
@@ -1034,6 +1064,9 @@
                     <br><input type="radio" name="miscRadio" id = "miscFunc75"  value="75" onclick = "miscRadioClicked(event.target.id)">BA8B Sq Distortion
                     <br><input type="radio" name="miscRadio" id = "miscFunc83"  value="83" onclick = "miscRadioClicked(event.target.id)">BA8C K-means Clustering
                     <br><input type="radio" name="miscRadio" id = "miscFunc84"  value="84" onclick = "miscRadioClicked(event.target.id)">BA8D Soft K-means Clustering
+			        <br><input type="radio" name="miscRadio" id = "miscFunc85"  value="85" onclick = "miscRadioClicked(event.target.id)">SNP Pairwise Diff
+				    <br><input type="radio" name="miscRadio" id = "miscFunc86"  value="86" onclick = "miscRadioClicked(event.target.id)">SNP Matrix Pairwise Diff
+			
                     </div>
 
                     <div id = "executeMiscDiv">
@@ -1042,7 +1075,7 @@
                         <button type = "button" onclick = "readTextFileFromServer('data/par2.txt','loadedMiscPar2',miscParLoadedFromServer)" >Load P2</button>
                         <br>
 
-                        <button type = "button" onclick="executeMisc(event)">Execute</button>
+                        <button type = "button"  onclick="executeMisc(event)">Execute</button>
                     </div>
                     <textarea name = "miscQuickResult" placeholder = "Result" rows = "6" cols = "20"  id = "miscQuickResult" ></textarea>
 
@@ -1064,7 +1097,7 @@
             <fieldset class="tabFieldset"> contents of tab 3</fieldset-->
 
         </div>
-        <canvas id = "skewCanvas">
+        <canvas id = "skewCanvas" width="200" height="134">
 
         </canvas>
         </div>
@@ -1073,7 +1106,7 @@
 
             <div id = "rightOne">
 
-                <span id = "rightOneLab">Results Selector</span>
+                <span id = "rightOneLab">Results Navigator</span>
                 <img class = "expCollImg"  id = "expMulti" onclick = "expCollClicked(event.target.id)" src = 'img/expand_black.png'>
                 <br>
 
@@ -1087,15 +1120,42 @@
             <div id="leftMainDiv">
 
                 <div id = "dnaviewer">
-                    <div id = "dnaView" onclick="clickInDNA(event)"></div>
+				    <div id = "navDiv">
+						<div id = "matchEls">
+							<button type = "button" onclick="matchPressed(-100000)" >|&lt</button>
+							<button type = "button"  onclick="matchPressed(-1)">&lt</button>
+							<span id="currMatchRangeDNA"></span>
+							<button type = "button" onclick="matchPressed(1)">&gt</button>
+							<button type = "button" onclick="matchPressed(100000)">&gt|</button>
+						</div>
+						<div id = "pageEls">
+							<button type = "button" onclick="pagePressed(-1000)" >|&lt</button>
+							<button type = "button"  onclick="pagePressed(-1)">&lt</button>
+							<span id="currRangeDNA"></span>
+							<button type = "button" onclick="pagePressed(1)">&gt</button>
+							<button type = "button" onclick="pagePressed(1000)">&gt|</button>
+						</div>
+	
+						<button type ="button" onclick="jumpToPressed()">Jump to:</button>
+						<input type = "number" class="largeNum" name = "jumpToBase" id = "jumpToBase"  min=0 value=0>
+						<button type = "button" id="trimToBut" onclick="trimPressed()">Trim to:</button>
+						<input type = "number" class="largeNum"  name = "trimToBase" id = "trimToBase"  min=0 value=0>
+                    </div>
+					<div id = "dnaMessageDiv">
+					     
+					</div>
+                <div id = "dnaView" onclick="clickInDNA(event)"></div>
                 </div>
                 <div id = "graphviewer">
                     <div id = "graphGraphDiv">
-                        <canvas id = "moreCanvas">
+                        <canvas id = "moreCanvas" width:  1100 height: 150>
                             hhh
                         </canvas>
 
                     </div>
+					<div id = "graphReconstructedDiv">
+						
+					</div>
                     <div id = "graphDnaDiv">
 
                     </div>
@@ -1176,13 +1236,73 @@
 
         </div>
 
-        <div id = "moreDetailDiv">
+        <div id = "moreDetailDiv" class=">
             <!--textarea id = "debugText"></textarea-->
             <textArea id = "moreDetailText"></textArea>
             <canvas id = "evenMoreCanvas">
                 hhh
             </canvas>
         </div>
+		<div id="extraParametersControl">
+		    <fieldset>
+			<legend>Input</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "statsControl" >Summary stats			
+			</fieldset>
+			<fieldset>
+				<legend>MFK</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "debugMFControl" >debug
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "runBruteMFControl">Brute
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"   id = "runFreqMFControl">Freq
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField" name="<b>Search</b>" id = "runObjectMFControl" checked>Object
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "runSortMFControl">Sort
+				<input type = "checkbox" conclick="initialiseDisplayFields()" class="controlField"  id = "runTreeMFControl" >Tree
+			</fieldset>
+			<fieldset>
+				<legend>Navigate kmers</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "trimToButControl" >debug
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "trimToBaseControl">Brute
+			</fieldset>	
+	
+			<fieldset>
+				<legend>Kmer</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "runKSControl" checked >Search
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "runRevComplKSControl" >Search
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "revComplKmerLabelControl" >Rev compl
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "debugKSControl" >Debug
+			</fieldset>
+			<fieldset>
+				<legend>Clumps</legend>
+				<input type = "checkbox"  id = "showClumpUnderlinesLC" >Show LT Clump Underlines
+				
+			</fieldset>
+			<fieldset>
+				<legend>Motifs</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "motifBruteControl" >Brute
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "motifRandomControl" checked >Random
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "scoreMotifsControl" >Score Motifs
+			</fieldset>
+
+			<fieldset>
+				<legend>Assembly</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "readBreakControl" >Read Break
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "pairedToReadsControl" >PairedToReads
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "removeDupsControl" >Remove Dups
+			</fieldset>	
+			<fieldset>
+				<legend>Translate</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "debugTTControl" >Debug
+
+			</fieldset>						
+				<legend>Phylogeny</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "phylAdd" >Additive
+	
+			<fieldset>
+				<legend>More Details</legend>
+				<input type = "checkbox" onclick="initialiseDisplayFields()" class="controlField"  id = "moreDetailDivControl" >More Detail Div
+			</fieldset>
+		
+	
+		</div>
 
 
         <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/{{JQUERY_VERSION}}/jquery.min.js"></script>
@@ -1206,3 +1326,4 @@
         </script>
     </body>
 </html>
+	
