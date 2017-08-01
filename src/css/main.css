@@ -509,7 +509,7 @@ input[type=number] {
     background-color: grey;
     width: 55%;
     height: 100%;
-    
+
     display: inline-block;
     margin-right: 0;
 
@@ -994,6 +994,10 @@ input[type=number] {
 	background-color: #0090FF;
 
 
+}
+
+.underConstruction {
+    color: red;
 }
 
 #extraParametersControl {

@@ -209,7 +209,7 @@ function updateRunImage() {
 	++imgNum;
 	var fullName = imgName + (imgNum  % numImgs + 1)  + imgSuffix;
 	return fullName;
-	
+
 }
 
 function startRunImage(progCallback) {
@@ -225,7 +225,7 @@ function startRunImage(progCallback) {
 		progCallback(fullName);
 		//imgEl.src = fullName;
 		}, 100);
-	
+
 }
 
 function stopRunImage() {
@@ -637,8 +637,8 @@ function randomMotif(dnaStrings,k,numIters,d,laplace,progCallback,runCallback) {
 					}
 				}
             }
-			
-			
+
+
         }
 
         kmers = [];
@@ -1378,16 +1378,16 @@ function addKmerToFreqArray(kmer,pos,freqArray,bestFreqArray,inclRevCompl,countO
     if (ltClumpThreshold == null) {
         ltClumpThreshold = 0;
     }
-    
+
     var ind =  kMerToIndSmall(kmer);//kMerToInd(kmer);
-    
+
     if (countOnly) {
         if (!freqArray[ind]) {
             freqArray[ind] = 1;
         }
         else {
             freqArray[ind] +=1;
-            
+
         }
         if (freqArray[ind] >= ltClumpThreshold) {
             bestFreqArray[ind] = [freqArray[ind],pos];
@@ -1528,7 +1528,7 @@ function buildFreqArray(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,pr
         if (progCallback) {
             if ((i % progThreshold == 0) || i == dna.length - k) {
                 progCallback('Build Freq',i,dna.length - k);
-				
+
             }
         }
 
@@ -1628,9 +1628,9 @@ function buildFreqObject(k,dna,inclRevCompl,maxMismatch,ltClumpThreshold,debug,p
         if (progCallback) {
             if ((i % progThreshold == 0) || i == dna.length - k) {
                 progCallback('Build Freq',i,dna.length - k);
-				
+
 				runCallback(updateRunImage());
-				
+
             }
         }
 
@@ -3136,7 +3136,7 @@ function addSingleBaseToTree(justAddedPrev,baseNode,letter,posn,k) {
 
 }
 
-function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback,fullPartialFlag,bestScorePrev) {
+function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback,fullPartialFlag,bestScorePrev,runCallback) {
 
 //fullpartialflag - indicates whether this section of the alignment is fully or partially on the path
 
@@ -3148,6 +3148,9 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
 
        //  if ((i % progThreshold == 0) || (i == partEnd - 1)) {
         progCallback('Aligning: ' + s.length + ' ' + t.length, 0, 0, 'align');
+        if (runCallback) {
+           runCallback(updateRunImage());
+        }
 
 
 
@@ -3173,11 +3176,12 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
     var g =  new DGAlignSpaceGraph(s,t,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
 
     g.progressCallback = countProgMostFreqWithStages;
+    g.runCallback = runImageProg;
 
 
    // var midNodeData = g.findMiddleEdgeAllInOne(fullPartialFlag);
     var midNodeData = g.findMiddleEdgeAllInOneQuick(fullPartialFlag);
- 
+
     var mid = g.middleRow;
 
 
@@ -3206,7 +3210,7 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
 
         var newTopS = s.substring(0, midNodeData[1]);
         var newTopT = t.substring(0, mid - 1);
-        
+
         var newBottomS = s.substring(midNodeData[3]);
         var newBottomT = t.substring(mid);
 
@@ -3215,13 +3219,13 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
 
             if ((g.midNode.longestPathToThisNode == 0) &&  (fullPartialFlag == 'P')) {
             //found start of alignment. Just do bottom
-            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback,'F',botBestScore);
+            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback,'F',botBestScore,runCallback);
 
         }
         else {
 
-            alignHalf(newTopS, newTopT, startRow, startCol, startTopOrder, e, storeNodes, progCallback, fullPartialFlag == 'F' ? 'F' : 'P', topBestScore);
-            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback, 'F', botBestScore);
+            alignHalf(newTopS, newTopT, startRow, startCol, startTopOrder, e, storeNodes, progCallback, fullPartialFlag == 'F' ? 'F' : 'P', topBestScore,runCallback);
+            alignHalf(newBottomS, newBottomT, absoluteMidNodeSuccRow, absoluteMidNodeSuccCol, absoluteTopOrderSuccNode, e, storeNodes, progCallback, 'F', botBestScore,runCallback);
         }
     }
 
@@ -3232,7 +3236,7 @@ function alignHalf(s,t,startRow,startCol,startTopOrder,e,storeNodes,progCallback
         newBottomS = s;
         newBottomT = t.substring(mid);
 
-        alignHalf(newBottomS, newBottomT, startRow + mid, startCol, startTopOrder, e, storeNodes, progCallback,'P',bestScorePrev);
+        alignHalf(newBottomS, newBottomT, startRow + mid, startCol, startTopOrder, e, storeNodes, progCallback,'P',bestScorePrev,runCallback);
 
 
     }
@@ -3281,9 +3285,9 @@ function convertStoreNodesToAlignment(g,e,storeNodes) {
 
 }
 
-function alignGlobalSpace(e,progCallback) {
+function alignGlobalSpace(e,progCallback,runCallback) {
     var storeNodes = [];
-    alignHalf(e.data.sAlign,e.data.tAlign,0,0,0,e,storeNodes,progCallback,'F');
+    alignHalf(e.data.sAlign,e.data.tAlign,0,0,0,e,storeNodes,progCallback,'F',null,runCallback);
 
     return convertStoreNodesToAlignment(null,e,storeNodes);
 
@@ -3298,6 +3302,8 @@ function alignLocalSpace(e,progCallback) {
     var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
 
     g.progressCallback = countProgMostFreqWithStages;
+    g.runCallback = runImageProg;
+
 
 
     g.initGraph();
@@ -3321,6 +3327,7 @@ function alignLocalSpace(e,progCallback) {
         var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
         newG.progressCallback = countProgMostFreqWithStages;
+        newG.runCallback = runImageProg;
 
         var mid = newG.middleRow;
 
@@ -3341,7 +3348,7 @@ function alignLocalSpace(e,progCallback) {
     }
 
 
-    alignHalf(sAdj,tAdj,absAdjRow,0,newG.getAbsTopOrderNode(newG.midNode,absAdjRow,0,g.cols),e,storeNodes,progCallback,'P',bestScore);
+    alignHalf(sAdj,tAdj,absAdjRow,0,newG.getAbsTopOrderNode(newG.midNode,absAdjRow,0,g.cols),e,storeNodes,progCallback,'P',bestScore,runCallback);
 
     return convertStoreNodesToAlignment(g,e,storeNodes);
 
@@ -3354,6 +3361,7 @@ function alignFittingSpace(e,progCallback) {
     var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
 
     g.progressCallback = countProgMostFreqWithStages;
+    g.runCallback = runImageProg;
 
 
     g.initGraph();
@@ -3378,6 +3386,8 @@ function alignFittingSpace(e,progCallback) {
     var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
     newG.progressCallback = countProgMostFreqWithStages;
+    newG.runCallback = runImageProg;
+
 
     newG.middleRow = 1; //first row
 
@@ -3397,7 +3407,7 @@ function alignFittingSpace(e,progCallback) {
     absAdjRow += mid;
 
 
-    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore);
+    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore,runCallback);
 
 
     return convertStoreNodesToAlignment(g,e,storeNodes);
@@ -3412,6 +3422,7 @@ function alignOverlapSpace(e,progCallback) {
     var g =  new DGAlignSpaceGraph(e.data.sAlign,e.data.tAlign,e.data.alignType,e.data.scoreMatrix,e.data.indelPen,e.data.mismatchPen,e.data.matchScore);
 
     g.progressCallback = countProgMostFreqWithStages;
+    g.runCallback = runImageProg;
 
 
     g.initGraph();
@@ -3432,13 +3443,14 @@ function alignOverlapSpace(e,progCallback) {
     var newG = new DGAlignSpaceGraph(sAdj, tAdj, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
     newG.progressCallback = countProgMostFreqWithStages;
+    newG.runCallback = runImageProg;
 
     newG.middleRow = 1;
 
     var mid =  newG.middleRow; //first row //newG.middleRow;
     var tBottom = tAdj.substring(mid);
 
-   
+
     newG.findMiddleEdgeAllInOneQuick('P');
 
     // should write out mid edge here (ie first edge)
@@ -3449,7 +3461,7 @@ function alignOverlapSpace(e,progCallback) {
     absAdjRow += mid;
 
 
-    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore);
+    alignHalf(sAdj,tAdj,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),newG.getAbsTopOrderNode(newG.midEdge.targetNode,absAdjRow,newG.getNodeCol(newG.midEdge.targetNode),g.cols),e,storeNodes,progCallback,'F',newG.bestBotScore,runCallback);
 
     return convertStoreNodesToAlignment(g,e,storeNodes);
 
@@ -3458,24 +3470,24 @@ function alignOverlapSpace(e,progCallback) {
 
 
 
-function alignSpace(e,progCallback) {
+function alignSpace(e,progCallback,runCallback) {
 
     var ret;
 
     if (e.data.alignType == DGraph.alignTypeGlobal) {
-        ret = alignGlobalSpace(e,progCallback);
+        ret = alignGlobalSpace(e,progCallback,runCallback);
 
     }
     else if (e.data.alignType == DGraph.alignTypeLocal) {
-        ret = alignLocalSpace(e,progCallback);
+        ret = alignLocalSpace(e,progCallback,runCallback);
 
     }
     else if (e.data.alignType == DGraph.alignTypeFitting) {
-        ret = alignFittingSpace(e,progCallback);
+        ret = alignFittingSpace(e,progCallback,runCallback);
 
     }
     else if (e.data.alignType == DGraph.alignTypeOverlap) {
-        ret = alignOverlapSpace(e,progCallback);
+        ret = alignOverlapSpace(e,progCallback,runCallback);
 
     }
     return ret;
@@ -3484,7 +3496,7 @@ function alignSpace(e,progCallback) {
 
 function sharedKmers(e,progCallback) {
 
- 
+
     var s = e.data.sbS;
     var t = e.data.sbT;
     var k = e.data.k;
@@ -3522,7 +3534,7 @@ function countProgMostFreqTree(stage,prog,tot) {
 
 function runImageProg(imgFull) {
 	 self.postMessage({'task': 'mostFrequentKmers','msgType' : 'runAnimation', 'imgName' : imgFull});
-	
+
 }
 
 function countProgMostFreq(prog,tot) {
@@ -3561,7 +3573,7 @@ function countProg(prog,tot) {
 }
 
 self.addEventListener('message', function(e) {
-    
+
     console.log('Worker starting. Task: ' + e.data.task);
     importScripts('russGenLibs/BioUtilities.js');
     importScripts('russGenLibs/GenUtilities.js');
@@ -3601,7 +3613,7 @@ self.addEventListener('message', function(e) {
             var debugInfo;
 
             startTime = Date.now();
-			
+
 			//startRunImage(runImageProg);
 
 
@@ -3820,7 +3832,7 @@ self.addEventListener('message', function(e) {
             //var res = gibbsSampler(e.data.dnaStrings, e.data.k, e.data.numIters, e.data.maxMismatch, e.data.laplace,countProgMostFreqWithStages);
             cycFlag = (e.data.pepType == Peptide.linear) ? false : true;
             res = leaderboardCyclopeptideSequencing(e.data.spectrum,e.data.M,e.data.N,false,cycFlag,null,countProgMostFreqWithStages);
-           
+
 
             txt = '';
             /*
@@ -3879,6 +3891,8 @@ self.addEventListener('message', function(e) {
                 var g = new DG3DAlignGraph(e.data.sAlign, e.data.tAlign,e.data.uAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
                 g.progressCallback = countProgMostFreqWithStages;
+                g.runCallback = runImageProg;
+
                 g.initGraph();
 
                 g.longestPathsDynamic();
@@ -3904,6 +3918,8 @@ self.addEventListener('message', function(e) {
                 g = new DGAffineAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore,e.data.affineOpenGap);
 
                 g.progressCallback = countProgMostFreqWithStages;
+                g.runCallback = runImageProg;
+
                 g.initGraph();
 
                 g.longestPathsDynamic();
@@ -3927,7 +3943,7 @@ self.addEventListener('message', function(e) {
             }
 
             else if (sizeOfProblem  > thresh) {
-                res = alignSpace(e,countProgMostFreqWithStages);
+                res = alignSpace(e,countProgMostFreqWithStages,runImageProg);
 
                 self.postMessage({'task': 'align','msgType' : 'result', 'alignType':e.data.alignType,'txtStuff' : res,'alignMethod':e.data.alignMethod});
 
@@ -3937,6 +3953,8 @@ self.addEventListener('message', function(e) {
                 g = new DGAlignGraph(e.data.sAlign, e.data.tAlign, e.data.alignType, e.data.scoreMatrix, e.data.indelPen, e.data.mismatchPen, e.data.matchScore);
 
                 g.progressCallback = countProgMostFreqWithStages;
+                g.runCallback = runImageProg;
+
                 g.initGraph();
 
                 g.longestPathsDynamic();

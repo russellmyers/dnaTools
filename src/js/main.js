@@ -70,7 +70,7 @@ var paramObj;
 var expDebugState = true;
 var expMultiState = true;
 
-var pGraphView = null; 
+var pGraphView = null;
 
 
 //Initialisation
@@ -97,19 +97,22 @@ function testStuff() {
 
     phylogenyInput();
 	*/
-	
+
 	/*
 	tab_click(10,tabClickDone); //Misc
     document.getElementById('miscFunc83').checked = true;
 	document.getElementById('miscParam1').value = '2 2';
 	document.getElementById('miscParam2').value = '1.3 1.1\n1.3 0.2\n0.6 2.8\n3.0 3.2\n1.2 0.7\n1.4 1.6\n1.2 1.0\n1.2 1.1\n0.6 1.5\n1.8 2.6\n1.2 1.3\n1.2 1.0\n0.0 1.9';
     */
-	
+
 
    // var builder = new DGraphBuilder('0->1\n0->2\n7->8\n7->9\n4->8\n1->3\n1->4\n8->3',new DNodeBuilder(),new DEdgeBuilder());
   // var builder = new DGraphBuilder('0->1\n0->2\n2->1',new DNodeBuilder(),new DEdgeBuilder());
   //  var builder = new DGraphBuilder('1<->2\n1<->5\n5<->9\n5<->10\n9<->10\n3<->4\n3<->7\n3<->8\n4<->8\n7<->11\n8<->11\n11<->12\n8<->12');
   // var builder = new DGraphBuilder('0<->1\n0<->2',new DNodeBuilder(),new DEdgeBuilder());
+
+    var tst = implantMessage('ACGATCGATGCTAGCTGATCGTAGCTAG','GATTACA',3);
+
     var builder = new DGraphBuilder('0->1\n0->2\n1->3\n2->3',new DNodeBuilder(),new DEdgeBuilder());
     var gr = new DBGraph(builder);
 
@@ -347,7 +350,7 @@ function testStuff() {
 
 function initialisePage() {
 
-    myParams.tabActive = 5;
+    myParams.tabActive = 4;
 
     tab_click(8);
     tab_click(10);
@@ -362,10 +365,10 @@ function initialisePage() {
     tab_click(1);
     tab_click(0);
 
-    
+
 
     processHTMLParams();
-	
+
 	initialiseDisplayFields();
 
     document.getElementById('fileInput')
@@ -390,9 +393,15 @@ function initialisePage() {
     document.getElementById('fileSBInput2')
         .addEventListener('change',readSBFile,false);
 
+    document.getElementById('fileTransInput')
+        .addEventListener('change',readTransFile,false);
+
+    document.getElementById('filePhylogenyInput')
+        .addEventListener('change',readPhylogenyFile,false);
+
     document.getElementById('motifGreedy').checked = true;
     motifRadClicked('motifGreedy');
-	
+
     sequencingRadClicked('seqPath');
     sequencingInputRadClicked('seqDNA');
 
@@ -404,7 +413,7 @@ function initialisePage() {
 
     document.getElementById('alignGlobal').checked = true;
     alignRadClicked('alignGlobal');
-	
+
 	document.getElementById('pepPeptide').checked = true;
 	peptideInputRadClicked('pepPeptide');
 
@@ -423,23 +432,23 @@ function initialisePage() {
 
 	document.getElementById('trDNA').checked = true;
 	transInputRadClicked('trDNA');
-	
+
 	useAffineClicked();
-	
+
 
     expDebugState = false;
     expStateChanged('expDebug',false);
     expMultiState = false;
     expStateChanged('expMulti',false);
-	
+
 	document.getElementById('tabs_data').style.visibility = 'visible';
-	
+
 
     readPamScoringMatrix();
     readBlosum62ScoringMatrix();
 
-	
-	
+
+
     //
 
 }
@@ -459,7 +468,7 @@ function setUpWorkerListeners() {
         }
 		else if (e.data.msgType === 'runAnimation') {
 			updateRunAnimation(e.data.imgName);
-			
+
 		}
         else {
 
@@ -468,18 +477,19 @@ function setUpWorkerListeners() {
                      // console.log('Worker finished');
                     // alert('kmer ind is: ' + e.data.txtStuff);
                     // mfk = [indexArray];
-					
+
 					expMultiState = true;
                     expStateChanged('expMulti',true);
-					
+
                     mfk = [e.data.indArray];
 					mfkProcessed = true;
                     //k = kmer.length;
                     document.getElementById('numKmers').value = 1;
                     numKmerChanged();
                     //colourDNA(dnaMaster,null,document.getElementById("includeRevComplKS").checked);
-					
+
 					document.getElementById('runImg').style.visibility = 'hidden';
+                    document.getElementById('progress').innerHTML = '';
 
                     if (document.getElementById('debugKS').checked) {
                         resString = '';
@@ -519,7 +529,7 @@ function setUpWorkerListeners() {
 
                     mfk = e.data.indArray;
 					mfkProcessed = true;
-					
+
                     tot = 0;
                     if (mfk.length == 0) {
 
@@ -567,7 +577,7 @@ function setUpWorkerListeners() {
                         // var km = dna.substring(mfk[numKmerVal - 1][0], mfk[numKmerVal - 1][0] + k);
                         document.getElementById('kMerMostFreq').innerHTML = dna.substring(mfk[numKmerVal - 1][0][0], mfk[numKmerVal - 1][0][0] + k);
                         document.getElementById('kMerRevCompl').innerHTML = reverseComplement(km);
-						
+
 						dnaMatch = 0;
 						setPageBasedOnMatch();
                     }
@@ -591,8 +601,9 @@ function setUpWorkerListeners() {
                         }
                         //alert(debugRes);
                     }
-					
+
 					document.getElementById('runImg').style.visibility = 'hidden';
+                    document.getElementById('progress').innerHTML = '';
 
                   break;
 
@@ -607,7 +618,7 @@ function setUpWorkerListeners() {
                     document.getElementById('numKmers').value = 1;
                     numKmerChanged();
 
-					
+
                     var clumps = e.data.clumps;
                     tot = 0;
                     if (mfk.length == 0) {
@@ -661,14 +672,15 @@ function setUpWorkerListeners() {
 
 
                     revComplAlreadyDone = [];
-					
+
 					var mark = null;
 					if (document.getElementById('showClumpUnderlinesLC').checked) {
 						mark = clumps;
 					}
-					
+
 					document.getElementById('runImg').style.visibility = 'hidden';
-					
+                    document.getElementById('progress').innerHTML = '';
+
                     colourDNA(dna, mark, document.getElementById('includeRevComplLT').checked);
 
                     break;
@@ -713,7 +725,7 @@ function setUpWorkerListeners() {
                     break;
 
                 case 'seqLeaderboardCyclopeptide':
-                  
+
                     /*
                     var resEl = document.getElementById('miscQuickResult');
                     resEl.value = 'results\n';
@@ -784,12 +796,12 @@ function outputProgress(e) {
 
     }
 
-	
+
 function updateRunAnimation(imgName) {
 
     //document.getElementById('runImg').style.visibility = 'visible';
-	document.getElementById('runImg').src = imgName;	
-	
+	document.getElementById('runImg').src = imgName;
+
 }
 
 /**
@@ -798,15 +810,16 @@ function updateRunAnimation(imgName) {
  */
 
 function processReturnedMotif(e) {
-	
+
 	document.getElementById('runImg').style.visibility = 'hidden';
-	
+    document.getElementById('progress').innerHTML = '';
+
 	expMultiState = true;
     expStateChanged('expMulti',true);
-	
+
     mfMotif = e.data.indArray;
 	mfMotifProcessed = true;
-	
+
     var tot = 0;
     if (mfMotif.length == 0) {
 
@@ -850,7 +863,7 @@ function processReturnedMotif(e) {
     }
 
 	if (mfMotif.length == 0) {
-		
+
 	}
 	else {
 		mfMotif = mfMotif.map(function(el) {
@@ -861,15 +874,15 @@ function processReturnedMotif(e) {
 
     revComplAlreadyDone = [];
     colourDNA(dna,null,false);
-	
+
 	var extraInfoAr = [];
-	
+
 	if (mfMotif.length == 0) {
-		
+
 	}
 	else {
 		var k = mfMotif[0][1].length;
-		
+
 		mfMotif[0][0].forEach(function(el,i) {
 				var ind = el[0][0];
 				var km = dnaMasterStrings[i].substring(ind,ind+k);
@@ -878,18 +891,18 @@ function processReturnedMotif(e) {
 		});
 
 		logoCanvas(extraInfoAr);
-		
+
 		document.getElementById('dnaMessageDiv').innerHTML = e.data.txtStuff + ' Consensus: ' + mfMotif[0][1];
 	}
-	
-	
+
+
 
     if (document.getElementById('debugMS').checked) {
 
 
         document.getElementById('debugText').value = e.data.txtStuff;
 
- 
+
         /*
          mfMotif.forEach(function(el) {
          extraInfoAr.push(el[1]);
@@ -953,7 +966,7 @@ function processReturnedAlign(e) {
     alignReturned.formattedGrid = ret[8];
 
     alignReturned.alignType = e.data.alignType;
-	
+
 	alignReturned.alignMethod = e.data.alignMethod;
 
     alignReturned.inProgress = false;
@@ -1005,7 +1018,7 @@ function readTextFileFromServer(fileName,fileId,onFinish) {
     client.open('GET', fileName);
     client.setRequestHeader('Cache-Control', 'no-cache');
     client.onreadystatechange = function() {
-       
+
         if (client.readyState == 4 && client.status == 200) {
 
             onFinish(fileName,fileId,client.responseText);
@@ -1158,6 +1171,24 @@ function readSingleSequencingFile(e) {
 
 }
 
+function readPhylogenyFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var parts = contents.split(/\r\n|\r|\n/g);
+        var joined = parts.join('\n');
+        document.getElementById('dnaStrings').value = joined;
+        phylogenyInput(e,joined);
+    };
+    reader.readAsText(file);
+    //e.target.files[0] = '';
+    // document.getElementById('fileMotifInput').value = '';
+}
+
 function readAlignFile(e) {
     //for sequence alignment
     var file = e.target.files[0];
@@ -1198,6 +1229,21 @@ function readAlignFile(e) {
 
 }
 
+function readTransFile(e) {
+    //for transcription/translation
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        transInput(e,contents);
+    };
+    reader.readAsText(file);
+
+}
+
 function readSBFile(e) {
     //for Synteny block construction
     var file = e.target.files[0];
@@ -1221,7 +1267,7 @@ function readSBFile(e) {
         if (tst[0].substring(0,1) == '>') { //fasta
             for (var i = 1;i < tst.length;++i) {
                 if (tst[i].substring(0,1) == '>') {
-                    
+
                 }
                 else {
                     newContents += tst[i].trim();
@@ -1245,8 +1291,8 @@ function clearFileName(e) {
 
 
 function initialiseDisplayFields() {
-	
-	
+
+
 	var controlFields = document.getElementsByClassName('controlField');
 
     for (var i = 0;i < controlFields.length;++i) {
@@ -1259,13 +1305,13 @@ function initialiseDisplayFields() {
 		else {
 			targetEl.style.visibility = cf.checked ? 'initial' : 'hidden';
 		}
-		
+
 		if ((cf.name !== '')  && cf.checked) {
 			//rename
 			targetEl.innerHTML = cf.name;
-			
+
 		}
-		
+
 		//Also label if it exists
 		var targetElLabId = targetElId.concat('Lab');
 		var targetElLab = document.getElementById(targetElLabId);
@@ -1273,7 +1319,7 @@ function initialiseDisplayFields() {
 			targetElLab.style.visibility = cf.checked ? 'initial' : 'hidden';
 		}
 	}
-	
+
 }
 
 function processHTMLParams()
@@ -1319,7 +1365,7 @@ function displayContents(contents) {
 
 function errMsg(errTxt) {
 	document.getElementById('errorMsgDiv').innerHTML = errTxt;
-	
+
 }
 
 
@@ -1813,7 +1859,7 @@ function skTimeoutLoop(dna,numAtATime) {
     if (!dna) {
         return;
     }
-   
+
     sk = gcSkew(dna,numAtATime, sk);
 
 
@@ -1837,18 +1883,18 @@ function skTimeoutLoop(dna,numAtATime) {
 
 
 function mostFrequentKmersBrute(e,variant) {
-    
+
     if (e) {
-        
+
     }
-	
+
 	if (dnaMaster == null || dnaMaster == '') {
 		errMsg('Please enter/load DNA first, then "Search"!');
 		return;
 	}
-	
+
     document.getElementById('runImg').style.visibility = 'visible';
-	
+
 
     initialiseResults();
 
@@ -2135,7 +2181,7 @@ function runLTClump() {
 		errMsg('Please enter/load DNA first, then "Search"!');
 		return;
 	}
-	
+
     initialiseResults();
 
     var numKmer = document.getElementById('numKmers');
@@ -2179,14 +2225,14 @@ function runLTClump() {
 }
 
 function searchKmer(e) {
-    
+
     if (e) {
-        
+
     }
-	
+
 	var kmer = document.getElementById('kmer').value;
     k = kmer.length;
-	
+
 	if (dnaMaster == null || dnaMaster == '') {
 		errMsg('Please enter/load DNA  and target k-mer first, then "Search"!');
 		return;
@@ -2202,16 +2248,16 @@ function searchKmer(e) {
     numKmer.value = 1;
 
 
- 
+
 
     var dna = dnaMaster; //document.getElementById('dnaInput').value;
 
     var inclRevCompl = document.getElementById('includeRevComplKS').checked;
 
     var maxMismatch = parseInt(document.getElementById('maxMismatchKS').value);
-	
+
 	document.getElementById('runImg').style.visibility = 'visible';
-	
+
 
     w.postMessage({'task' : 'searchKmer', 'dna' : dna, 'kmer':kmer, 'inclRevCompl': inclRevCompl,'maxMismatch': maxMismatch}); // Start the worker.
 
@@ -2499,48 +2545,48 @@ function miscParLoadedFromServer(fileName,parId,text) {
     else if (parId == 'loadedMiscPar2') {
         loadedMiscPar2 = text;
     }
-    
+
 }
 
 
 function miscRadioClicked(id) {
-	
+
 	var par1El = document.getElementById('miscParam1');
 	var par2El = document.getElementById('miscParam2');
 	var par3El = document.getElementById('miscParam3');
-	
+
 	par1El.value = '';
 	par2El.value = '';
 	par3El.value = '';
-	
-	
+
+
 	switch (id) {
-		
+
 		case 'miscFunc74':
 		    par1El.placeholder = '<Enter space delimited k and m values>';
 			par2El.placeholder = '<Enter set of space delimited points, 1 per line>';
 			par3El.placeholder = 'Param 3\nnot used';
-		    break;	
-			
+		    break;
+
 		case 'miscFunc75':
 		    par1El.placeholder = '<Enter space delimited k and m values>';
 			par2El.placeholder = '<Enter set of space delimited centres, 1 per line>';
 			par3El.placeholder = '<Enter set of space delimited points, 1 per line>';
-		    break;	
-		
+		    break;
+
 		case 'miscFunc79':
 		    par1El.placeholder = 'Enter Spectral Vectors';
 			par2El.placeholder = 'Enter Proteome';
 			par3El.placeholder = 'Enter Threshold';
-		    break;	
-		
+		    break;
+
 		case 'miscFunc80':
 		    par1El.placeholder = 'Enter Spectral Vector';
 			par2El.placeholder = 'Enter Threshold';
 			par3El.placeholder = 'Enter Max Score';
-		    break;	
-	
-		
+		    break;
+
+
 		case 'miscFunc81':
 		    par1El.placeholder = 'Enter Peptide';
 			par2El.placeholder = 'Enter Spectral Vector';
@@ -2552,31 +2598,31 @@ function miscRadioClicked(id) {
             par2El.placeholder = 'Param 2\nnot used';
             par3El.placeholder = 'Param 3\nnot used';
             break;
-			
+
 		case 'miscFunc83':
 		    par1El.placeholder = '<Enter space delimited k and number of  runs values>';
 			par2El.placeholder = '<Enter set of space delimited points, 1 per line>';
 			par3El.placeholder = 'Param 3\nnot used';
 		    break;
-		
+
 		default:
 		    par1El.placeholder = 'Enter param 1';
 			par2El.placeholder = 'Enter param 2';
 			par3El.placeholder = 'Enter param 3';
-		
+
 		  break;
-		  
+
 	}
-		
-	
+
+
 }
 
 
 
 function executeMisc(e) {
-    
+
     if (e) {
-        
+
     }
 
     initialiseResults();
@@ -3577,7 +3623,7 @@ function executeMisc(e) {
 
 
             break;
-            
+
             if (loc == 'Y') {
                 res = al.align(true,1,-1);
                 resEl.value += '\nLocal edit dist: ' + res[0];
@@ -3638,10 +3684,10 @@ function executeMisc(e) {
             coins = coins.map(function(el) {
                 return parseInt(el);
             });
-            
+
             var l = lowestCoins(amt,coins);
-            
- 
+
+
             resEl.value = 'results\n';
 
             resEl.value += '\nLowest coins: ' + l;
@@ -3675,7 +3721,7 @@ function executeMisc(e) {
 
             }
 
-     
+
             break;
 
 
@@ -3856,7 +3902,7 @@ function executeMisc(e) {
             source = sourceNum.toString();
             var sinkNum  =  rows * cols - 1;
             sink = sinkNum.toString();
-            
+
             g.longestPathsDynamic(source,sink);
 
             pathData = g.longestPathBacktrack(sink,source);
@@ -3918,7 +3964,7 @@ function executeMisc(e) {
                 }
 
            });
-           
+
            //var earliestTarget = 99999;
             target.forEach(function(t) {
                 /*
@@ -3929,10 +3975,10 @@ function executeMisc(e) {
                     }
                 }
                 */
-                
+
             });
-            
-            
+
+
             break;
 
 
@@ -3993,7 +4039,7 @@ function executeMisc(e) {
             var bpGraph = new DBasicGraph(source,DGraph.fromBreakpoint);
 
             bpGraph.initGraph();
-            
+
             bpGraph.numBlocks();
             numCycles = bpGraph.numCycles();
 
@@ -4421,7 +4467,7 @@ function executeMisc(e) {
                         break;
                     default:
                         col = 'W';
-                        
+
                 }
                 return[xMid,yMid,'C:' + col,el['id']];
 
@@ -4544,7 +4590,7 @@ function executeMisc(e) {
                                 break;
                             }
                         }
-                    
+
                 }
             }
 
@@ -4628,7 +4674,7 @@ function executeMisc(e) {
             //var good = boundTurnpike(turnAr,[[0,2,4,7,10],[0,2,6,7,10]]);
 
 
-            
+
 
             /* branch and bound
 
@@ -4738,7 +4784,7 @@ function executeMisc(e) {
 
 
             builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(alignments));
-            
+
             gr = new DBTreeGraph(builder);
 
             resEl.value = gr.toAdjacencyList();
@@ -4765,8 +4811,8 @@ function executeMisc(e) {
             var canv = document.getElementById('evenMoreCanvas');
             var ctx = canv.getContext('2d');
             r = new DBRect(30,30,30,30);
-            
-            
+
+
             var gView = new DBGraphView(ctx,r,gr);
             gView.display();
 
@@ -5142,7 +5188,7 @@ function executeMisc(e) {
                 return parseInt(el);
 
             });
-            
+
             var num = parseInt(par2El.value);
 
             h  = new MinHeap(ar);
@@ -5166,7 +5212,7 @@ function executeMisc(e) {
             adjList = par1El.value;
 
             builder = new DGraphBuilder(adjList);
-      
+
             gr = new DBGraph(builder);
 
             var nodeAr = gr.nodes.map(function() {
@@ -5205,7 +5251,7 @@ function executeMisc(e) {
                 sucs.forEach(function(suc) {
                     totDeg += suc.degree();
 
-                    
+
                 });
                 nodeAr[ind] = totDeg;
             });
@@ -5253,7 +5299,7 @@ function executeMisc(e) {
 
 
 
-            
+
 
             var inds = threeWayPartitionNonInPlace(ar,v);
 
@@ -5407,7 +5453,7 @@ function executeMisc(e) {
            // If so: need to check number of nodes. If less than vertices specified, there are
            // more (isolated) connected components, ie extra vertices which have no connections
 
-            
+
             adjList = par1El.value;
 
             var info = par2El.value;
@@ -5611,7 +5657,7 @@ function executeMisc(e) {
             adjArray.forEach(function(el) {
                 var n1 = el.split('->')[0];
                 var n2 = el.split('->')[1];
-            
+
                 if (n1 == edgeToUseLabFrom)  {
                       if (n2 == edgeToUseLabTo) {
                       }
@@ -5670,8 +5716,8 @@ function executeMisc(e) {
             });
 
             var neighb = edge.neighbouringEdges();
-            var fromNode1; 
-            var fromNode2; 
+            var fromNode1;
+            var fromNode2;
 
             var edgeNum = 0;
             var otherEdgeNum = 1;
@@ -5687,8 +5733,8 @@ function executeMisc(e) {
                 edgeNum = 1;
                 otherEdgeNum = 0;
             }
-            
-            
+
+
 
             var fromOneLab = neighb[edgeNum][0].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][0].targetNode.label : neighb[edgeNum][0].sourceNode.label;
             //var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
@@ -5710,7 +5756,7 @@ var toSwapper1 = 0;
 var toSwapper2 = 1;
 
 //if ( parseInt(toOneLab) < parseInt(toTwoLab) ) {
-if (toOneLab == firstTo) { 
+if (toOneLab == firstTo) {
       toSwapper1 = 0;
       toSwapper2 = 1;
 }
@@ -5745,7 +5791,7 @@ else {
 
             neighb = edge.neighbouringEdges();
 
- 
+
             if (edge.sourceNode.label == edgeToUseLabFrom) {
                  fromNode1 = edge.sourceNode;
                  fromNode2 = edge.targetNode;
@@ -5778,133 +5824,133 @@ else {
 
 
             break;
-			
+
 		case '74': //BA8A Farthest First Traversal
 
 
-       
-  
+
+
 		  var params = par1El.value;
 		  //var params = parseAr.shift();
 		  console.log('params: ' + params);
-		  
+
 		  k = parseFloat(params.split(' ')[0]);
-		  
-		  
-		  var pSpace = new PointSpace(par2El.value); 
-		  
+
+
+		  var pSpace = new PointSpace(par2El.value);
+
 		  pSpace.movePointToCentres(pSpace.points[0],true);
-		  
+
 		   /*
 		  var centres = [];
 		  centres.push(parseAr.shift());
 		  */
-		  
-		  
+
+
 		  while (pSpace.centres.length < k) {
-			  
+
 			  var p = pSpace.findFarthestPointFromCentres();
-			  
+
 			  pSpace.movePointToCentres(p,true);
-			  
+
 		  }
-		
+
 		    pSpace.allocatePointsToClusters();
-			
+
 		    resStr = pSpace.centresToString(); //+ '\nSq distort: ' + dist;
 
-			
+
             resEl.value =resStr;
 
             break;
-			
+
 		case '75': //BA8B Squared Distortion
 
 
 		  var params = par1El.value;
 		  //var params = parseAr.shift();
 		  console.log('params: ' + params);
-		  
+
 		  k = parseFloat(params.split(' ')[0]);
-		  
-		  var pSpace = new PointSpace(par3El.value); 
-		  
+
+		  var pSpace = new PointSpace(par3El.value);
+
 		  var centAr = par2El.value.split('\n');
 		  centAr.forEach(function(str) {
-			 pSpace.addCentre(str); 
+			 pSpace.addCentre(str);
 		  });
-		  
+
 		  var dist = pSpace.sqDistortion();
-			
+
 		    resStr = 'Sq dist:\n' + dist;
 
-			
+
             resEl.value =resStr;
 
             break;
-	
-	
+
+
 
 		case '76': //Peptide Vector
 
-  
+
 		  pepStr = par1El.value;
-		  
+
 		  pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
-		  
+
 		  var vect = pep.toPeptideVector();
-		  
-		  
+
+
 		  resString = '';
-		  
+
 		  resString += arrayToString(vect);
-		  
-			
+
+
           resEl.value =resString;
 
             break;
-			
+
 	case '77': //Peptide from Vector
 
-  
+
 		  var vecStr = par1El.value;
-		  
+
 		  pep = new Peptide(Peptide.AminoArrFromVector(vecStr));
-		  
-	  
-		  
+
+
+
 		  resString = '';
-		  
+
 		  resString += pep.toShortString('');
-		  
-			
+
+
           resEl.value =resString;
 
             break;
-						
+
 	case '78': //Peptide Identification
 
-  
+
 		  vecStr = par1El.value;
 		  proteome = par2El.value;
-		  
+
 		  res = peptideIdentification(vecStr,proteome);
-		  
+
 		  /*
-		  
+
 		  var vecAr = vecStr.split(' ');
-		  
+
 		  vecAr = vecAr.map(function(el) {
-			 return parseInt(el); 
+			 return parseInt(el);
 		  });
-		  
+
 		  var pepWeight = vecAr.length;
-		  
-		  
-		  
+
+
+
 		  var candidates = [];
-		  
-		  		  
+
+
 		  for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
 			  //find candidate peptide starting at stPos with correct weight
 			  var candFound = false;
@@ -5921,146 +5967,146 @@ else {
 				  }
 			  }
 		  }
-		  
-		  
+
+
 		  var bestCand = '';
 		  var bestScore = DGraph.infinity * -1;
-		
+
 		  candidates.forEach(function(cand,i) {
 			  var score = cand.scoreAgainstSpectralVector(vecAr);
 			  if (score > bestScore) {
 				  bestCand = cand.toShortString('');
 				  bestScore = score;
 			  }
-			  
+
 		  });
-		  
-          */	 
-		  
+
+          */
+
 		  resString = '';
-		  
+
 		  resString += '\nBest score: '  + res[1] + '\nBest Candidate: ' + res[0];
-		  
-			
+
+
           resEl.value =resString;
 
-            break;	
+            break;
 
 	case '79': //PSM
 
-  
+
 		  var vecStrs = par1El.value;
 		  var vecArs = vecStrs.split('\n');
 		  proteome = par2El.value;
 		  threshold = parseInt(par3El.value);
-		  
+
 		  var psmMatches = [];
-		  
+
 		  vecArs.forEach(function(vecStr) {
 			  var res = peptideIdentification(vecStr,proteome);
 			  if (res[1] > threshold) {
 				  psmMatches.push(res[0]);
 			  }
-			  
+
 		  });
-		  
-		  
-		  
-		  	  
+
+
+
+
 		  resString = '';
-		  
+
 		  resString += '\nPS Matches: \n' + arrayToString(psmMatches,'\n');
-		  
-			
+
+
           resEl.value =resString;
 
-            break;		
+            break;
 
 	case '80': //Spectral Dictionary Size
 
-  
+
 		  vecStr = par1El.value;
-		 
+
 		  threshold = parseInt(par2El.value);
 		  var max_score = parseInt(par3El.value);
-		  
+
 		  vecAr = vecStr.split(' ');
-		  
+
 	      vecAr = vecAr.map(function(el) {
-			 return parseInt(el); 
+			 return parseInt(el);
 		  });
-		  
-		  
+
+
 		  var totSize = 0;
-		  
+
 		  var useToy = false;
-		  
+
 		  for (t = threshold;t <=max_score;++t) {
 			  size = spectralDictSize(vecAr,t,[],useToy);
 			  totSize += size;
 		  }
-		  
-		  
+
+
 		  /*
 		  var totNum = numPeptidesWithSpectralVector(vecAr,[], useToy);
 		  */
 		  var totProb = 0;
-		  
+
 		  for (t = threshold;t <=max_score;++t) {
 			  prob = spectralDictProbability(vecAr,t,[],useToy);
 			  totProb += prob;
 		  }
-		 
-	  
-		  	  
+
+
+
 		  resString = '';
-		  
+
 		  resString += '\nSpectral Dict Size: \n' + totSize +   '\nProb: \n' + totProb;
-		  
-			
+
+
           resEl.value =resString;
 
-            break;							
+            break;
 
 case '81': //Spectral Alignment
 
           par1El.placeholder = 'blah';
-  
+
           pepStr = par1El.value;
 		  vecStr = par2El.value;
-		 
-		 
+
+
 		  k  = parseInt(par3El.value);
-		  
+
 		  vecAr = vecStr.split(' ');
-		  
+
 	      vecAr = vecAr.map(function(el) {
-			 return parseInt(el); 
+			 return parseInt(el);
 		  });
-		  
+
 		  pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
-		  
+
 		  var pepWeight = pep.getIntegerWeight();
-		  
+
 		  delta = vecAr.length - pepWeight;
-		  
+
 		  rows = pepWeight + 1;
 		  cols = vecAr.length + 1;
 		  //var lays = k + 1;
-		  
+
 		  builder = new DGraphGridFromSpecAlignBuilder([pep,vecAr,k]);
-		  
+
 		  var gg = new DBGridGraph(builder,'generic grid');
-		  
-  
+
+
 
           res = gg.longestPathNodeWeighted(gg.getSourceNode(),gg.getSinkNode());
-		  	  
+
 		  resString = '';
-		  
+
 		  resString += 'Best Modified Peptide: ' + res[0] + ' Score: ' + res[1];
-		  
-			
+
+
           resEl.value =resString;
 
             break;
@@ -6191,8 +6237,8 @@ case '81': //Spectral Alignment
 		case '83': //BA8C K-means clustering
 
 
-       
-  
+
+
 		  var params = par1El.value;
 		  //var params = parseAr.shift();
 		  console.log('params: ' + params);
@@ -6204,15 +6250,15 @@ case '81': //Spectral Alignment
               runs = parseInt(spl[1]);
           }
 
-		  
-		  var pSpace = new PointSpace(par2El.value); 
-		  
+
+		  var pSpace = new PointSpace(par2El.value);
+
 		  /*
 		  for (var i = 0;i < k;++i) {
 		     pSpace.movePointToCentres(pSpace.points[i],true);
 		  }
-	
-		
+
+
 		  pSpace.allocatePointsToClusters();
 		  */
 
@@ -6237,7 +6283,7 @@ case '81': //Spectral Alignment
           if (i > 1) {
               resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
           }
-			
+
           resEl.value=resStr;
 
             break;
@@ -6256,12 +6302,12 @@ case '81': //Spectral Alignment
             if (lines.length > 1) {
                 runs = parseInt(lines[1]);
             }
-            
+
             var stiff = 1;
             if (lines.length > 2) {
                 stiff = parseFloat(lines[2]);
             }
-            
+
             var maxItersPerRun = 1000;
             if (lines.length > 3) {
                 maxItersPerRun = parseInt(lines[3]);
@@ -6297,89 +6343,89 @@ case '81': //Spectral Alignment
             resEl.value=resStr;
 
             break;
-			
+
 	    case '85': //SNP Pairwise Diff
 
 			var sVecStr = par1El.value;
 			var tVecStr = par2El.value;
-			
-			
+
+
 			var sVecStr = sVecStr.replace(/ /g,'');
 			var sVecAr = sVecStr.split(',');
-			
+
 			var tVecStr = tVecStr.replace(/ /g,'');
 			var tVecAr =  tVecStr.split(',');
-			
-			
-			
+
+
+
 			var diffTPairs = [];
-			
+
 			for (var i = 0;i < tVecAr.length;++i) {
 				for (var j = i+1;j < tVecAr.length;++j) {
 					if (tVecAr[i] === tVecAr[j]) {
-						
+
 					}
 					else {
-						
+
 						diffTPairs.push([i,j]);
 					}
 				}
 			}
-			
-			
+
+
 			var diffS = 0;
 			diffTPairs.forEach(function(el) {
 				if (sVecAr[el[0]] === sVecAr[el[1]]) {
-					
+
 				}
 				else {
 					++diffS;
 				}
 			});
-			
+
 			resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
-			
-			
+
+
 			break;
-			
+
 	    case '86': //SNP Matrix Pairwise Diff
 
 			var sVecStr = par1El.value;
 			var tVecStr = par2El.value;
-			
-			
+
+
 			var sVecStr = sVecStr.replace(/ /g,'');
 			var sVecAr = sVecStr.split('\n');
 			sVecAr = sVecAr.map(function(el) {
 				return el.split(',');
 			});
-			
-			sVecAr =  sVecAr[0].map(function(col, i) { 
-                     return sVecAr.map(function(row) { 
+
+			sVecAr =  sVecAr[0].map(function(col, i) {
+                     return sVecAr.map(function(row) {
                           return row[i] ;
                      });
             });
-			
+
 			var tVecStr = tVecStr.replace(/ /g,'');
 			var tVecAr =  tVecStr.split(',');
-			
-			
-			
+
+
+
 			var diffTPairs = [];
-			
+
 			for (var i = 0;i < tVecAr.length;++i) {
 				for (var j = i+1;j < tVecAr.length;++j) {
 					if (tVecAr[i] === tVecAr[j]) {
-						
+
 					}
 					else {
-						
+
 						diffTPairs.push([i,j]);
 					}
 				}
 			}
-			
-			
+
+
 			var diffS = 0;
 			diffTPairs.forEach(function(el) {
 				for (var n = 0;n < sVecAr[0].length;++n) {
@@ -6389,18 +6435,18 @@ case '81': //Spectral Alignment
 						++diffS;
 						break;
 					}
-					
+
 				}
-	
+
 			});
-			
+
 			resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
-			
-			
-			break;		
-			
-        
-       
+
+
+			break;
+
+
+
 
         default:
             break;
@@ -6569,12 +6615,12 @@ function turnpikeScore(candidates,turnDict) {
 function boundTurnpikeDict(turnAr,candidates,turnDict) {
 
     console.log('bounding turnpike. Len: ' + candidates.length);
-    
+
     //var turnArCopy = [];
     //turnAr.forEach(function(el) {
    //     turnArCopy.push(el);
     //});
-    
+
 
     var goodCandidates = [];
 
@@ -6583,12 +6629,12 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
         if (c % 1000 == 0) {
             console.log('c: ' + c);
         }
-        
+
         //turnArCopy = [];
         //turnAr.forEach(function(el) {
         //    turnArCopy.push(el);
         //});
-        
+
 
         var diffAr = [];
         var good = true;
@@ -6630,7 +6676,7 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
                 //  }
             }
         }
-       
+
        // for (var d = 0;d < diffAr.length;++d) {
         //    var ind = turnArCopy.indexOf(diffAr[d]);
          ///   if (ind > -1) {
@@ -6642,7 +6688,7 @@ function boundTurnpikeDict(turnAr,candidates,turnDict) {
 
             //}
         //}
-        
+
 
         if (good) {
             goodCandidates.push(candidates[c]);
@@ -6753,9 +6799,9 @@ function initialiseMotifParams() {
 }
 
 function runSBBackground(e) {
-    
+
     if (e) {
-        
+
     }
 
     initialiseResults();
@@ -6798,11 +6844,11 @@ function runSBBackground(e) {
 
 
 function runAlignBackground(e) {
-    
+
     if (e) {
-        
+
     }
-	
+
 	if (alignS == '') {
 		errMsg('Please enter/load DNA sequences to align first, then Run!');
 		return;
@@ -6812,6 +6858,7 @@ function runAlignBackground(e) {
 
     var paramObj = initialiseAlignParams();
 
+    document.getElementById('runImg').style.visibility = 'visible';
 
     switch (paramObj.alignRadioMethodSel.id) {
 
@@ -6821,7 +6868,7 @@ function runAlignBackground(e) {
         case 'alignLocal':
         case 'alignFitting':
         case 'alignOverlap':
-            
+
 
             //var g;
 
@@ -6880,9 +6927,9 @@ function runAlign(e) {
         case 'alignEditDist':
         case 'alignLocal':
 
-            
 
-          
+
+
             var g;
 
             var scoreMatRadioSel = getSelectedRadioEl('alignScore');
@@ -6902,16 +6949,16 @@ function runAlign(e) {
             }
 
             //var scoreMat = document.getElementById('alignPamScore').checked ? pamScoringMatrix : null;
-            
+
             if (alignRadioMethodSel.id === 'alignLCS') {
                 indelPen = 0;
                 mismatchPen = 0;
                 g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeGlobal,null,indelPen,mismatchPen);
-                
+
             }
             else if (alignRadioMethodSel.id === 'alignGlobal') {
                 g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeGlobal,scoreMat,indelPen,mismatchPen);
-                
+
             }
             else if (alignRadioMethodSel.id === 'alignEditDist') {
                 indelPen = 1;
@@ -6921,7 +6968,7 @@ function runAlign(e) {
             else if (alignRadioMethodSel.id === 'alignLocal') {
                 g =  new DGAlignGraph(alignS,alignT,DGraph.alignTypeLocal,scoreMat,indelPen,mismatchPen);
             }
-            
+
 
           //  w.postMessage({'task' : 'alignLCS', 'graph': g, 'debug':document.getElementById('debugAL').checked }); // Start the worker.
 
@@ -6937,7 +6984,7 @@ function runAlign(e) {
 
            // g.longestPathsDynamic(source,sink);
 
-            
+
 
             g.longestPathsDynamic();
 
@@ -7015,10 +7062,10 @@ function runAlign(e) {
 
 
 function runMotif(e) {
-	
+
 	if (document.getElementById('dnaStrings').value == '') {
 	   errMsg('Please enter DNA sequences first!');
-       return;	   
+       return;
 	}
 
     var rads = document.getElementsByName('motifMethod');
@@ -7032,9 +7079,9 @@ function runMotif(e) {
 
         }
     }
-	
+
 	document.getElementById('dnaMessageDiv').innerHTML = '';
-	
+
 	document.getElementById('runImg').style.visibility = 'visible';
 
 
@@ -7070,10 +7117,10 @@ function motifCompare(e) {
     if (e) {
 
     }
-	
+
 	if (document.getElementById('dnaStrings').value == '') {
 	   errMsg('Please enter Motifs first!');
-       return;	   
+       return;
 	}
 
     initialiseResults();
@@ -7098,7 +7145,7 @@ function motifCompare(e) {
 
     });
     colourDNA(dnaMaster,null,false);
-	
+
 	var extraInfoAr = [];
 
     mfMotif[0][0].forEach(function(el,i) {
@@ -7138,7 +7185,7 @@ function motifCompare(e) {
         document.getElementById("debugText").value += '\nEntropy Matrix: '  +  entropyMatrixStr;
         document.getElementById("debugText").value += '\nProfile Matrix: '  +  profileMatrixStr;
 
- 
+
 
     }
 
@@ -7500,7 +7547,7 @@ function initialiseAlignParams() {
 
     paramObj.indelPen = parseInt(document.getElementById('indelPenAL').value);
     paramObj.mismatchPen = parseInt(document.getElementById('mismatchPenAL').value);
-    
+
     paramObj.linearSpaceThreshold = parseInt(document.getElementById('spaceThreshAL').value);
 
     paramObj.matchScore = 1; //default (overriden if score matrix exists)
@@ -7520,11 +7567,11 @@ function initialiseAlignParams() {
     }
     else if (paramObj.alignRadioMethodSel.id === 'alignGlobal') {
         paramObj.alignType = DGraph.alignTypeGlobal;
-        
+
     }
     else if (paramObj.alignRadioMethodSel.id === 'alignLocal') {
-        paramObj.alignType = DGraph.alignTypeLocal;                
-        
+        paramObj.alignType = DGraph.alignTypeLocal;
+
     }
     else if (paramObj.alignRadioMethodSel.id === 'alignFitting') {
         paramObj.alignType = DGraph.alignTypeFitting;
@@ -7536,7 +7583,7 @@ function initialiseAlignParams() {
 
 
     paramObj.debug = document.getElementById('debugAL').checked;
-    
+
     paramObj.useAffine = document.getElementById('affineAL').checked;
     paramObj.affineOpenGap = parseInt(document.getElementById('affineOpenGapAL').value);
 
@@ -7704,7 +7751,7 @@ function initialisePeptideParams() {
 
     paramObj.convSize = parseInt(document.getElementById('convPS').value);
     paramObj.leaderboardSize = parseInt(document.getElementById('leaderPS').value);
-    
+
     paramObj.useTheseAminos = document.getElementById('peptideUseTheseAminos').value;
 
     paramObj.prefixSuffixOnly = document.getElementById('spectrometerPrefixSuffixPS').checked;
@@ -7740,7 +7787,7 @@ function initialisePeptideParams() {
             break;
 	    case 'pepSequenceGraphVector':
 		    paramObj.pepMethod = Peptide.PepMethodSequenceGraphVector;
-            break;			
+            break;
 
         default:
             break;
@@ -7964,11 +8011,11 @@ function runSequencingBackground(e) {
         'k': k,
         'makeCycle': false,
         'pairDist': paramObj.pairDist
-        
+
     }); // Start the worker.
 
    // grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
-    
+
 }
 
 function runSequencing(e) {
@@ -7978,27 +8025,27 @@ function runSequencing(e) {
     }
 
    // sequencingInput();
-   
-  
+
+
 
     initialiseResults();
 
     var paramObj = initialiseSequencingParams();
-	
+
 	 if (paramObj.seqInput == DGraph.fromReads) {
 		 if (dnaMasterStrings == null || dnaMasterStrings == '') {
 		   errMsg('Please enter/load Reads first, then Run!');
 		   return;
-   
+
 		}
 	 }
 	if (paramObj.seqInput == DGraph.fromDna) {
 		 if (dnaMaster == null || dnaMaster == '') {
 		   errMsg('Please enter/load DNA first, then Run!');
 		   return;
-   
+
 		}
-	 }	 
+	 }
 
    // var rads = document.getElementsByName('seqMethod');
 
@@ -8035,7 +8082,7 @@ function runSequencing(e) {
         reads = dnaMasterStrings.split('\n');
 
         input = reads;
-                        
+
         if (reads[0]) {
             k = reads[0].length;
         }
@@ -8319,7 +8366,7 @@ function runPhylogeny(e) {
     if (e) {
 
     }
-	
+
 	if (dnaMasterStrings == null || dnaMasterStrings == '') {
 		errMsg('Please enter/load DNA alignments first (or distance matrix or adj list), then Run!');
 		return;
@@ -8361,7 +8408,7 @@ function runPhylogeny(e) {
 
     }
 
-    document.getElementById('debugText').value += 'Outputs: ' + 'none' + '\n';
+    //document.getElementById('debugText').value += 'Outputs: ' + 'none' + '\n';
 
 
 //    grph = new DGraph(input,paramObj.seqInput,paramObj.seqType,k,false,paramObj.pairDist);
@@ -8573,8 +8620,8 @@ function runPhylogeny(e) {
         }
 
 
-        
-        
+
+
        // g.deleteNode(g.nodes[g.nodes.length-1]);
 
        // var ctx = initGraphCanvas();//('495px','112px');//('660px','150px');
@@ -8582,7 +8629,7 @@ function runPhylogeny(e) {
 
         var gvCont = new DBGraphViewController(g);
         //var gvCont = new DBTestSimpleController();
-        
+
         var viewPort = new DBRect(0,0,parent.clientWidth,parent.clientHeight);
 
         pGraphView = new DBGraphView(canv,viewPort, gvCont);
@@ -8835,8 +8882,8 @@ function pairedToReads(e) {
    loopy(e,0,breakNum);
     return;
     */
-    
-    
+
+
     if (!dnaMasterStrings) {
         return;
     }
@@ -8913,14 +8960,14 @@ function runTrans(e) {
     }
 
     transInput();
-	
-	
-	
+
+
+
 
     initialiseResults();
 
     var paramObj = initialiseTransParams();
-	
+
 	if (paramObj.trMethod === DNA.TransMethodTranscribe && (dnaMaster == null || dnaMaster == '')) {
 		errMsg('Please enter DNA/RNA or Protein first, then Run!');
 		return;
@@ -8989,10 +9036,10 @@ function runPeptide(e) {
     if (e) {
 
     }
-	
-	
+
+
     peptideInput();
-	
+
 	if (document.getElementById('pepInput').value == '') {
 		errMsg('Please enter Protein or Spectrum or Spectral Vector then Run!');
 		return;
@@ -9071,30 +9118,30 @@ function runPeptide(e) {
             //var prot = rnaMaster.translate(paramObj.readingFrameOffset,!paramObj.useStartCodon,!paramObj.useStopCodon,paramObj.inclRevCompl);
 
             break;
-			
+
 		case Peptide.PepMethodSequenceGraphBrute:
-		
+
             var builder = new DGraphFromSpectrumBuilder(spectrumMaster);
-      
+
             var gr = new DBGraph(builder);
-			
+
 			var paths = gr.allPathsSourceToSink();
-			
+
 			var prots = paths.map(function(path) {
 				return path.map(function(el) {
 					return Amino.CodeForWeight(el.edgeWeight);
 				});
-				
+
 			});
-			
+
 			var protStrs = prots.map(function(protAr) {
 				return arrayToString(protAr,'');
 			});
-			
-			
+
+
 			var specs = [];
 			protStrs.forEach(function(protStr,i) {
-				
+
 				var pep = new Peptide(Peptide.AminoArrFromStr(protStr));
 				//var tst = pep.toPeptideVector();
 				var spec = pep.linearSpectrum(paramObj.prefixSuffixOnly);
@@ -9107,20 +9154,20 @@ function runPeptide(e) {
                        p.freshEdge = true;
                     });
                 }
-				
+
 			});
-			
-			
-			
+
+
+
 		       if (document.getElementById('debugPS').checked) {
                 resStr = '';
                 resStr += '\nDebug pressed';
                 resStr += '\nSpectrum Graph processing';
-				
+
 				var adj = gr.toAdjacencyList().split('\n');
-				
-				
-				
+
+
+
 				adj = adj.map(function(el) {
 					 var spl = el.split(':');
 					 var w = parseFloat(spl[1]).toFixed(0);
@@ -9129,22 +9176,22 @@ function runPeptide(e) {
 					 //spl[1] = code;
 					 return spl.join(':');
 				});
-				
+
 				var adjStr = adj.join('\n');
-				
+
 				resStr += '\ntostr: \n' + adjStr;
-				
+
 				var possStr = '';
 				specs.forEach(function(el) {
 					possStr +='\n' + el[0];
 					possStr += el[2] ? ' Yes' : ' No';
-					
+
 				});
-				
+
 				resStr += '\n\nPossible proteins:' + possStr;
- 
-                
-				
+
+
+
                 document.getElementById('debugText').value = resStr;
 
 
@@ -9161,14 +9208,14 @@ function runPeptide(e) {
                 displayPeptideSeqGraph(gr,document.getElementById('debugPS').checked);
             }
 
-            break;		
+            break;
 
 		case Peptide.PepMethodSequenceGraphVector:
-		
+
             builder = new DGraphFromSpectralVectorBuilder(spectrumMaster);
-      
+
             gr = new DBGraph(builder);
-			
+
 			var ret = gr.longestPathNodeWeighted();
 
             gr.resetFreshNodesAndEdges();
@@ -9177,7 +9224,7 @@ function runPeptide(e) {
             });
 
 
-			
+
 			if (document.getElementById('debugPS').checked) {
                 resStr = '';
                 resStr += 'Debug pressed';
@@ -9186,8 +9233,8 @@ function runPeptide(e) {
 				resStr += '\n';
 				resStr += 'Bests: ' + ret[1];
 			}
-			
-			
+
+
 			document.getElementById('debugText').value = resStr;
 
             if (gr) {
@@ -9199,11 +9246,11 @@ function runPeptide(e) {
 
                 displayPeptideSeqGraph(gr,document.getElementById('debugPS').checked);
             }
-			
-			
+
+
 			break;
 
-			
+
         default:
             break;
 
@@ -10147,7 +10194,7 @@ function skewCanvas(skewData) {
 	ctx.font = ctx.font.replace(/\d+px/, "10px");
 	ctx.fillText('Max: ' + max +  ' [Base: ' + skewData[4] + ']', 2,133); //,190,15);
     ctx.fillText('Min: ' + min +  ' [Base: ' + skewData[3] + ']', 2,120); //,80    ,15);
-    
+
 
 
 
@@ -10185,11 +10232,11 @@ function skewCanvas(skewData) {
 }
 
 function initialiseResults()  {
-	
+
 	errMsg('');
 
     document.getElementById('progress').innerHTML = '';
-	
+
     //var hData = ['k-mers', 'Num found'];
 	var hData = ['', ''];
     var tData;
@@ -10333,9 +10380,9 @@ function colourAlignFromBackground() {
         if (alignU.length > 0) {
             document.getElementById('alignStringDiv').innerHTML += '<BR>' + 'U: ' + uFormatted;
         }
-		
+
 		if (alignReturned == null) {
-			
+
 		}
 		else {
 			if (alignReturned.alignMethod == 'alignEditDist') {
@@ -10347,10 +10394,10 @@ function colourAlignFromBackground() {
 			if (alignReturned.alignMethod == 'alignLCS') {
 				document.getElementById('alignStringDiv').innerHTML += ' LCS: ' + alignReturned.lcsStr;
 			}
-			
+
 		}
-		
-		
+
+
 
         document.getElementById('alignGridDiv').innerHTML = alignReturned.formattedGrid;
 
@@ -10581,13 +10628,13 @@ function colourMotifs(dna,view,bases,mark) {
 
     var numKmer = document.getElementById('numKmers');
 	var numKmerInd = parseInt(numKmer.value) - 1;
-	
+
 	if (mfMotif.length > 0) {
-	
+
 		var extraInfoAr = [];
-		
+
 		var k = mfMotif[numKmerInd][1].length;
-		
+
 		mfMotif[numKmerInd][0].forEach(function(el,i) {
 				var ind = el[0][0];
 				var km = dnaMasterStrings[i].substring(ind,ind+k);
@@ -10596,11 +10643,11 @@ function colourMotifs(dna,view,bases,mark) {
 		});
 
 		logoCanvas(extraInfoAr);
-		
+
 		document.getElementById('dnaMessageDiv').innerHTML = mfMotif[numKmerInd][2] + ' Consensus: ' + mfMotif[numKmerInd][1];
 	}
-	
-	
+
+
 
 
     //var totPos = 0;
@@ -10683,7 +10730,7 @@ function colourMFK(dna,view,bases,mark) {
 
         var needHighlight = false; //match
 		var needSuperHighlight = false; //currently selected match
-		
+
         if (mfk.length > 0) {
             //m = mfk[parseInt(numKmer.value) - 1];
             m = mfk[parseInt(numKmer.value) - 1].slice(0, 2);
@@ -10700,7 +10747,7 @@ function colourMFK(dna,view,bases,mark) {
 							needSuperHighlight = true;
 						}
                     }
-					
+
                 });
             });
         }
@@ -10992,7 +11039,7 @@ function colourPep() {
             }
         }
         */
-        
+
        // trans.innerHTML += ' (rnd ' + lenBit + ')';
 
         for (i = 0;i < 14;++i) {
@@ -11114,11 +11161,11 @@ function colourPep() {
 
 function colourDNA(dna,mark,inclRevCompl) {
 
-    if (myParams.tabActive == 5) {
+    if (myParams.tabActive == 4) {
         colourTrans();
         return;
     }
-    else if (myParams.tabActive == 6) {
+    else if (myParams.tabActive == 8) {
         colourPep();
         return;
     }
@@ -11132,19 +11179,19 @@ function colourDNA(dna,mark,inclRevCompl) {
             inclRevCompl = document.getElementById("includeRevComplMF").checked;
             break;
         case 1:
-            inclRevCompl = document.getElementById("includeRevComplLT").checked;
+            inclRevCompl = document.getElementById("includeRevComplKS").checked;
             break;
         case 2:
-            inclRevCompl = document.getElementById("includeRevComplKS").checked;
+            inclRevCompl = document.getElementById("includeRevComplLT").checked;
             break;
         case 3:
             inclRevCompl = false;// document.getElementById("includeRevComplMS").checked;
             motifView = true;
             break;
-        case 4:
+        case 6:
             assemblyView = true;
             break;
-        case 5:
+        case 4:
             inclRevCompl = document.getElementById("revComplTT").checked;
             break;
         default:
@@ -11167,17 +11214,17 @@ function colourDNA(dna,mark,inclRevCompl) {
         highThisPage = dna.length;
     }
     document.getElementById('currRangeDNA').innerHTML = 'Page: ' + (dnaPage + 1) + ' Bases ' +  lowThisPage + '-' + highThisPage;
-	
+
 	if (mfk.length > 0) {
 		document.getElementById('matchEls').style.display = "inline-block";
 		document.getElementById('currMatchRangeDNA').innerHTML = 'Match: ' + (dnaMatch + 1);
-		
+
 	}
 	else {
 		document.getElementById('matchEls').style.display = "none";
 		document.getElementById('currMatchRangeDNA').innerHTML = '';
 	}
-	
+
     var bases = {
         'A': 'aChar',
         'C': 'cChar',
@@ -11270,7 +11317,7 @@ function colourDNA(dna,mark,inclRevCompl) {
     if (motifView)  {
 		if (mfMotifProcessed) {
 			hData = ['Motifs', 'Num found'];
-			
+
 		}
 		else {
 			hData = ['', ''];
@@ -11279,11 +11326,11 @@ function colourDNA(dna,mark,inclRevCompl) {
     else {
 		if (mfkProcessed){
 			hData = ['k-mers', 'Num found'];
-			
+
 		}
 		else {
 			hData = ['', ''];
-			
+
 		}
     }
 
@@ -11317,9 +11364,9 @@ function colourDNA(dna,mark,inclRevCompl) {
     }
 
    /// console.log('colour start table');
-   
+
    var numKmerVal = parseInt(document.getElementById('numKmers').value) - 1;
-   
+
     var t = createTable(tData, hData, null, null, null, null, null, 'kmers_',null,numKmerVal);
     t.className += ' codeTable';
     t.id = 'kMerResultsTab';
@@ -11333,7 +11380,7 @@ function colourDNA(dna,mark,inclRevCompl) {
             var numKmer = document.getElementById('numKmers');
             numKmer.value = this.rowIndex;
             numKmerChanged(event);
-		
+
 
         }
     }
@@ -11731,7 +11778,7 @@ function dnaMasterChanged() {
         case 2:
             skewRequired = true;
             break;
- 
+
 
         default:
             break;
@@ -11763,7 +11810,7 @@ function dnaMasterChanged() {
 
     mfk = [];
     mfMotif = [];
-	
+
 	mfkProcessed = false;
 	mfMotifProcessed = false;
 
@@ -12365,7 +12412,7 @@ function cleanContents(contents,contentType) {
                 newContents = contents.replace(/[,]/gm, " ");
                 //newContents = newContents.replace(/[^0123456789.- ]/gm, "");
 				newContents = newContents.replace(/^[+-]?\d+$/gm, "");
-                
+
 				newContents = newContents.trim();
                 newContents = newContents.toUpperCase();
                 return newContents;
@@ -12453,7 +12500,7 @@ function dnaInput(e) {
 
     dnaMaster = inDNA.value;
     dnaMasterChanged();
-	
+
 	errMsg('');
 
 
@@ -12464,7 +12511,7 @@ function motifsInput(e) {
     if (e) {
 
     }
-	
+
 	if (document.getElementById('dnaStrings').value == '') {
 		errMsg('Please enter DNA sequences first!');
 		return;
@@ -12479,7 +12526,7 @@ function motifsInput(e) {
         return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
 
     });
-	
+
 	document.getElementById('dnaMessageDiv').innerHTML = '';
 
     dnaMasterStrings =  dnaStrings;//document.getElementById('dnaStrings').value.split('\n');
@@ -12490,7 +12537,7 @@ function motifsInput(e) {
     document.getElementById('dnaStrings').value = dnaMaster;
 
     dnaMasterChanged();
-	
+
 	errMsg('');
 
 }
@@ -12519,13 +12566,13 @@ function alignInput(e,contents,seqNum) {
         alignStrings = alignStrings.filter(function (el) {
             return el.length != 0;
         });
-		
+
 		alignStrings = alignStrings.map(function(el) {
 			return el.toUpperCase();
 		});
-		
+
 		document.getElementById('alignStrings').value = alignStrings.join('\n');
-		
+
         /*
          alignStrings = alignStrings.map(function(el) {
          return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
@@ -12629,14 +12676,14 @@ function phylogenyInput(e,input) {
     phylInp = getSelectedRadioEl('phylInput');
 
 
-    
+
 
     var cleaned;
 
     switch (phylInp.id) {
         case 'phylDNA':
             cleaned =  cleanContents(source,DGraph.fromFastaDna);
-            
+
             break;
 
         case 'phylDistMat':
@@ -12658,13 +12705,8 @@ function phylogenyInput(e,input) {
     }
 
 
-    if (input) {
+    document.getElementById('phylogenyStrings').value = cleaned;
 
-    }
-    else {
-
-        document.getElementById('phylogenyStrings').value = cleaned;
-    }
 
 
     switch (phylInp.id) {
@@ -12734,7 +12776,7 @@ function sequencingInput(e,input) {
         source = document.getElementById('sequencingStrings').value;
 
     }
-	
+
 	if (source == null || source == '') {
 		errMsg('Please enter Reads first, then "Run"!');
 	}
@@ -12894,9 +12936,19 @@ function downloadSeq() {
     //    + encodeURIComponent(txt.value);
 }
 
-function transInput(e) {
+function transInput(e,input) {
 
     if (e) {
+
+    }
+
+    var source;
+    if (input) {
+        source = input;
+
+    }
+    else {
+        source = document.getElementById('transInput').value;
 
     }
 
@@ -12912,14 +12964,14 @@ function transInput(e) {
 
     switch (val) {
         case 'trDNA':
-            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromDna);
+            cleaned = cleanContents(source, DGraph.fromDna);
             break;
         case 'trRNA':
-            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromRna);
+            cleaned = cleanContents(source, DGraph.fromRna);
             break;
 
         case 'trProtein':
-            cleaned = cleanContents(document.getElementById('transInput').value, DGraph.fromProtein);
+            cleaned = cleanContents(source, DGraph.fromProtein);
             break;
 
         default:
@@ -12929,7 +12981,9 @@ function transInput(e) {
     }
 
 
+
     document.getElementById('transInput').value = cleaned;
+
 
 
    // var revCompl = document.getElementById('revComplTT').checked;
@@ -12980,7 +13034,7 @@ if (e) {
         source = document.getElementById('pepInput').value;
 
     }
-	
+
 	if (source == null || source == '') {
 		return;
 	}
@@ -13113,9 +13167,9 @@ function restrictToACGT(event,allowNewline,otherCharsAllowed)
 }
 
 function stopPressed(e) {
-    
+
     if (e) {
-        
+
     }
     stop = true;
 
@@ -13132,7 +13186,7 @@ function kMerRevComplPressed() {
 
 function kmerChanged(e) {
     var kmerEl = document.getElementById('kmer');
-	
+
 	kmerEl.value = kmerEl.value.toUpperCase();
 
 }
@@ -13142,9 +13196,9 @@ function kMerLenChanged(e) {
     document.getElementById('numKmers').value = 1;
 }
 function numKmerChanged(e) {
-    
+
     if (e) {
-        
+
     }
 
     switch (myParams.tabActive) {
@@ -13190,10 +13244,10 @@ function numKmerChanged(e) {
             inclRevCompl = document.getElementById("includeRevComplMF").checked;
             break;
         case 1:
-            inclRevCompl = document.getElementById("includeRevComplLT").checked;
+            inclRevCompl = document.getElementById("includeRevComplKS").checked;
             break;
         case 2:
-            inclRevCompl = document.getElementById("includeRevComplKS").checked;
+            inclRevCompl = document.getElementById("includeRevComplLT").checked;
             break;
         default:
             break;
@@ -13201,7 +13255,7 @@ function numKmerChanged(e) {
 
 	dnaMatch = 0;
 	setPageBasedOnMatch();
-	
+
     colourDNA(dnaMaster,null,inclRevCompl);
 
 }
@@ -13209,11 +13263,11 @@ function numKmerChanged(e) {
 
 
 function randPressed(event) {
-    
+
     if (event) {
-        
+
     }
-    
+
     var randN = document.getElementById('numRand');
     var randNVal = parseInt(randN.value);
 
@@ -13221,20 +13275,20 @@ function randPressed(event) {
    // dnaInput();
 
     dnaMaster =  randomDNA(randNVal);
-	
+
 	document.getElementById('dnaInput').value = dnaMaster;
-	
+
     dnaMasterChanged();
 
-    
+
 }
 
 function randTransPressed(event) {
-    
+
     if (event) {
-        
+
     }
-    
+
     var randN = document.getElementById('numTransRandTT');
     var randNVal = parseInt(randN.value);
 
@@ -13242,21 +13296,21 @@ function randTransPressed(event) {
    // dnaInput();
 
     dnaMaster =  randomDNA(randNVal);
-	
+
 	document.getElementById('transInput').value = dnaMaster;
-	
+
     dnaMasterChanged();
 
-    
+
 }
 
 function randSequencingPressed(event) {
    if (event) {
-        
+
     }
 
     var seqRadioInputId = getSelectedRadioEl('seqInput').id;
-    
+
     var randNVal = parseInt(document.getElementById('numSequencingRand').value);
 
     var randDNA = randomDNA(randNVal);
@@ -13267,7 +13321,7 @@ function randSequencingPressed(event) {
         return;
 
     }
-	
+
 	if (seqRadioInputId == 'seqPairedReads') {
 
         var readLen = parseInt(document.getElementById('kmerLenSA').value);
@@ -13405,9 +13459,9 @@ function randPhylogenyPressed(event) {
 
 
 function randAlignPressed(event) {
-    
+
     if (event) {
-        
+
     }
 
     var numSequencesToGen = 2;
@@ -13418,13 +13472,21 @@ function randAlignPressed(event) {
 
 
     var seqLines = '';
-	
-	
+
+    var offsetRange = randNVal < 15 ? 3 : 7;
+
 
     for (var i = 0;i < numSequencesToGen;++i) {
-		var offset = getRandomInt(-7,7);
-        var dna = randomDNA(randNVal + offset);
-        seqLines+=dna + '\n';
+        var offset;
+        if (i == 0) {
+            offset = offsetRange; //biggest first esp for fitting alignment
+        }
+        else {
+            offset = getRandomInt(offsetRange * -1, offsetRange);
+        }
+        //var dna = randomDNA(randNVal + offset);
+        var aminoSeq = randomAminos(randNVal + offset);
+        seqLines+=aminoSeq + '\n';
     }
 
     document.getElementById('alignStrings').value = seqLines;
@@ -13433,10 +13495,35 @@ function randAlignPressed(event) {
 
 }
 
+function implantMessage(dna,mess,numMismatches) {
+
+    var newMess = mess.slice();
+
+    var positions = [];
+    for (var i = 0;i < mess.length;++i) {
+        positions.push(i);
+    }
+
+
+    for (var j = 0;j < numMismatches;++j) {
+            var r = getRandomInt(0,positions.length);
+            var replacementChar = randomDNA(1);
+            newMess = newMess.substring(0,positions[r]) + replacementChar + newMess.substring(positions[r] + 1);
+            positions.splice(r,1);
+
+    }
+
+    var startPos = getRandomInt(0,dna.length - 1 - mess.length);
+    return dna.substring(0,startPos) + newMess + dna.substring(startPos + newMess.length);
+
+
+
+}
+
 function randMotifPressed(event) {
-    
+
     if (event) {
-        
+
     }
 
     var numSequencesToGen = 10;
@@ -13444,13 +13531,14 @@ function randMotifPressed(event) {
     var randN = document.getElementById('numMotifRand');
     var randNVal = parseInt(randN.value);
 
-
+    var offsetRange = randNVal < 10 ? 3 : 7;
 
     var seqLines = '';
 
     for (var i = 0;i < numSequencesToGen;++i) {
-		var offset = getRandomInt(-7,7);
+		var offset = getRandomInt(offsetRange * -1,offsetRange);
         var dna = randomDNA(randNVal + offset);
+        dna = implantMessage(dna,'GATTACA',1);
         seqLines+=dna + '\n';
     }
 
@@ -13534,11 +13622,11 @@ function pagePressed(inc) {
 function setPageBasedOnMatch() {
 
 	   var numKmerInd = parseInt(document.getElementById('numKmers').value) - 1;
-	   
-	   var dna = dnaMaster; 
-	   
+
+	   var dna = dnaMaster;
+
 	   var matchPos = mfk[numKmerInd][0][dnaMatch];
-	   
+
 	   var jumpToBase;
 	   if (matchPos < 5) {
 		   jumpToBase = 0;
@@ -13546,14 +13634,14 @@ function setPageBasedOnMatch() {
 	   else {
 		   jumpToBase = matchPos - 5;
 	   }
-	   
+
 	   dnaPage = Math.floor(jumpToBase / basesPerPage);
 
        dnaPageOffset = jumpToBase % basesPerPage;
-	   
+
 	   colourDNA(dna);
 
-	
+
 }
 
 function matchPressed(inc) {
@@ -13561,22 +13649,22 @@ function matchPressed(inc) {
     if (mfk.length == 0) {
 		return;
 	}
-		
+
     document.getElementById('currPosInDNA').innerHTML = '';
 
 	var numKmerInd = parseInt(document.getElementById('numKmers').value) - 1;
-     
-  
+
+
 
     if (inc == -100000) {
 		dnaMatch = 0;
         setPageBasedOnMatch();
     }
     else if (inc == 100000) {
-		dnaMatch = 	mfk[numKmerInd][0].length - 1;  
+		dnaMatch = 	mfk[numKmerInd][0].length - 1;
 		setPageBasedOnMatch();
 
-  
+
     }
     else if (inc < 0) {
         if (dnaMatch <= 0) {
@@ -13615,9 +13703,9 @@ function useAffineClicked() {
 
 
 function alignRadClicked(id) {
-    
+
     if (id) {
-        
+
     }
 
     var alignTypeRadioSel = getSelectedRadioEl('alignMethod');
@@ -13702,11 +13790,11 @@ function sbRadClicked(id)  {
 
 
     if (id) {
-        
+
     }
 
     var sbTypeRadioSel = getSelectedRadioEl('sbMethod');
- 
+
     //Align method Radio Button
     switch (sbTypeRadioSel.id) {
         case 'sbSharedKmers':
@@ -14051,32 +14139,32 @@ function transInputRadClicked(id) {
     switch (id) {
         case 'trDNA':
 
-            
+
 			document.getElementById('trTranscribe').style.display = 'inline-block';
 			document.getElementById('trTranslate').style.display = 'none';
 			document.getElementById('trRetro').style.display = 'none';
 			document.getElementById('trTranscribeLab').style.display = 'inline-block';
 			document.getElementById('trTranslateLab').style.display = 'none';
 			document.getElementById('trRetroLab').style.display = 'none';
-			
+
 			document.getElementById('trTranscribe').checked = true;
-			
+
             transRadClicked('trTranscribe');
 
 
             break;
 
         case 'trRNA':
-            
+
 			document.getElementById('trTranscribe').style.display = 'none';
 			document.getElementById('trTranslate').style.display = 'inline-block';
 			document.getElementById('trRetro').style.display = 'inline-block';
 			document.getElementById('trTranscribeLab').style.display = 'none';
 			document.getElementById('trTranslateLab').style.display = 'inline-block';
 			document.getElementById('trRetroLab').style.display = 'inline-block';
-			
+
 			document.getElementById('trTranslate').checked = true;
-			
+
             transRadClicked('trTranslate');
             break;
 
@@ -14088,7 +14176,7 @@ function transInputRadClicked(id) {
 			document.getElementById('trTranscribeLab').style.display = 'none';
 			document.getElementById('trTranslateLab').style.display = 'none';
 			document.getElementById('trRetroLab').style.display = 'inline-block';
-			
+
             document.getElementById('trRetro').checked = true;
             transRadClicked('trRetro');
 
@@ -14168,9 +14256,9 @@ function peptideShapeRadClicked(id) {
 			document.getElementById('pepSequenceGraphBruteLab').style.display = "inline-block";
 			document.getElementById('pepSequenceGraphVectorLab').style.display = "none";
             peptideRadClicked('pepIdealSpectrum');
- 
+
 			document.getElementById('pepSequenceBrute').checked = true;
-			
+
             peptideRadClicked('pepSequenceBrute');
 
             document.getElementById('pepPeptideTypeCircular').disabled = false;
@@ -14351,10 +14439,10 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "none";
             document.getElementById('leaderLabPS').style.display = "none";
-			
+
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
-	
+
             document.getElementById('pepPeptideTypeCircular').disabled = false;
             document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
 
@@ -14370,7 +14458,7 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "none";
             document.getElementById('leaderLabPS').style.display = "none";
-			
+
 			document.getElementById('peptideUseTheseAminos').style.display = "none";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
@@ -14406,7 +14494,7 @@ function peptideRadClicked(id) {
 
             document.getElementById('convLabPS').style.display = "block";
             document.getElementById('leaderLabPS').style.display = "block";
-			
+
 			document.getElementById('peptideUseTheseAminos').style.display = "block";
 			document.getElementById('peptideUseTheseAminosLab').style.display = "block";
 
@@ -14416,7 +14504,7 @@ function peptideRadClicked(id) {
             document.getElementById('pepSpectrum').checked = true;
 
             break;
-			
+
 		case 'pepSequenceGraphBrute':
 
             document.getElementById('convPS').style.display = "none";
@@ -14438,7 +14526,7 @@ function peptideRadClicked(id) {
             document.getElementById('pepSpectrum').checked = true;
 
             break;
-			
+
 		case 'pepSequenceGraphVector':
 
             document.getElementById('convPS').style.display = "none";
@@ -14470,7 +14558,7 @@ function peptideRadClicked(id) {
 			document.getElementById('peptideUseTheseAminosLab').style.display = "none";
 
             document.getElementById('pepPeptideTypeCircular').disabled = false;
-			
+
             document.getElementById('pepPeptide').checked = true;
 
             break;
@@ -14491,26 +14579,26 @@ function phylGraphClicked(e) {
                 var nv = pGraphView.determineNodeViewClicked(e);
             }
             break;
-        
+
         case 'mousedown':
             pGraphView.mouseDown(e);
             break;
-        
+
         case 'mouseup':
             pGraphView.mouseUp(e);
             break;
-        
+
         case 'mousemove':
             pGraphView.mouseMove(e);
             break;
-        
-        
+
+
         default:
             break;
     }
-    
-    
-    
+
+
+
 };
 */
 
@@ -14535,7 +14623,7 @@ function updateExpColl(elId,newState) {
 
     var rOneMax = '27%';
     var rOneMin = '2%';
-	
+
     var leftMax = '94.5%';
     var leftMin = '46%';
     var leftWithDeb = '70%';
@@ -14620,9 +14708,9 @@ function expStateChanged(elId,newVal) {
 
 
 function clickInDNA(e) {
-    
+
     if (e) {
-        
+
     }
     //alert('key down. Posn: ' + getCaretCharacterOffsetWithin(document.getElementById('dnaView')));
 
@@ -14639,31 +14727,31 @@ function tabClickDone(tabNum,prevTabNum) {
     document.getElementById('statsAndInputTools').style.display = 'block';
 
 	if ((tabNum < 3) && dnaMaster && dnaMaster.length > 0) {
-		
+
 	}
 	else {
 		skewCanvas(null);
 		document.getElementById('rightTwo').style.display = 'none';
 	}
-	
+
 	if ((tabNum == 3) && (prevTabNum < 3)) {
 		dnaMasterStrings = '';
 		dnaMaster = '';
 		dnaMasterChanged();
-		
+
 	}
 	if ((tabNum < 3) && (prevTabNum == 3)){
 		dnaMasterStrings = '';
 		dnaMaster = '';
 		dnaMasterChanged();
-		
+
 	}
-	
+
 	document.getElementById('dnaMessageDiv').innerHTML = '';
-	
-	
-	
-	document.getElementById('mainAreaDiv').style.height = tabNum == 5 ?  '200px' : '500px';
+
+
+
+	document.getElementById('mainAreaDiv').style.height = tabNum == 4 ?  '200px' : '500px';
 
     switch (tabNum) {
         case 3: //Motif tab
@@ -14683,7 +14771,7 @@ function tabClickDone(tabNum,prevTabNum) {
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
-			
+
 			document.getElementById('dnaMessageDiv').style.display = "block";
 
             expDebugState = false;
@@ -14691,7 +14779,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expMultiState = false;
             expStateChanged('expMulti',false);
             break;
-        case 4:  //Sequencing tab
+        case 6:  //Sequencing tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "block";
@@ -14708,8 +14796,8 @@ function tabClickDone(tabNum,prevTabNum) {
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
-			
-			
+
+
 
 
             expDebugState = false;
@@ -14718,7 +14806,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 5:  //Transcription/Translation tab
+        case 4:  //Transcription/Translation tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
@@ -14737,7 +14825,7 @@ function tabClickDone(tabNum,prevTabNum) {
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
 
-			
+
 
 
             expDebugState = false;
@@ -14746,7 +14834,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 6: //Peptide sequencing tab
+        case 8: //Peptide sequencing tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
@@ -14776,7 +14864,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 7: //Align tab
+        case 5: //Align tab
 
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
@@ -14803,7 +14891,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 8: // Synteny Block tab
+        case 9: // Synteny Block tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
@@ -14829,7 +14917,7 @@ function tabClickDone(tabNum,prevTabNum) {
             expStateChanged('expMulti',false);
             break;
 
-        case 9:  //Phylogeny tab
+        case 7:  //Phylogeny tab
             document.getElementById('mfkTools').style.display = "none";
             document.getElementById('motifTools').style.display = "none";
             document.getElementById('sequencingTools').style.display = "none";
@@ -14875,15 +14963,15 @@ function tabClickDone(tabNum,prevTabNum) {
 			document.getElementById('rightTwo').style.display = 'none';
 
             document.getElementById('statsAndInputTools').style.display = 'none';
-			
+
             expDebugState = true;
             expStateChanged('expDebug',true);
             expMultiState = false;
             expStateChanged('expMulti',false);
-			
+
 			var el = document.getElementById('miscRadioBox');
 			el.scrollTop = el.scrollHeight;
-			
+
             break;
 
 
@@ -14905,7 +14993,7 @@ function tabClickDone(tabNum,prevTabNum) {
             document.getElementById('alignViewer').style.display = "none";
             document.getElementById('sbViewer').style.display = "none";
             document.getElementById('phylogenyViewer').style.display = "none";
-			
+
 			document.getElementById('dnaMessageDiv').style.display = "none";
 
 

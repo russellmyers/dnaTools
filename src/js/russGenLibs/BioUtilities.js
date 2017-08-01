@@ -38,14 +38,14 @@ function DGEdge(sourceNode,targetNode,edgeType) {
     }
 
     this.visited = false;
-    
+
     this.edgeWeight = 0;
-    
+
     this.edgeAction = ''; //used for aligning, eg ' A' means insert, 'A ' means del, 'AA' means match
 
     this.priorityScore = 0; //used for determining which edge to use when equally good
 
-    
+
 }
 
 DGEdge.prototype.edgeLabel = function() {
@@ -60,7 +60,7 @@ DGEdge.prototype.setWeight = function(w) {
 function DGFancyEdge(sNode,tNode,fLab) {
     DGEdge.apply(this,[sNode,tNode]);
     this.fancylab = fLab;
-    
+
     this.edgeLabel = function() {
         return this.sourceNode.label + '->' + this.targetNode.label +  ' fancy: ' + this.fancylab;
     }
@@ -71,7 +71,7 @@ function DGNode(label,repeatNum) {
     this.label = label;
 
     this.visited = false;
-    
+
     this.cycleNum = 0;
 
     this.successors = [];
@@ -87,7 +87,7 @@ function DGNode(label,repeatNum) {
     else {
         this.repeatNum = 1;
     }
-    
+
 
 
 }
@@ -177,7 +177,7 @@ function DNode(dna,repeatNum) {
     }
 
     this.visited = false;
-    
+
     this.label = '';
 
     this.successors = [];
@@ -354,8 +354,8 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
 
     };
-    
- 
+
+
     this.quickScore = function(fullPartialFlag) {
         var curRowScores = [];
         var prevRowScores = [];
@@ -390,7 +390,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
                 curRowPointers.push('*');
             }
         }
-        
+
         for (var r = 1;r < this.rows;++r) {
             prevRowScores = curRowScores;
             curRowScores = [];
@@ -489,7 +489,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
         return [curRowScores,curRowPointers,prevRowScores];
     };
- 
+
 
     this.longestPathsDynamicInitRow = function () {
         // creates nodes and sets weights
@@ -509,7 +509,11 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
             if (this.progressCallback) {
                 if ((i  % progThreshold == 0) || (i  == lim - 1)) {
                     this.progressCallback('Init graph', i, lim - 1, 'align');
-                }            }
+                    if (this.runCallback) {
+                        this.runCallback(updateRunImage());
+                    }
+                }
+            }
 
 
             var node = new DGNode('' + topOrder);
@@ -572,8 +576,8 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
         }
         //}
-		
-	
+
+
 
 
     };
@@ -658,7 +662,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
             this.longestPathsDynamicCreateRow();
         }
 
-        
+
 
     };
 
@@ -873,7 +877,7 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
 
         var bestNodeTopScore = -99999; //top contribution
         var bestNodeBotScore = -99999; //bottom contribution
-        
+
         for (var i = 0;i < this.cols;++i) {
             if (scoresMidRowPlusOneNodes[i][0] > bestNodeScore) {
                 bestNodeScore = scoresMidRowPlusOneNodes[i][0];
@@ -883,10 +887,10 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
             }
 
         }
-        
+
         this.bestScoreThroughMid = bestNodeScore;
         this.bestBotScore = bestNodeBotScore;
-        
+
         var topOrderMidPlusOneNode = this.getTopOrder(this.rows -1,bestInd);
         var midEdgeAction,midNodeRowCol;
         if (this.nodes[topOrderMidPlusOneNode].longestEdgeToThisNode) {
@@ -897,14 +901,14 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
             midEdgeAction =  this.midEdge.edgeAction;
             midNodeRowCol = this.getNodeRowCol(this.midNode.label);
             return [midNodeRowCol[0],midNodeRowCol[1],this.rows - 1,bestInd,midEdgeAction[0],midEdgeAction[1],bestNodeScore,this.midNode.longestPathToThisNode,bestNodeBotScore];
-            
+
         }
         else {
             return [-1,-1,this.rows - 1,bestInd,'-','-',-99999,-99999,bestNodeBotScore];
         }
 
 
-        
+
 
 
     };
@@ -915,25 +919,25 @@ function DGAlignSpaceGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScor
         var topScores = this.rowScores(this.rows - 1);
         var bottomScores = bottomG.rowScores(bottomG.rows - 1);
         bottomScores = bottomScores.reverse();
-  
+
         var scoresMidRowNodes = topScores.map(function(el,i) {
             return el + bottomScores[i];
         });
-        
+
         var bestNodeScore = -99999;
         var bestInd = -1;
-        
+
         for (var i = 0;i < this.cols;++i) {
             if (scoresMidRowNodes[i] > bestNodeScore) {
                 bestNodeScore = scoresMidRowNodes[i];
                 bestInd = i;
             }
-            
+
         }
         var topOrderMidNode = this.getTopOrder(this.rows -1,bestInd);
         var midNodePredecessor = this.nodes[topOrderMidNode].longestEdgeToThisNode.sourceNode;
         var topOrderPredecessor = this.getNodeRowCol(midNodePredecessor.label);
-                
+
         return [this.rows - 1,bestInd,topOrderPredecessor[0],topOrderPredecessor[1],bestNodeScore];
     }
     */
@@ -1024,6 +1028,9 @@ function DGAffineAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchSco
                     if (this.progressCallback) {
                         if ((topOrder % progThreshold == 0) || (topOrder == lim - 1)) {
                             this.progressCallback('Init graph', topOrder, lim - 1, 'align');
+                            if (this.runCallback) {
+                                this.runCallback(updateRunImage());
+                            }
                         }
                     }
 
@@ -1231,6 +1238,9 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
                     if (this.progressCallback) {
                         if ((topOrder % progThreshold == 0) || (topOrder == lim - 1)) {
                             this.progressCallback('Init graph', topOrder, lim - 1, 'align');
+                            if (this.runCallback) {
+                                this.runCallback(updateRunImage());
+                            }
                         }
                     }
 
@@ -1338,7 +1348,7 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
 
 
     };
-    
+
     this.alignStrings = function() {
         /*
          var sourceNum  = 0;
@@ -1360,7 +1370,7 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
         var endPosT = -1;
         var startPosU = -1;
         var endPosU = -1;
-        
+
         if (this.alignType == DGraph.alignTypeGlobal)  {
             //whole strings will be aligned
             startPosS = 0;
@@ -1411,8 +1421,8 @@ function DG3DAlignGraph(s,t,u,alignType,scoreMat,indelPen,mismatchPen,matchScore
 
 
         var line = '';
-        
-    
+
+
 
 
 
@@ -1433,17 +1443,17 @@ function DGAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScore) {
     DGGridGraph.apply(this,args);
     this.s = s;
     this.t = t;
-    
+
     this.scoreMat = scoreMat;
 
     this.sAligned = '';
     this.tAligned = '';
-    
+
     this.indelPen = indelPen ? indelPen : 0;
     this.mismatchPen = mismatchPen ? mismatchPen : 0;
     this.matchScore = (matchScore == null) ? 1 : matchScore;
-    
-    
+
+
     this.rows = t.length + 1;
     this.cols = s.length + 1;
 
@@ -1529,9 +1539,9 @@ function DGAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScore) {
 
 
     this.scoreAlignment = function(a,b) {
-        
+
         var totScore = 0;
-        
+
         for (var i = 0;i < a.length;++i) {
             if ((a[i] == '-') || (b[i] == '-')) {
                totScore += this.indelPen * -1;
@@ -1544,9 +1554,9 @@ function DGAlignGraph(s,t,alignType,scoreMat,indelPen,mismatchPen,matchScore) {
                     totScore += a[i] == b[i] ? this.matchScore : this.mismatchPen * -1;
                 }
             }
-       
+
         }
-            
+
             return totScore;
     };
 
@@ -1603,7 +1613,7 @@ this.setEdgeActionAndWeight = function(row,col,ed,act) {
     };
 
 
-    
+
     this.alignStrings = function() {
 
         /*
@@ -1612,7 +1622,7 @@ this.setEdgeActionAndWeight = function(row,col,ed,act) {
         var sinkNum  =  (t.length + 1) * (s.length + 1) - 1;
         var sink = sinkNum.toString();
         */
-        
+
        // var pathData = this.longestPathBacktrack(sink,source);
         var pathData = this.longestPathBacktrack();
         var path = pathData[1];
@@ -1713,7 +1723,7 @@ this.setEdgeActionAndWeight = function(row,col,ed,act) {
 
         this.sAligned = sStr;
         this.tAligned = tStr;
-        
+
         return [longest,sStr,tStr,lcsStr,startPosS,endPosS,startPosT,endPosT,line];
 
 
@@ -1730,7 +1740,7 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
    // DGGraph.apply(this,null,);
     var args = [null,null,alignType];
     DGGraph.apply(this,args);
-    
+
     this.rows = rows;
     this.cols = cols;
     this.downWeights = downWeights;
@@ -1745,9 +1755,9 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
     this.sinkLab = sinkNum.toString();
 
 
-    
+
     this.initGraph = function() {
-        
+
         var topOrder;
 
         var progThreshold = 100;
@@ -1761,6 +1771,9 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
                 if (this.progressCallback) {
                         if ((topOrder % progThreshold == 0) || (topOrder == lim - 1)) {
                             this.progressCallback('Init graph',topOrder,lim - 1,'align');
+                            if (this.runCallback) {
+                                this.runCallback(updateRunImage());
+                            }
                         }
                  }
 
@@ -1823,13 +1836,13 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
 
                 //this.nodes.push(node);
                 this.nodes['' + topOrder] = node;
-                
+
             }
         }
 
 
-        
-        
+
+
     };
 
     this.setEdgeActionAndWeight = function(row,col,ed,act) {
@@ -1860,8 +1873,8 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
 
     };
 
-    
-    
+
+
     this.getNodeRow = function(node) {
         if (node) {
             var topOrder = node.getTopOrder();
@@ -1870,7 +1883,7 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
             return -1;
         }
     };
-    
+
     this.getNodeCol = function(node) {
         if (node) {
             var topOrder = node.getTopOrder();
@@ -1880,8 +1893,8 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
             return - 1;
         }
     };
-    
-  
+
+
 
     this.getNodeRowCol = function(topOrder) {
         var row = Math.floor(topOrder / this.cols);
@@ -1892,13 +1905,13 @@ function DGGridGraph(rows,cols,alignType,downWeights,rightWeights,diagWeights) {
     this.getTopOrder = function(row,col) {
         return (row * this.cols) + col;
     };
-    
+
     this.getAbsTopOrderNode = function(node,startRow,startCol,absColSize) {
         var r = this.getNodeRow(node);
         var c = this.getNodeCol(node);
         return ((r + startRow) * absColSize) + c + startCol;
     };
-    
+
     this.rowScores = function(r) {
         var scores = [];
         for (var i = r * this.cols;i < (r+1) * this.cols;++i) {
@@ -1918,12 +1931,12 @@ function DGGraph(source,sourceType,alignType) {
     this.sinkLab = '';
 
     this.nodes = {};
-    
+
     this.bestNode = null;
     this.bestNodeLastRow = null;
     this.bestNodeLastCol = null;
-    
-  
+
+
     this.progressCallback = null;
 
     this.alignType = alignType;
@@ -1982,27 +1995,27 @@ function DGGraph(source,sourceType,alignType) {
             var spl2 = spl[1].split(':');
             var suf = spl2[0];
             var weight = spl2[1];
- 
+
             var sufNode;
-            
+
             var prefNode = svdThis.findNodes(pref)[0];
-    
+
             var matches = svdThis.findNodes(suf);
             if (matches.length == 0) {
                 sufNode = new DGNode(suf);
                 //svdThis.nodes.push(sufNode);
                 svdThis.nodes[suf] = sufNode;
                 matches = svdThis.findNodes(suf);
-                
+
             }
             sufNode = svdThis.findNodes(suf)[0];
-  
+
 
             var ed = new DGEdge(prefNode, sufNode);
             ed.setWeight(parseInt(weight));
             prefNode.successors.push(ed);
             sufNode.predecessors.push(ed);
-            
+
 
         });
 
@@ -2019,7 +2032,7 @@ function DGGraph(source,sourceType,alignType) {
 
         /*
         for (var i = 0;i < this.nodes.length;++i ) {
-    
+
             if (this.nodes[i].label === label) {
                     matchingNodes.push(this.nodes[i]);
             }
@@ -2031,18 +2044,18 @@ function DGGraph(source,sourceType,alignType) {
 
         return matchingNodes;
     };
-    
+
     this.longestPathsDynamic = function(sourceLab,sinkLab,partStart,partEnd) {
-                
+
         //if source supplied, use that, otherwise use entire graph source
         if (sourceLab) {
-            
+
         }
         else {
             sourceLab = this.sourceLab;
         }
         if (sinkLab) {
-            
+
         }
         else {
             sinkLab = this.sinkLab;
@@ -2055,7 +2068,7 @@ function DGGraph(source,sourceType,alignType) {
 
         //var progThreshold = 100;
 
-        
+
         for (var i = partStart;i < partEnd;++i) {
 
             if (this.progressCallback) {
@@ -2087,12 +2100,12 @@ function DGGraph(source,sourceType,alignType) {
                 if (node.predecessors.length == 0) {
                     longest = 0;
                     if (node.label === sourceLab) {
-                        
+
                     }
                     else {
                         node.onSourcePath = false;
                     }
-                    
+
                 }
                 else {
 
@@ -2177,14 +2190,14 @@ function DGGraph(source,sourceType,alignType) {
                 }
             }
         }
-        
+
     };
-    
+
     this.longestPathBacktrack = function(sinkLab,sourceLab) {
-        
+
         sinkLab  = sinkLab ? sinkLab : this.sinkLab;
         sourceLab = sourceLab ? sourceLab : this.sourceLab;
-        
+
         var matches = this.findNodes(sinkLab);
         var sink = null;
         if (matches.length > 0) {
@@ -2210,7 +2223,7 @@ function DGGraph(source,sourceType,alignType) {
 
         var startPosU = -1;
         var endPosU = -1;
-        
+
 
         var curNode;
         if (this.alignType == DGraph.alignTypeLocal) {
@@ -2243,12 +2256,12 @@ function DGGraph(source,sourceType,alignType) {
             curNode = matches[0]; //sink;
        }
         var long = curNode.longestPathToThisNode;
-        
+
         var path = []; //nodes in path
         var edgePath = []; //edges in path
 
         var progThreshold = 1;
-        
+
         path.push(curNode.label);
         while (curNode.label !== source.label) {
 
@@ -2275,7 +2288,7 @@ function DGGraph(source,sourceType,alignType) {
         if  ((this.alignType == DGraph.alignTypeLocal)
          || (this.alignType == DGraph.alignTypeFitting)
           || (this.alignType == DGraph.alignTypeOverlap) ){
-            
+
             if (this.u && (this.u.length > 0 )) {
                 coord = this.getNodeRowColLevel(parseInt(curNode.label));
                 //startPosS = coord[1]; //col
@@ -2288,7 +2301,7 @@ function DGGraph(source,sourceType,alignType) {
                 //startPosT = coord[0]; //row
             }
         }
-        
+
         return [long,path,edgePath];
     }
 
@@ -2455,7 +2468,7 @@ function DGraph(source,sourceType,graphType,k,makeCycle,pairDist,variableOverlap
 
         f = squishString(f,30);
         l = squishString(l,30);
-        
+
         return ('Nodes / Edges: ' + n + ' / ' + e + '\n'
               //  + 'Num Edges: ' + e + '\n'
                 + 'First / Last: ' + f   + ' / ' + l + '\n'
@@ -4060,13 +4073,13 @@ function DBTestSimpleController() {
         }
 
         return nvs;
-        
+
     };
 
     this.numNodes = function() {
         return 6;
     };
-    
+
     this.nodeViewOrder = function() {
         var pairs = [];
         pairs.push([2,4,3]);
@@ -4080,7 +4093,7 @@ function DBTestSimpleController() {
 
 
     }
-    
+
 }
 */
 
@@ -4103,7 +4116,7 @@ function DBGraphViewController(g,prefStyle) {
     this.numNodes = function() {
         return g.numNodes();
     };
-    
+
 
     this.nodeViews = function() {
         var vNodes = [];
@@ -4295,7 +4308,7 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
     this.margin = 3;
 
     this.viewPort = viewPort;
-    
+
 
     this.nvBeingDragged = null;
 
@@ -4339,7 +4352,7 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
                 nv.setR(new DBPos(stX + (i * xInc),stY));
                 nv.absPos = true;
             });
-            
+
         }
 
 
@@ -4603,14 +4616,14 @@ function DBGraphView(canv,viewPort,gvDataSource,ctx) {
         var pos = new DBPos(clickEvent.offsetX,clickEvent.offsetY);
 
         var nvClicked = null;
-        
+
         this.nvs.forEach(function(nv) {
             if (nv.r.containsPoint(pos)) {
                 console.log('node clicked: ' + nv.text);
                 nvClicked = nv;
             }
         });
-        
+
         return nvClicked;
 
 
@@ -4768,19 +4781,19 @@ function DBEdge(sourceNode,targetNode,w,dirFlag) {
 
 function DBTreeEdge(sourceNode,targetNode,w,dirFlag) {
     DBEdge.apply(this, [sourceNode, targetNode, w,dirFlag]);
-    
+
     this.isLimb = function() {
         if (sourceNode.isLeaf() || targetNode.isLeaf())  {
             return true;
         }
-        
+
         return false;
     };
-    
+
     this.isInternalEdge = function() {
         if  (sourceNode.isLeaf() || targetNode.isLeaf())  {
             return false;
-            
+
         }
         return true;
     };
@@ -4882,7 +4895,7 @@ function DBNode(label) { //basic node
     this.visited = false;
 
     this.cycleNum = 0;
-	
+
 	this.nodeWeight = 0; // only used to find node weighted paths
 
     this.freshNode = false; //used to highlight newly added nodes
@@ -4919,8 +4932,8 @@ function DBNode(label) { //basic node
     this.getSuccessors = function (awayFromNode) {
         //gets successor edges of a node. If awayFromNode is supplied for undirected graph, only returns
         //edges in other direction of awayFromNode
-        
-        
+
+
         var sucs = [];
         for (var i = 0; i < this.edges.length; ++i) {
             var edge = this.edges[i];
@@ -4931,7 +4944,7 @@ function DBNode(label) { //basic node
             }
             else {
                 if (awayFromNode && ((edge.sourceNode == awayFromNode) || (edge.targetNode == awayFromNode))) {
-                    
+
                 }
                 else {
                     sucs.push(edge); //all edges are outgoing (and incoming)
@@ -5090,10 +5103,10 @@ function DBNode(label) { //basic node
         }
         return false;
     };
-    
-    
+
+
     this.removeEdge = function(ed) {
-      
+
         for (var i = this.edges.length-1;i >=0;--i) {
            // if (this.edges[i] === ed) {  // not sure why this isn't working
             if ((this.edges[i].sourceNode == ed.sourceNode) && (this.edges[i].targetNode == ed.targetNode)) {
@@ -5117,13 +5130,13 @@ function DBNode(label) { //basic node
 
 function DBTreeNode(label) {
     var labSplit = label.split(';');
-    
+
     DBNode.apply(this,[labSplit[0]]);
-    
+
     this.sequence = labSplit.length > 1 ? labSplit[1] : '';
 
     this.parsimonyScore = null;
-   
+
     this.isLeaf = function(isDirected) {
         if (isDirected) {
             return (this.outDegree() == 0);
@@ -5162,7 +5175,7 @@ function DBTreeNode(label) {
 
 
     };
-    
+
     this.bestParsimonyBasedOnChar = function(ch,childScore) {
         //if ch is empty, return absolute best. Used for root
         var bestScore = DGraph.infinity;
@@ -5192,7 +5205,7 @@ function DBTreeNode(label) {
         });
 
         return [bestScore,bestCh];
-        
+
     };
 
     this.calcParsimonyScore = function(child1Score,child2Score,useAminos) {
@@ -5251,11 +5264,11 @@ function DBTreeNode(label) {
     };
 
 }
-    
+
 function DBGridNode(label) {
-        
+
     DBNode.apply(this,[label]);
-	
+
 	this.nodeWeight = 0;
 	this.row = -1;
 	this.col = -1;
@@ -5263,31 +5276,31 @@ function DBGridNode(label) {
     this.numRows = -1;
     this.numCols = -1;
     this.numLays = -1;
-    
+
     this.bestPathScore = DGraph.infinity * -1;
     this.bestPathEdge = null;
-	
-	
+
+
 	this.setAttributes = function(row,col,lay,numRows,numCols,numLays,w) {
-		
+
 	   this.nodeWeight = w ? w : 0;
-	
+
 	   this.row = (row == null) ? -1 : row;
 	   this.col = (col == null) ? -1 : col;
 	   this.lay = (lay == null) ? -1 : lay;
-        
+
        this.numRows = (numRows == null) ? -1 : numRows;
        this.numCols = (numCols == null) ? -1 : numCols;
        this.numLays = (numLays == null) ? -1 : numLays;
-		
+
 	};
-    
+
     this.orderNum = function() {
         return (this.row * this.numCols + (this.col + 1)) + (this.lay * this.numCols * this.numRows);
-        
+
     }
-    
-    
+
+
 }
 
 
@@ -5301,7 +5314,7 @@ function DNodeBuilder() {
 
 function DTreeNodeBuilder() {
     DNodeBuilder.apply(this,[]);
-    
+
     this.createNode = function(lab) {
         return new DBTreeNode(lab);
     }
@@ -5310,7 +5323,7 @@ function DTreeNodeBuilder() {
 
 function DGridNodeBuilder() {
 	DNodeBuilder.apply(this,[]);
-	
+
 	this.createNode = function(lab) {
 		return new DBGridNode(lab);
 	};
@@ -5334,7 +5347,7 @@ function DTreeEdgeBuilder() {
 
 
 function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
-    
+
     this.nodes = [];
     this.source = source;
 
@@ -5358,7 +5371,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
     else {
         this.edgeBuilder = edgeBuilder;
     }
-   
+
     this.buildNodes = function() {
         //subclass this
 
@@ -5458,7 +5471,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
         if (!w) {
             w = 0;
         }
-		
+
 		//supppressConv means suppress logic to convert anti parallel directed edges to an undirected edge
 		//This logic is not needed in a lot of cases, and is quicker without
 		if (suppressConv == null) {
@@ -5470,9 +5483,9 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
         //If directed, first check if a directed edge already exits the other way. If so, join and make undir
 
         var processed = false;
-		
+
 		if (suppressConv) {
-			
+
 		}
 		else {
 			node2.getSuccessors().forEach(function(ed) {
@@ -5515,23 +5528,23 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
 
 
     };
-    
-    
+
+
     this.swapEdges = function(ed1,ed2,fromNode1,fromNode2) {
       //  assumes fromNode1 is attached to ed1, fromNode2 is attached to ed2.
       // attaches ed1 to fromNode2 and ed2 to fromNode1
-        
+
       var targNode1 = ed1.getTargetNode(fromNode1);
       var targNode2 = ed2.getTargetNode(fromNode2);
-      
+
       fromNode1.removeEdge(ed1);
-      targNode1.removeEdge(ed1);  
+      targNode1.removeEdge(ed1);
       fromNode2.removeEdge(ed2);
       targNode2.removeEdge(ed2);
       this.connectNodes(fromNode1,targNode2,ed1.isDirected(),17);
       this.connectNodes(fromNode2,targNode1,ed2.isDirected(),17);
-        
-        
+
+
     };
 
 
@@ -5545,17 +5558,17 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
 
         return this.addNode(this.internalNodePrefix + nodeNum);
     };
-    
+
     this.addNode = function(lab) {
       //  var node = new DBNode(lab);
         var node  = this.nodeBuilder.createNode(lab);
         this.nodes.push(node);
         return node;
-        
+
     };
-    
-    
-    
+
+
+
     this.findNodes = function(lab) {
 
         var matchingNodes = [];
@@ -5566,10 +5579,10 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
                 matchingNodes.push(this.nodes[i]);
             }
         }
-   
+
         return matchingNodes;
-        
-        
+
+
     };
 
     this.findEdges = function(edge) {
@@ -5614,7 +5627,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
         }
 
         var svdThis = this;
-        
+
         var isDirected;
 
         adjList.forEach(function (adj) {
@@ -5686,7 +5699,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
 
 
         });
-        
+
 
 
 
@@ -5730,7 +5743,7 @@ function DGraphBuilder(source,nodeBuilder, edgeBuilder) {
       return found;
     };
    // this.buildNodes();
-    
+
 }
 
 function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
@@ -5800,93 +5813,93 @@ function DGraphFromNodesBuilder(source,nodeBuilder,edgeBuilder,copyFlag) {
 }
 
 function DGraphFromSpectrumBuilder(source) {
-	
+
 	 DGraphBuilder.apply(this, [source, new DNodeBuilder(), new DEdgeBuilder()]);
-	
+
 	 this.buildNodes = function () {
- 
+
             var svdThis = this;
-			
+
 			var srcAr = this.source.split(' ');
 
 
             srcAr.forEach(function (spec) {
                 svdThis.addNode(spec);
-                
+
 			});
-			
+
 			srcAr = srcAr.map(function(el) {
 				return parseInt(el);
 			});
-			
+
 			var amW = Amino.AminoWeights();
-			
+
 			var foundWs = [];
-			
+
 			for (var i = 0;i < this.nodes.length;++i) {
 				for (var j = i+1;j < this.nodes.length;++j) {
 					var iW = parseInt(this.nodes[i].label);
 					var jW = parseInt(this.nodes[j].label);
 					if  (amW.indexOf(jW - iW) > -1) {
 						foundWs.push(jW - iW);
-						
+
 						var newEdge = this.connectNodes(this.nodes[i],this.nodes[j],true,jW - iW);
 					}
 				}
 			}
-			
-			
-			
+
+
+
 			return this.nodes;
 	 }
-	
+
 }
 
 
 function DGraphFromSpectralVectorBuilder(source) {
-	
+
 	 DGraphBuilder.apply(this, [source, new DNodeBuilder(), new DEdgeBuilder()]);
-	
+
 	 this.buildNodes = function () {
- 
+
             var svdThis = this;
-			
+
 			var srcAr = this.source.split(' ');
 
- 			
+
 			svdThis.addNode('0:0');
             srcAr.forEach(function (spec,i) {
                 var newNode = svdThis.addNode('' + (i+1) + ':' + spec);
-                
+
 			});
-			
+
 			/*
 			srcAr = srcAr.map(function(el) {
 				return parseInt(el);
 			});
 			*/
-			
+
 			var amW = Amino.AminoWeights();
-			
+
 			var foundWs = [];
-			
+
 			for (var i = 0;i < this.nodes.length;++i) {
 				for (var j = i+1;j < this.nodes.length;++j) {
 					var iW = parseInt(this.nodes[i].label.split(':')[0]);
 					var jW = parseInt(this.nodes[j].label.split(':')[0]);
 					if  (amW.indexOf(jW - iW) > -1) {
 						foundWs.push(jW - iW);
-						
+
 						var newEdge = this.connectNodes(this.nodes[i],this.nodes[j],true,jW - iW);
 					}
 				}
 			}
-			
-			
-			
+
+
+
 			return this.nodes;
 	 }
-	
+
 }
 
 function DGraphTreeBuilder(source) {
@@ -5920,14 +5933,14 @@ function DGraphTreeBuilder(source) {
 function DGraphGridBuilder(source) {
 
     DGraphBuilder.apply(this, [source, new DGridNodeBuilder(), new DEdgeBuilder()]);
-	
+
 	this.rows = this.source[0];
 	this.cols = this.source[1];
 	this.lays = this.source[2];
 
     this.buildNodes = function() {
 		var svdThis = this;
-		
+
 		for (var l = 0;l < this.lays;++l) {
 			for (var r = 0;r < this.rows;++r) {
 				for (var c = 0;c< this.cols;++c)  {
@@ -5935,18 +5948,18 @@ function DGraphGridBuilder(source) {
 					newNode.setAttributes(r,c,l,this.rows,this.cols,this.lays,0);
 				}
 			}
-			
+
 		}
-		
+
 		return this.nodes;
-		
-		
-		
-		
+
+
+
+
 	};
 
     this.findNodeWithCoord = function(l,r,c) {
-		
+
 		/*
         for (var i = 0;i < this.nodes.length;++i) {
             var node = this.nodes[i];
@@ -5961,14 +5974,14 @@ function DGraphGridBuilder(source) {
 		return this.findNodeWithOrderNum(ord);
 
     };
-	
+
 	this.coordToOrderNum = function(l,r,c) {
 		return (l * this.rows * this.cols) + (r * this.cols) + c + 1;
-		
+
 	};
 
     this.findNodeWithOrderNum = function(orderNum) {
-		
+
 		/*
         for (var i = 0;i < this.nodes.length;++i) {
             var node = this.nodes[i];
@@ -5979,17 +5992,17 @@ function DGraphGridBuilder(source) {
         return null;
 
 		*/
-		
+
 		//Speed up! Assumes nodes created in layer/row/col order
 		if (orderNum > this.nodes.length) {
 			return null;
 		}
-		
+
 		else {
 			return this.nodes[orderNum-1];
 		}
-		
-		
+
+
     };
 
 
@@ -5997,12 +6010,12 @@ function DGraphGridBuilder(source) {
 
 
 function DGraphGridFromSpecAlignBuilder(source) {
-	
+
 	this.pep = source[0];
     this.spec = source[1];
 	this.k = source[2];
-	
-	
+
+
 	DGraphGridBuilder.apply(this,[[this.pep.peptide.length + 1,this.spec.length + 1,this.k + 1]]);
 
     this.buildNodes = function() {
@@ -6089,8 +6102,8 @@ function DGraphGridFromSpecAlignBuilder(source) {
 
 
     };
-	
-	
+
+
 }
 
 function DGraphTreeFromNodesBuilder(source,copyFlag) {
@@ -6278,7 +6291,7 @@ function DGraphTreeFromDistMatrixBuilder(source) {
         return [dTrimmed,newLabs];
 
     };
-    
+
     this.minDistInMatrix = function(m) {
         var minDist = 1000000;
         var lowI = 0;
@@ -6286,7 +6299,7 @@ function DGraphTreeFromDistMatrixBuilder(source) {
         for (var i = 0;i < m.length;++i) {
             for (var j = 0;j < m.length;++j) {
                 if (i == j) {
-                    
+
                 }
                 else {
                     if (m[i][j] < minDist) {
@@ -6298,9 +6311,9 @@ function DGraphTreeFromDistMatrixBuilder(source) {
             }
         }
         return [minDist,lowI,lowJ];
-        
+
     };
-    
+
     this.parseSource();
 }
 
@@ -6415,9 +6428,9 @@ function DGraphUltraTreeFromDistBuilder(source) {
         }
 
         return this.nodes;
-        
+
     }
-    
+
 }
 
  function DGraphTreeFromDistBuilder(source) {
@@ -6695,15 +6708,15 @@ function DGraphTreeNJFromDistBuilder(source) {
 
       }
 
-      var n = mat.length;  
-        
+      var n = mat.length;
+
         var totDists = mat.map(function(el) {
             return el.reduce(function(el1,el2) {
                 return el1 + el2;
             });
-            
+
         });
-        
+
         var njMat = mat.map(function(line,i) {
             var newLine = line.map(function(el,j) {
                 if (i == j) {
@@ -6713,7 +6726,7 @@ function DGraphTreeNJFromDistBuilder(source) {
             });
             return newLine;
         });
-        
+
         return [njMat,totDists];
     };
 
@@ -6847,7 +6860,7 @@ function DGraphTreeNJFromDistBuilder(source) {
 DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
     var alArray = alignments.split('\n');
     //var alDict = {};
-    
+
     var labs = '';
     var seqs = [];
     alArray.forEach(function(el,i) {
@@ -6856,10 +6869,10 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
             labs += ' ';
         }
     });
-    
+
     alArray.forEach(function(el) {
         seqs.push(el.split(' ')[1]);
-        
+
     });
 
 
@@ -6870,7 +6883,7 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
         seqs.forEach(function(colSeq,j) {
             if (i == j) {
                 matRow += '0';
-                
+
             }
             else {
                 matRow += hamDist(rowSeq,colSeq);
@@ -6880,7 +6893,7 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
             }
         });
         mat.push(matRow);
-        
+
     });
 
 
@@ -6892,9 +6905,9 @@ DGraphTreeFromDistBuilder.AlignmentsToDistMatrix = function(alignments) {
 
         }
     });
-    
+
     return matString;
-    
+
 };
 
 /**
@@ -6929,7 +6942,7 @@ function DBGraph(builder,comments) {
     this.checkDirected = function() {
 
         var undirected = false;
-        
+
         for (var i = 0;i < this.nodes.length;++i) {
             var node = this.nodes[i];
 
@@ -6950,19 +6963,19 @@ function DBGraph(builder,comments) {
                     if (suc.successors[k].targetNode == node) {
                         undirected = true;
                         break;
-                        
+
                     }
                 }
                 if (undirected) {
                     break;
                 }
                 */
-                
+
             }
             if (undirected) {
                 break;
             }
-            
+
         }
         return (!undirected);
     };
@@ -6985,28 +6998,28 @@ function DBGraph(builder,comments) {
         return this.nodes.length;
     };
 
-   
+
     //end of "Interface" implementation
 
     this.resetNodesVisited = function() {
        this.nodes.forEach(function(node) {
            node.visited = false;
-       });  
+       });
     };
-    
+
     this.resetFreshNodesAndEdges = function() {
         //fresh nodes/edges used in graph displays to highlight new nodes/edges or paths
         svdThis = this;
-        
+
         this.nodes.forEach(function(node) {
             node.freshNode = false;
             node.edges.forEach(function(edge) {
-               edge.freshEdge = false; 
+               edge.freshEdge = false;
             });
-            
+
         });
     };
-    
+
     this.getNodeFromLabel = function(lab) {
 
         //get first node which matches label
@@ -7024,7 +7037,7 @@ function DBGraph(builder,comments) {
         return this.nodes.indexOf(node);
 
     };
-    
+
     this.checkAllConnected = function() {
         this.resetNodesVisited();
         var done = false;
@@ -7058,7 +7071,7 @@ function DBGraph(builder,comments) {
         }
         return connectedComponents;
     };
-    
+
     this.depthFirstSearch = function(node,prevNode,clearAllVisited,nodesSoFar) {
         if (!nodesSoFar) {
             nodesSoFar = [];
@@ -7097,16 +7110,16 @@ function DBGraph(builder,comments) {
                 }
             }
 
-            
-            
+
+
         });
-        
+
         return [nodesSoFar,cycleFound];
 
 
 
     };
-    
+
     this.checkCycle = function(node) {
         if (node.visited) {
             return true;
@@ -7122,11 +7135,11 @@ function DBGraph(builder,comments) {
             if (cyc) {
                 cycleFound = true;
             }
-         
+
         });
         return cycleFound;
 
-        
+
     };
 
     this.getConnected = function(node) {
@@ -7168,28 +7181,28 @@ function DBGraph(builder,comments) {
     this.edgeList = function() {
         var edges = [];
 
-        
-        
+
+
         this.nodes.forEach(function(node) {
            node.edges.forEach(function(ed) {
                if (edges.indexOf(ed) > -1) {
-                   
+
                }
                else {
                    edges.push(ed);
                }
-               
+
            })
         });
-        
+
         return edges;
 
     };
-    
+
     this.toText = function() {
-      
+
         var txt = '';
-        
+
         this.nodes.forEach(function(node) {
             txt += node.label;
             txt +='-';
@@ -7202,14 +7215,14 @@ function DBGraph(builder,comments) {
                     txt+=',';
                 }
 
-                
+
             });
             txt+= '\n';
         });
         return txt;
-        
+
     };
-    
+
     this.toAdjacencyList = function(numDec,showSeqs,showDirAsUndir,suppressWeights) {
 
         if (numDec == null) {
@@ -7243,7 +7256,7 @@ function DBGraph(builder,comments) {
                     adjList +='\n';
                 }
             });
-            
+
         });
         */
 
@@ -7307,8 +7320,8 @@ function DBGraph(builder,comments) {
         });
         return adjList;
     };
-    
-    
+
+
     this.copyGraph = function() {
         var adjList = this.toAdjacencyList();
         var  build = new DGraphBuilder(adjList,this.builder.nodeBuilder,this.builder.edgeBuilder);
@@ -7316,9 +7329,9 @@ function DBGraph(builder,comments) {
         return copiedGraph;
     };
 
-    
-   
-    
+
+
+
     this.deletePredecessor = function(node,pred) {
 
         /* old regime
@@ -7347,7 +7360,7 @@ function DBGraph(builder,comments) {
         }
 
     };
-    
+
     this.deleteSuccessor = function(node,succ) {
 
         /*
@@ -7390,24 +7403,24 @@ function DBGraph(builder,comments) {
         /*
         node.predecessors.forEach(function(pred) {
             svdThis.deleteSuccessor(pred,node);
-            
+
         });
         */
 
         node.edges = null;
-        
-        
+
+
         for (var i = this.nodes.length-1;i>=0;--i) {
             if (this.nodes[i] == node) {
                 this.nodes.splice(i,1);
             }
         }
-        
+
 
 
 
     };
-	
+
 	this.getSourceNode = function() {
 		//assumes DAG
 		for (var i = 0;i < this.nodes.length;++i) {
@@ -7417,7 +7430,7 @@ function DBGraph(builder,comments) {
 		}
 		return null;
 	};
-	
+
 	this.getSinkNode = function() {
 		//assumes DAG
 		for (var i = this.nodes.length - 1;i >= 0;--i) {
@@ -7426,114 +7439,114 @@ function DBGraph(builder,comments) {
 			}
 		}
 		return null;
-	};	
-	
+	};
+
 	this.longestPathNodeWeighted = function(sourceNode,sinkNode) {
                 //longest path in Graph based on node weights not edge weights)
 				//assumes DAG
 				//assumes nodes are in order, ie later nodes are all successors of prev ones
-        
+
 		if (sourceNode) {
-			
-     
+
+
 		}
 		else {
 			sourceNode = this.getSourceNode();
 		}
-		
+
 		if (sinkNode) {
-			
+
 		}
 		else {
 			sinkNode = this.getSinkNode();
 		}
-		
+
 		//var done = false;
-		
+
 		var bests = [[0,0]];
-		
+
 		var currNode = sourceNode;
 		var currNodeNum = parseInt(currNode.label.split(':')[0]);
-		
+
 		var sinkNodeNum = parseInt(sinkNode.label.split(':')[0]);
-		
+
 		for (var i = currNodeNum+1;i <= sinkNodeNum;++i) {
 			currNode = this.nodes[i];
 			var predNodes = currNode.getPredecessors();
 			var bestPred = DGraph.infinity * -1;
 			var bestNum = -1;
-			
+
 			predNodes.forEach(function(pred) {
 				var predNum  = parseInt(pred.label.split(':')[0]);
 				var predScore = bests[predNum][0];
 				if (predScore  > bestPred) {
 					bestPred = predScore;
 					bestNum = predNum;
-					
+
 				}
-					
-				
+
+
 			});
-			
+
 			var thisNodeWeight = parseInt(currNode.label.split(':')[1]);
 			if (bestPred == DGraph.infinity * -1) {
 				thisNodeWeight = 0;
 				bestNum = -1;
 			}
 			bests.push([bestPred + thisNodeWeight,bestNum]);
-			
-			
+
+
 		}
-		
-		
+
+
 		//backtrack
 		var currNum = bests.length - 1;
-		
+
 		var diffAr = [];
         var currNodeAr = [this.nodes[currNum]];
-		
+
 		while (currNum > 0) {
 			var diff = currNum - bests[currNum][1];
 			diffAr.unshift(diff);
 			currNum = bests[currNum][1];
             currNodeAr.unshift(this.nodes[currNum]);
 		}
-		
+
 		var pep = new Peptide(Peptide.AminoArrFromWeights(diffAr));
-		
+
 		return [pep.toShortString(''),bests,currNodeAr];
-	 
+
 	};
-	
 
 
-      
-	
+
+
+
 	this.allPathsSourceToSink = function() {
-		
+
          //assumes DAG
-		 
+
 		 //iterative queue based
-		 
+
 		 var done = false;
-		 
+
 		 var sourceNode = this.getSourceNode();
 		 var sinkNode = this.getSinkNode();
-		 
+
 		 var paths = [];
-		 
+
 		 sourceNode.getSuccessors().forEach(function(el) {
 			var path = [];
 			path.push(el);
-            paths.push(path);				
+            paths.push(path);
 		 });
-		 
+
 		 var svdThis = this;
-		 
+
 		 while (!done) {
 			 var newPaths = [];
 			 done = true;
-			 
+
 			 paths.forEach(function(path) {
 				if (path[path.length-1].targetNode == svdThis.getSinkNode()) {
 					newPaths.push(path);
@@ -7549,18 +7562,18 @@ function DBGraph(builder,comments) {
 						newPaths.push(newPath);
 					});
 				}
-				
 
-				
+
+
 			 });
-			 
+
 			 paths = newPaths;
-			 
+
 		 }
-		 
+
 		 return paths;
-		 
-		 
+
+
 	};
 
 
@@ -7580,19 +7593,19 @@ function DBTreeGraph(builder,comments) {
         });
 
         return lvs;
-        
+
     };
-    
+
     this.internalNodes = function() {
         var iNodes;
         var svdThis = this;
         iNodes = this.nodes.filter(function(node) {
-           return (!node.isLeaf(svdThis.checkDirected())); 
+           return (!node.isLeaf(svdThis.checkDirected()));
         });
-        
+
         return iNodes;
     };
-    
+
     this.internalEdges = function() {
         var iEdges;
         var svdThis = this;
@@ -7605,9 +7618,9 @@ function DBTreeGraph(builder,comments) {
                 return true;
             }
         });
-        
+
         return iEdges;
-        
+
     };
 
     this.stripLeaves = function() {
@@ -7617,10 +7630,10 @@ function DBTreeGraph(builder,comments) {
                 this.deleteNode(this.nodes[i]);
             }
         }
-       
+
 
     };
-    
+
     this.findRoot = function() {
         var rootsFound = 0; //should only find 1. If more, not rooted
         var rootNode = null;
@@ -7630,7 +7643,7 @@ function DBTreeGraph(builder,comments) {
                 rootNode = el;
             }
         });
-        
+
         if (rootsFound == 1) {
             return rootNode;
         }
@@ -7638,11 +7651,11 @@ function DBTreeGraph(builder,comments) {
             return null;
         }
     };
-    
+
     this.isRooted = function() {
         return this.findRoot() != null;
-        
-        
+
+
     };
 
     this.centralNode = function() {
@@ -7656,7 +7669,7 @@ function DBTreeGraph(builder,comments) {
 
         while (!done) {
             strippingTree.stripLeaves();
-       
+
             if (strippingTree.nodes.length <= 2) {
                 done = true;
                 return strippingTree.nodes[0].label;
@@ -7666,9 +7679,9 @@ function DBTreeGraph(builder,comments) {
 
 
     };
-    
+
     this.unRoot = function() {
-        
+
         var root = this.findRoot();
         var rootEdges = root.getSuccessors();
         var child1 = rootEdges[0].getTargetNode(root);
@@ -7689,25 +7702,25 @@ function DBTreeGraph(builder,comments) {
                 }
             });
         });
-        
+
     };
-    
-    
-    
+
+
+
     this.addRoot = function(edge) {
-        
+
         //add root to undirected, unrooted tree
 
       var svdThis = this;
-        
+
       if (this.checkDirected()) {
           return null;
       }
-        
+
         if (this.isRooted()) {
             return null;
       }
-        
+
       var rootNode = this.builder.addNodeBetween(edge.sourceNode,edge.targetNode,edge.edgeWeight /2 , edge.edgeWeight / 2);
 
       //var done = false;
@@ -7748,27 +7761,27 @@ function DBTreeGraph(builder,comments) {
         var fromNode1 = ed.sourceNode;
         var fromNode2 = ed.targetNode;
         this.builder.swapEdges(neighb[0][1],neighb[1][0],fromNode1,fromNode2);
-        
-        
-      
-        
+
+
+
+
     };
-    
-    
+
+
     this.getAllChildren = function(node,leavesOnly) {
        console.log('node =  ' + node.label);
       //get all children of a node
        var svdThis = this;
-        
+
       if (node.isLeaf()) {
-          
+
           return [];
       }
       if (!this.isRooted()) {
           return [];
-      }  
-        
-      var childNodes = [];  
+      }
+
+      var childNodes = [];
 
       var succs =  node.getSuccessorNodes();
       if (succs.length == 0) {
@@ -7789,10 +7802,10 @@ function DBTreeGraph(builder,comments) {
           console.log('node: ' + node.label + ' suc: ' + suc.label +  ' children of succ: ' + children);
          childNodes = childNodes.concat(children);
       });
-        
-      return childNodes;  
-        
-        
+
+      return childNodes;
+
+
     };
 
 
@@ -7847,9 +7860,9 @@ function DBTreeGraph(builder,comments) {
         return ripes;
 
     };
-    
+
     this.largeParsimony = function(useAminos) {
-      
+
         var svdThis = this;
 
         var bestEdge = null;
@@ -7976,14 +7989,14 @@ function DBTreeGraph(builder,comments) {
 
 
     };
-    
+
     this.smallParsimony = function(stepNum,useAminos) {
       //find parsimonious sequences for internal nodes given sequences for leaves (current species)
       //if useAminos is set, assumes sequences are amino acides, not bases
 
         var seqLength = 0;
 
-       
+
 
 
         var tempRoot = false;
@@ -7996,7 +8009,7 @@ function DBTreeGraph(builder,comments) {
 
 
 
-        
+
         //do parsimony here
 
         //svdThis = this;
@@ -8102,7 +8115,7 @@ function DBTreeGraph(builder,comments) {
             var manNum = i+1;
            console.log('sm pars node: ' + node.label + ' seq: ' + node.sequence.length + 'man: ' +  manNum + ' ' + node.sequence.substring(0,10));
         });
-        
+
         return totParsimonyScore;
     };
 
@@ -8135,23 +8148,23 @@ function DBTreeGraph(builder,comments) {
                         subPath.pathLen += suc.edgeWeight;
                         return subPath;
                         //return subPath + suc.edgeWeight;
-                        
+
                     }
-                    
+
                 }
-                
+
             }
             return {'pathLen':-1,'edgeList':[]}; //did't find
-            
+
 
         }
 
     };
-    
+
     this.distanceMatrixFromTree = function() {
-        
+
         //assumes all edges are already weighted
-        
+
         var leaves = this.leaves();
         var rows = [];
         for (var i = 0;i < leaves.length;++i) {
@@ -8163,7 +8176,7 @@ function DBTreeGraph(builder,comments) {
                 else {
                     row.push(this.findPathBetweenNodes(leaves[i],leaves[j],leaves[i],null).pathLen);
                 }
-                
+
             }
             rows.push(row);
         }
@@ -8201,7 +8214,7 @@ function DBGridGraph(builder,comments) {
        // var bests = [[0,0]];
 
         var currNode = sourceNode;
-        
+
        // var currRow = currNode.row;
         //var currCol = currNode.col;
        // var currLay = currNode.lay;
@@ -8364,7 +8377,7 @@ function DBasicGraph(source,sourceType) {
 
     };
 
-  
+
 
     this.traverseCycle = function (st) {
 
@@ -8395,7 +8408,7 @@ function DBasicGraph(source,sourceType) {
         return nodesInCycle;
 
     };
-    
+
     this.graphToGenome = function(edgeType) {
 
         this.resetNodesVisited();
@@ -8445,9 +8458,9 @@ function DBasicGraph(source,sourceType) {
     };
 
     this.findEdgeInNonTrivialCycle = function () {
-        
+
         var genStages = [];
-        
+
        // var edgeInd = 1; //blue edge
 
 
@@ -8517,7 +8530,7 @@ function DBasicGraph(source,sourceType) {
 
                // var keys = Object.keys(this.nodes);
                // keys.sort();
-                
+
                 for (var node in this.nodes) {
                 //keys.forEach(function(node) {
 
@@ -8536,7 +8549,7 @@ function DBasicGraph(source,sourceType) {
                             nodesInCycle.forEach(function(el) {
                                 el.cycleNum = 0;
                             });
-                            
+
                         }
 
                     }
@@ -8965,17 +8978,17 @@ Amino.AminoWeights = function() {
 
 
 Amino.CodeForWeight = function(w) {
-	  
+
 	for (var amEntry in Amino.transTable) {
         if (Amino.transTable.hasOwnProperty(amEntry)) {
            if (Amino.transTable[amEntry][2] == w) {
 			   return amEntry;
 		   }
-            
+
         }
 	}
 	return '-';
-		
+
 }
 
 Amino.AllAminos = function() {
@@ -9002,15 +9015,15 @@ Amino.AllAminos = function() {
 };
 
 Amino.AllUniqueWeightAminos = function(include200) {
-    
+
     //include200 - flag to include all other potential Amino Acids between weights 57 - 200
-    
+
     var amList = Amino.AllAminos();
 
     var amUniqueList = [];
 
     var foundWeights = [];
-    
+
     if (include200) {
         for (var w = Amino.LowestWeight;w <= Amino.HighestWeight;++w) {
             if (foundWeights.indexOf(w) > -1) {
@@ -9198,11 +9211,11 @@ function Peptide(aminoArr,startPosInRNA) {
         }
 
         var str = '';
-        
+
         var pepStrAr = [];
 
         var pepAr = this.peptide.slice(cycleStart).concat(this.peptide.slice(0,cycleStart));
-        
+
         //this.peptide.forEach(function (am, i) {
         pepAr.forEach(function (am,i) {
             if (i > 0) {
@@ -9239,7 +9252,7 @@ function Peptide(aminoArr,startPosInRNA) {
                 pepStrAr.push('unk');
             }
         });
-        
+
         if (reverse) {
             str = '';
             for (var i = pepStrAr.length - 1;i >=0;--i) {
@@ -9318,33 +9331,33 @@ function Peptide(aminoArr,startPosInRNA) {
             return 0;
         }
     };
-	
+
 	this.prefixMasses = function() {
-		
+
 		var prefMasses = [];
-		
+
 		var totMass = 0;
-		
-		
-		
+
+
+
 		this.peptide.forEach(function(am) {
 			var w = am.getIntegerWeight();
 			totMass += w;
 			prefMasses.push(totMass);
 		});
-		
+
 		return prefMasses;
-		
+
 	};
-	
-	
+
+
 	this.toPeptideVector = function() {
 		//prefix masses
-		
+
 		var prefMasses = this.prefixMasses();
-		
+
 		var vect = [];
-		
+
 		for (var i = 1;i <=		 prefMasses[prefMasses.length -1];++i) {
 		   	if (prefMasses.indexOf(i) > -1) {
 				vect.push(1);
@@ -9353,23 +9366,23 @@ function Peptide(aminoArr,startPosInRNA) {
 				vect.push(0);
 			}
 		}
-		
+
 		return vect;
-		
-		
-		
+
+
+
 	};
 
 
-    
-    
+
+
     this.spectrum = function (cyclic,retSubPeptides,prefSufOnly) {
-        
+
         //retSubPeptides: flag to indicate whether to also return the sub peptide strings
         //prefSufOnly - only include prefixes and suffices, not "interior" sub-peptides
 
         var pepStr = this.toShortString('');
-        
+
         var prefixMasses = [0];
         this.peptide.forEach(function (am, i) {
             var prefMass = am.getIntegerWeight() + prefixMasses[i];
@@ -9411,10 +9424,10 @@ function Peptide(aminoArr,startPosInRNA) {
         else {
             return spec.map(function(el) {
                 return el[0];
-                
+
             });
         }
-       
+
 
     };
 
@@ -9500,30 +9513,30 @@ function Peptide(aminoArr,startPosInRNA) {
         return sc;
 
     };
-	
+
 	this.scoreAgainstSpectralVector = function(specVector) {
-		
+
 		var pepVector = this.toPeptideVector();
-		
+
 		if (pepVector.length == specVector.length) {
-			
+
 			var score = 0;
-			
+
 			specVector.forEach(function(el,i) {
 				score += (el * pepVector[i]);
 			});
-			
+
 			return score;
-			
+
 		}
 		else {
 			return DGraph.infinity * -1;
-		
+
 		}
 	};
 
     this.allCycles = function() {
-      var cyclesAr = [];  
+      var cyclesAr = [];
       for (var i = 0;i < this.peptide.length;++i) {
           cyclesAr.push(this.toString(Peptide.short,'',false,i));
           cyclesAr.push(this.toString(Peptide.short,'',true,i)); //reverse
@@ -9559,9 +9572,9 @@ Peptide.AminoArrFromArr = function(arr) {
 
     amAr = arr.map(function(el) {
         return new Amino(el);
-        
+
     });
-  
+
     return amAr;
 
 
@@ -9570,7 +9583,7 @@ Peptide.AminoArrFromArr = function(arr) {
 Peptide.AminoArrFromWeights = function(weights) {
 
     var amArr;
-    
+
     amArr = weights.map(function(w) {
         for (var amEntry in Amino.transTable) {
             if (Amino.transTable.hasOwnProperty(amEntry)) {
@@ -9587,29 +9600,29 @@ Peptide.AminoArrFromWeights = function(weights) {
 };
 
 Peptide.AminoArrFromVector = function(vector) {
-	
+
 	var amWeightArr = [];
-	
+
 	var vecArr = vector.split(' ');
-	
+
 	var prevMass = 0;
-	
+
 	vecArr.forEach(function(el,i) {
-		
+
 		if (el == 1) {
 			var thisMass = i + 1 - prevMass;
 			amWeightArr.push(thisMass);
-			
+
 			prevMass = i + 1;
 		}
-			
-			
-			
+
+
+
 	});
-	
+
 	return Peptide.AminoArrFromWeights(amWeightArr);
-	
-	
+
+
 };
 
 
@@ -9662,15 +9675,15 @@ function RNA(rna) {
 
     this.translate = function(frameOffset,forceTranslateStart,forceTranslateStop,rev) {
         var cods = this.codons(frameOffset,rev);
-        
+
         var startPos = frameOffset;
-        
+
         var started = false;
         var stopped = false;
 
         if (forceTranslateStart) {
             started = true; //ie don't wait for start codon
-            
+
         }
 
         var tranCods = cods.filter(function(cod,codNum) {
@@ -9805,14 +9818,14 @@ function Spectrum(spectrumString) {
     this.specAr = this.specAr.map(function(el) {
            return svdThis.isFloatSpectrum ?  parseFloat(el) : parseInt(el);
           });
-    
+
     this.init = function() {
-        
+
     };
-    
+
     this.convolutionStr = function() {
         var convAr = this.convolution();
-        
+
         var str = '';
         convAr.forEach(function(el) {
             str+= el + ' ';
@@ -9821,25 +9834,25 @@ function Spectrum(spectrumString) {
     };
 
     this.topElements = function(N) {
-        
+
         var topEls = [];
-        
+
         var conv = this.convolution();
-        
+
         var prev = conv[0];
-        
+
         var currCount = 0;
         var prevCount = -1;
         var NCount = -1;
-        
+
         for (var i =0;i < conv.length;++i) {
             if (conv[i] == prev) {
                 ++currCount;
-                
+
             }
             else {
-  
-                
+
+
                 if ((prev >= Amino.LowestWeight) && (prev <= Amino.HighestWeight)) {
                     if (topEls.length > N) {
                         if (currCount == NCount) {
@@ -9861,11 +9874,11 @@ function Spectrum(spectrumString) {
                 prevCount = currCount;
                 currCount = 1;
             }
-            
+
         }
 
         return topEls;
-        
+
 
     };
 
@@ -9884,13 +9897,13 @@ function Spectrum(spectrumString) {
 
 
     };
-    
+
     this.convolution = function() {
-        
+
         //var svdThis = this;
-        
+
         var convo = [];
-        
+
         //this.specAr.forEach(function(el1) {
         for (var i = 0;i < this.specAr.length; ++i) {
             for (var j = i+1;j < this.specAr.length;++j) {
@@ -9956,9 +9969,9 @@ function Spectrum(spectrumString) {
 
         return convo;
     };
-    
+
     this.init();
-    
+
 }
 
 Spectrum.PepMethodIdealSpectrum = 1;
@@ -9974,7 +9987,7 @@ function Aligner(p,t,m) {
     this.tLen = this.t.length;
 
     this.m = m ? m : 0;
-    
+
     this.debugComparisons = 0;
     this.debugTime = 0;
 
@@ -10269,11 +10282,11 @@ function Aligner(p,t,m) {
         if (type == 'blo') {
             return this.penaltyDictBlosum[ch1][ch2];
         }
-        
+
         if (type == 'LCS') {
             return ch1 == ch2 ? 1 : 0;
         }
-        
+
         if (type == 'dna') {
             if (localFlag) {
                 return this.penaltyDictDNALoc[ch1][ch2];
@@ -10306,7 +10319,7 @@ function Aligner(p,t,m) {
 
         //Alignment pre-process
         this.scoreMatrix = [];
-        
+
         for (var i = 0;i < this.p.length + 1;++i) {
             var rowAr = [];
             if (i == 0) {
@@ -10360,9 +10373,9 @@ function Aligner(p,t,m) {
 
     this.init = function() {
 
- 
 
-   
+
+
        // this.editDistInit(true);
         /*
          for (var i = 0;i < this.p.length + 1;++i) {
@@ -10370,9 +10383,9 @@ function Aligner(p,t,m) {
          for (var j = 0;j < this.t.length)
          }
          */
-        
+
         //Boyer Moore pre-process
-        
+
         this.badChars = this.initBadChars(this.p);
         this.goodSuffs = this.initGoodSuffs(this.p);
 
@@ -10411,31 +10424,31 @@ function Aligner(p,t,m) {
             this.partOffsets.push(0);
 
         }
-        
+
     };
-    
+
     this.toText = function() {
         return 'len p: ' + this.p.length + ' len t: ' + this.t.length;
     };
-    
+
     this.naive = function() {
 
         return this.naiveWithMismatch(0);
-        
+
     };
-    
+
     this.matchString = function(posns) {
         var svdThis = this;
         return posns.map(function(el) {
             return svdThis.t.substring(el,el+svdThis.p.length);
         });
-        
-        
+
+
     };
-    
+
     this.naiveWithMismatch = function(maxMismatch) {
         var start = performance.now();
-   
+
         var posns = [];
         this.debugComparisons = 0;
 
@@ -10457,10 +10470,10 @@ function Aligner(p,t,m) {
 
         var end = performance.now();
         this.debugTime = end - start;
-        
 
-        return posns;       
-        
+
+        return posns;
+
     };
 
     this.bmFind = function(part,partNum) {
@@ -10541,7 +10554,7 @@ function Aligner(p,t,m) {
             //allPosns = allPosns.concat(posns);
         });
 
-       
+
         var end = performance.now();
         this.debugTime = end - start;
 
@@ -10557,11 +10570,11 @@ function Aligner(p,t,m) {
     };
 
     this.align = function(localFlag,alignType,indelPen) {
- 
+
         //var editDistType = 1;
         //var alignBlo = 2;
         //var alignDNA = 3;
-        
+
         var type;
         switch (alignType) {
             case Aligner.EditDistType:
@@ -10578,17 +10591,17 @@ function Aligner(p,t,m) {
                 break;
             default:
                 break;
-  
+
         }
-   
-        
+
+
         this.penaltyDictBlosum = this.initPenaltyDictBlosum(indelPen);
         this.penaltyDictDNA = this.initPenaltyDictDNA(indelPen);
         this.penaltyDictDNALoc = this.initPenaltyDictDNALoc(indelPen);
         this.penaltyDictLCS = this.initPenaltyDictLCS();
         this.penaltyDict = this.initPenaltyDictEdit();
 
-        
+
         this.alignInit(localFlag,alignType,alignType == Aligner.EditDistType ? -1 : indelPen);
 
         for (var i = 1;i < this.p.length + 1;++i) {
@@ -10735,7 +10748,7 @@ function Aligner(p,t,m) {
         var j = c;
         var pAligned = '';
         var tAligned = '';
-        
+
         var tStart = 0; // used for local edit dist
 
         while ((i >= 1) || (j >=1)) {
@@ -10832,8 +10845,8 @@ function Aligner(p,t,m) {
         return [pAligned,tAligned,tStart];
 
     };
-    
-    
+
+
 
     this.init();
 }
@@ -10855,7 +10868,7 @@ Aligner.LCS = 4;
  * @property m number of dimensions
  */
 function Point(coords) {
-	
+
 	this.coords = coords ? coords : [];
 	this.m = coords.length;
 
@@ -10864,28 +10877,28 @@ function Point(coords) {
      *  @returns {string}
      *  */
 	this.toString = function() {
-		
+
 		var svdThis = this;
 		var str = '';
 		this.coords.forEach(function(el,i) {
 			str += el.toFixed(3);
 			if (i == svdThis.m - 1) {
-				
+
 			}
 			else {
 				str +=' ';
 			}
 		});
-		
+
 		return str;
 	};
-	
+
 	this.equalTo = function(p) {
 		var svdThis = this;
 		var eq = true;
 		for (var i = 0;i < this.coords.length;++i) {
 			 if (this.coords[i] == p.coords[i]) {
-				 
+
 			 }
 			 else {
 				 eq = false;
@@ -10895,7 +10908,7 @@ function Point(coords) {
 		}
 		return eq;
 	}
-	
+
 }
 
 /**
@@ -10910,13 +10923,13 @@ function Point(coords) {
  */
 
 function Centre(centrePoint)  {
- 
-    
-    
+
+
+
 	this.centrePoint = centrePoint ? centrePoint : null;
-	
+
 	this.prevCentrePoint = null;
-	
+
 	this.clusterPoints = [];
 
     this.responsibilityVector = [];
@@ -10977,7 +10990,7 @@ function Centre(centrePoint)  {
      */
 
 	this.centreOfGravity = function(setCentreFlag) {
-		
+
 		//if setCentreFlag is true, sets the centre based on the centre of gravity, otherwise just returns the cog
 
 		var svdThis = this;
@@ -10986,7 +10999,7 @@ function Centre(centrePoint)  {
             return null;
 
         }
-		
+
 		var totAr = this.clusterPoints[0].coords.map(function(el) {
 			return 0;
 		});
@@ -10994,21 +11007,21 @@ function Centre(centrePoint)  {
 			 p.coords.forEach(function(coordVal,j) {
 				 totAr[j] += coordVal;
 			 });
-			 
+
 		});
 		totAr = totAr.map(function(el) {
 			return el  / svdThis.clusterPoints.length;
 		});
-		
+
 		var cogPoint = new Point(totAr);
 		if (setCentreFlag) {
-			
+
 			this.centrePoint = cogPoint;
 		}
-		
+
 		return cogPoint;
-		
-		
+
+
 	};
 
 
@@ -11018,24 +11031,24 @@ function Centre(centrePoint)  {
      * @returns {string}
      */
 	this.toString = function(includeClusters) {
-		
+
 		var svdThis = this;
-		
+
 		if (includeClusters) {
 			var str = 'Centre: ' + this.centrePoint.toString() + '\n';
 			this.clusterPoints.forEach(function(el,i) {
 				str += el.toString();
 				if (i == svdThis.clusterPoints.length - 1) {
-					
+
 				}
 				else {
                    str +='\n';
-				}				
+				}
 			});
-			
+
 			return str;
 		}
-		else { 
+		else {
 		  return this.centrePoint ? this.centrePoint.toString() : '';
 		}
 
@@ -11046,7 +11059,7 @@ function Centre(centrePoint)  {
      * @param p point to be added
      * @param resp responsibility of centre for point
      */
-	
+
 	this.addToCluster = function(p,resp) {
 		this.clusterPoints.push(p);
 
@@ -11054,7 +11067,7 @@ function Centre(centrePoint)  {
            this.responsibilityVector.push(resp);
         }
 	};
-	
+
 }
 
 
@@ -11069,10 +11082,10 @@ function Centre(centrePoint)  {
  */
 
 function PointSpace(points,centres) {
-	
+
 	//points is a string containing space-delimited point co-ordinates (one per line)
-	
-	
+
+
 	this.centres = centres ?  centres : [];
 
     /**
@@ -11080,11 +11093,11 @@ function PointSpace(points,centres) {
      * @param points
      */
 	this.initPoints = function(points) {
-		
-		  
+
+
 
           var pointsAr = points.split('\n');
-		  
+
 		  pointsAr = pointsAr.map(function(el) {
 			var spl = el.split(' ');
 			spl = spl.map(function(splEl) {
@@ -11092,15 +11105,15 @@ function PointSpace(points,centres) {
 			});
 			return spl;
 	      });
-		 
-		 
-		  
+
+
+
 		  this.points = pointsAr.map(function(el) {
 			  return new Point(el);
-			  
-			  
+
+
 		  });
-		
+
 	};
 
     /**
@@ -11115,12 +11128,12 @@ function PointSpace(points,centres) {
 		p1.coords.forEach(function(coord1,i) {
 			var coord2 = p2.coords[i];
 			d += Math.pow((coord1 - coord2),2);
-			
+
 		});
 		d = Math.sqrt(d);
-		
+
 		return d;
-		
+
 	};
 
     /**
@@ -11131,25 +11144,25 @@ function PointSpace(points,centres) {
 	this.sqDistortion = function() {
 		var svdThis = this;
 		var sqDistort = 0.0;
-		
+
 		this.points.forEach(function(p) {
 			var clo = svdThis.findClosestCentre(p);
 			var d = svdThis.dist(clo.centrePoint,p);
 			sqDistort += Math.pow(d,2);
-		
+
 		});
-		
+
 		if (this.points.length == 0) {
-			
+
 		}
 		else {
 		   sqDistort  = sqDistort * 1.0 / this.points.length;
-		
+
 		}
-		
+
 		return sqDistort;
-		
-		
+
+
 	};
 
     /**
@@ -11168,12 +11181,12 @@ function PointSpace(points,centres) {
               else {
                   chosen.push(this.points[r]);
               }
-              
-              
+
+
           }
-        
+
         return chosen;
-         
+
     };
 
     /**
@@ -11283,17 +11296,17 @@ function PointSpace(points,centres) {
 			//Uses first k points as initial centres
             // if initrandom is true, choose k points randomly as initial centres
             // if initcentrepoints is populated, use these points as initial centres
-		
+
 		var svdThis = this;
 
         this.initCentres(k,initRandom,initCentrePoints);
 
 		this.allocatePointsToClusters();
-		
+
 		var done = false;
-		
-		
-		
+
+
+
 		var iter = 0;
 		while (!done) {
 			var done = true;
@@ -11311,14 +11324,14 @@ function PointSpace(points,centres) {
 				}
 				console.log('centre of gravity iter: ' + iter + ' '  + cent.centreOfGravity());
 			});
-			 
+
 			svdThis.allocatePointsToClusters();
-			
+
 			++iter;
-			
+
 		}
-	
-		
+
+
 	};
 
 
@@ -11329,7 +11342,7 @@ function PointSpace(points,centres) {
      */
 	this.movePointToCentres = function(p,keepPoints) {
 
- 
+
         var ind = this.points.indexOf(p);
 		var centrePoint;
 		if (keepPoints) {
@@ -11340,8 +11353,8 @@ function PointSpace(points,centres) {
 		}
 		var cent = new Centre(centrePoint[0]);
 		this.centres.push(cent);
-		//cent.addToCluster(centrePoint[0]); 
-		
+		//cent.addToCluster(centrePoint[0]);
+
 	};
 
     /**
@@ -11360,10 +11373,10 @@ function PointSpace(points,centres) {
 				clo = centre;
 			}
 		});
-		
+
 		return clo;
-		
-		
+
+
 	};
 
     /**
@@ -11371,15 +11384,15 @@ function PointSpace(points,centres) {
      * @param {string} coordsStr
      */
 	this.addCentre = function(coordsStr) {
-		
+
 		var coordsAr = coordsStr.split(' ');
 		coordsAr = coordsAr.map(function(el) {
 				return parseFloat(el);
 		});
-		
+
 		var cent = new Centre(new Point(coordsAr));
 		this.centres.push(cent);
-		
+
 	};
 
     /**
@@ -11387,12 +11400,12 @@ function PointSpace(points,centres) {
      * @returns {Point}
      */
 	this.findFarthestPointFromCentres = function() {
-		
+
 		var farthestPoint = null;
 		var maxDist = 0;
-		
+
 		var svdThis = this;
-		
+
 		this.points.forEach(function(p) {
 			 var closestCentre = svdThis.findClosestCentre(p);
 			 var d = svdThis.dist(closestCentre.centrePoint,p);
@@ -11400,12 +11413,12 @@ function PointSpace(points,centres) {
 				 maxDist = d;
 				 farthestPoint = p;
 			 }
-			
+
 		});
-		
+
 		return farthestPoint;
-		
-		
+
+
 	};
 
     /**
@@ -11417,7 +11430,7 @@ function PointSpace(points,centres) {
 			cent.clusterPoints = [];
             cent.responsibilityVector =[];
 		});
-		
+
 	};
 
     /**
@@ -11482,9 +11495,9 @@ function PointSpace(points,centres) {
      */
 	this.allocatePointsToClusters = function() {
 		var svdThis = this;
-		
+
 		this.clearClusters();
-		
+
 		this.points.forEach(function(p) {
 			var cent = svdThis.findClosestCentre(p);
 			cent.addToCluster(p);
@@ -11500,33 +11513,33 @@ function PointSpace(points,centres) {
          var str = '';
 
 		 var svdThis = this;
-		 
-		 
-		 
+
+
+
          this.centres.forEach(function(el,i) {
               str += el.toString(includeClusters);
 			  if (i == svdThis.centres.length - 1) {
-				  
+
 			  }
 			  else {
 				   str += '\n';
 			  }
 		 });
 
-         return str;		 
-	
+         return str;
+
 	};
-	
-	
+
+
 	if (points) {
 		this.initPoints(points);
 	}
 	else {
 		this.points = [];
-		
+
 	}
-	
-	
+
+
 }
 
 /**
@@ -11668,7 +11681,7 @@ function allPossiblePeptidesWithWeight(w) {
  */
 function cyclopeptideSequencing(expSpectrum,cyclicFlag,progCallback,prefSufOnly) {
     //actually caters for linear peptide  (cyclic flag false) or cyclic peptide (cyclic flag true)
-    
+
     var expSpectrumAr = expSpectrum.split(' ');
     expSpectrumAr = expSpectrumAr.map(function (el) {
         return parseInt(el);
@@ -11934,7 +11947,7 @@ function leaderboardCyclopeptideSequencing(expSpectrum,M,N,includeAll200,cyclicF
         return a - b;
     });
 
-    
+
     var  allAms = Amino.AllUniqueWeightAminos(includeAll200);
 
     var spec = new Spectrum(expSpectrum);
@@ -12176,7 +12189,7 @@ function trimLeaderboard(leaderBoard,spectrum,N,round,progCallback,prefSufOnly) 
                 progCallback('Process bound [' + i + '/' + leaderBoard.length + '] round ', round, '');
             }
         }
-       return [el,el.linearScore(spectrum,prefSufOnly)]; 
+       return [el,el.linearScore(spectrum,prefSufOnly)];
        // return [el,el.score(spectrum,false)]; //uses cyclic score on Rosalind tedxtbook track problem
     });
 
@@ -12252,7 +12265,7 @@ function hamDist(dna1,dna2,limit) {
                 if (dist >= limit) {
                     return dist;
                 }
-                        
+
 
             }
 
@@ -12365,7 +12378,7 @@ function allKmers(k) {
 }
 
 function gcSkew(dna,numBases,skewAlready) {
-    
+
     if (!dna) {
         return   [-1,-1,[],[],[]];
     }
@@ -12514,6 +12527,26 @@ function randomDNA(len) {
 
 
 }
+
+
+function randomAminos(len) {
+
+    var randAminos = '';
+
+    var aminoSet = c_Aminos.slice(0,c_Aminos.length -1);
+
+    for (var i = 0;i < len;++i) {
+        var r = getRandomInt(0, aminoSet.length - 1);
+        randAminos += aminoSet[r];
+    }
+
+
+    return randAminos;
+
+
+}
+
+
 
 function indToKmer(ind,k) {
 
@@ -12785,7 +12818,7 @@ function calcMotifLogo(motifs,laplace) {
 
     return transpose(colMatrix);
 
-   
+
 
 }
 
@@ -13049,7 +13082,7 @@ function greedyReversal(genome) {
         });
     }
     return steps;
-    
+
 }
 
 function partSharedKmers(k,tOffset,tNumToProcess,s,t,progressCallback) {
@@ -13216,7 +13249,7 @@ function initPlot(c,points) {
 
 function plot(c,points,params) {
     //plot on supplied canvas
-   
+
     var h = c.height;
     var w = c.width;
 
@@ -13352,7 +13385,7 @@ function lowestCoins(amt,coins) {
                 });
                 lowArr.push(bestCand);
             }
-            
+
 
         }
 
@@ -13396,49 +13429,49 @@ function closestCentre(point,centres) {
       var d = 0;
       if (point[0] == 18.1) {
          console.log(' aha point found');
-         
+
       }
       for (var ind = 0;ind < c.length;++ind) {
          var thisD = (c[ind] - point[ind]) * (c[ind] - point[ind]);
-         
+
          d+= thisD;
       }
       //console.log('d before sqrt: ' + d);
-      
+
       d = Math.sqrt(d);
-      
+
      // console.log('centre ind: ' + i  + ' point: ' + point +  ' dist to point: ' + d );
-     
+
       if (d < minDist) {
          minDist = d;
          minInd = i;
       }
-      
-      
+
+
    });
-   
+
   if (point[0] == 18.1) {
      console.log('mindist: ' + minDist + ' minInd: ' + minInd);
   }
- 
-   
+
+
    return [minDist,minInd];
 
 }
 
 function peptideIdentification(spectralVectorString,proteome) {
-	
+
 	      var vecAr = spectralVectorString.split(' ');
-		  
+
 	      vecAr = vecAr.map(function(el) {
-			 return parseInt(el); 
+			 return parseInt(el);
 		  });
-		  
+
      	  var pepWeight = vecAr.length;
-		  
+
 		  var candidates = [];
-		  
-		  		  
+
+
 		  for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
 			  //find candidate peptide starting at stPos with correct weight
 			  var candFound = false;
@@ -13455,59 +13488,59 @@ function peptideIdentification(spectralVectorString,proteome) {
 				  }
 			  }
 		  }
-		  
-		  
+
+
 		  var bestCand = '';
 		  var bestScore = DGraph.infinity * -1;
-		
+
 		  candidates.forEach(function(cand,i) {
 			  var score = cand.scoreAgainstSpectralVector(vecAr);
 			  if (score > bestScore) {
 				  bestCand = cand.toShortString('');
 				  bestScore = score;
 			  }
-			  
-		  });
-		  
-	 
-		  
-		  return [bestCand,bestScore];
-	
 
-	
+		  });
+
+
+
+		  return [bestCand,bestScore];
+
+
+
 }
 
 function spectralDictSize(vecAr,t,grid,useToy) {
-	
-	
+
+
 	if (t < 0) {
 		return 0;
 	}
-	
-	
-	
+
+
+
 	var i = vecAr.length;
-	
+
 	if ((i == 0) && (t == 0)) {
 		return 1;
 	}
-	
-	
+
+
 	var aminoSet;
 	if (useToy) {
 	  aminoSet = ['X','Z'];
 	}
 	else {
-	  
+
 	  aminoSet = c_Aminos.slice(0,c_Aminos.length -1);  //c_aminos contains an extra 'X' at end
 	}
-	
+
 	var sumPrevious = 0;
-	
+
 	var currPeak = vecAr[vecAr.length - 1];
-	
+
 	aminoSet.forEach(function(el) {
-		
+
 		var w;
 		if (useToy) {
 			w = 0;
@@ -13522,10 +13555,10 @@ function spectralDictSize(vecAr,t,grid,useToy) {
 			var am = new Amino(el);
 		    w = am.getIntegerWeight();
 		}
-		
+
 		var prevI = i - w;
 		if (prevI < 0) {
-			
+
 		}
 		else {
 			var prevT = t - currPeak;
@@ -13539,46 +13572,46 @@ function spectralDictSize(vecAr,t,grid,useToy) {
 				sumPrevious += prev;
 			}
 		}
-		
+
 	});
-	
+
 	return sumPrevious;
-	
-	
+
+
 }
 
 function spectralDictProbability(vecAr,t,grid,useToy) {
-	
-	
+
+
 	if (t < 0) {
 		return 0;
 	}
-	
-	
+
+
 	var aminoSet;
 	if (useToy) {
 	  aminoSet = ['X','Z'];
 	}
 	else {
-	  
+
 	  aminoSet = c_Aminos.slice(0,c_Aminos.length -1);  //c_aminos contains an extra 'X' at end
 	}
-	
+
 	var i = vecAr.length;
-	
+
 	if ((i == 0) && (t == 0)) {
 		return 1;
 	}
-	
-	
 
-	
+
+
+
 	var sumPrevious = 0;
-	
+
 	var currPeak = vecAr[vecAr.length - 1];
-	
+
 	aminoSet.forEach(function(el) {
-		
+
 		var w;
 		if (useToy) {
 			w = 0;
@@ -13593,10 +13626,10 @@ function spectralDictProbability(vecAr,t,grid,useToy) {
 			var am = new Amino(el);
 		    w = am.getIntegerWeight();
 		}
-		
+
 		var prevI = i - w;
 		if (prevI < 0) {
-			
+
 		}
 		else {
 			var prevT = t - currPeak;
@@ -13610,39 +13643,39 @@ function spectralDictProbability(vecAr,t,grid,useToy) {
 				sumPrevious += prev;
 			}
 		}
-		
+
 	});
-	
+
 	return sumPrevious / aminoSet.length; // 20 for full amino acid set, 2 for toy set
-	
-	
+
+
 }
 
 
 function numPeptidesWithSpectralVector(vecAr,grid,useToy) {
-	
-	
+
+
 	var i = vecAr.length;
-	
+
 	if (i == 0)  {
 		return 1;
 	}
-	
-	
+
+
 	var aminoSet;
 	if (useToy) {
 	  aminoSet = ['X','Z'];
 	}
 	else {
-	  
+
 	  aminoSet = c_Aminos.slice(0,c_Aminos.length -1);  //c_aminos contains an extra 'X' at end
 	}
-	
+
 	var sumPrevious = 0;
-	
-	
+
+
 	aminoSet.forEach(function(el) {
-		
+
 		var w;
 		if (useToy) {
 			w = 0;
@@ -13657,10 +13690,10 @@ function numPeptidesWithSpectralVector(vecAr,grid,useToy) {
 			var am = new Amino(el);
 		    w = am.getIntegerWeight();
 		}
-		
+
 		var prevI = i - w;
 		if (prevI < 0) {
-			
+
 		}
 		else {
 	        var key = prevI + '';
@@ -13673,10 +13706,10 @@ function numPeptidesWithSpectralVector(vecAr,grid,useToy) {
 				sumPrevious += prev;
 			}
 		}
-		
+
 	});
-	
+
 	return sumPrevious;
-	
-	
+
+
 }
