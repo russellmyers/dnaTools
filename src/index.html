@@ -218,17 +218,17 @@
                     <br>
                     Type:
                     <label for="lin">Linear</label>
-                    <input type = "radio" name = "bob" id="lin" value = "aha" checked>
+                    <input type = "radio" name = "bob" id="lin" value = "aha" >
                     <label for="cyc">Cyclopeptide</label>
-                    <input type = "radio" name = "bob" id="cyc" value = "ahoo">
+                    <input type = "radio" name = "bob" id="cyc" value = "ahoo" checked>
                 </div>
                 <div class="inputLoad">
                     <label for="filePepInput">Load Peptide/Spectrum:</label>
                     <input type = "file" name="filePepInput" onclick = "clearFileName(event)" id = "filePepInput">
                     <br>
                     <br>
-                    <button type = "button" onclick="randPressed(event)" class="spacedBut">Use Sample</button>
-                    <input type = "number"  name = "numRand" id = "numRandPS"  min=1 max=1000000 value=50000>
+                    <button type = "button" onclick="randPeptidePressed(event)" class="spacedBut">Use Sample</button>
+                    <input type = "number"  name = "numRand" id = "numRandPS"  min=1 max=1000000 value=10>
 
                     <!--span id = "dnaLengthText">DNA Sequence Len: </span>
                     <span id = "dnaLength"></span-->
@@ -933,7 +933,7 @@
                         <br>
                         <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectrum" value="pepSpectrum"  >Exp Spectrum
                         <br>
-                        <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectralVector" value="pepSpectrum"  >Spectral Vector
+                        <input type="radio" name="pepInput"  onclick = "peptideInputRadClicked(event.target.id)" id ="pepSpectralVector" value="pepSpectralVector"  >Spectral Vector
 
 
                     </div>
