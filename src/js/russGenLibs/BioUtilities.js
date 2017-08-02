@@ -12,6 +12,8 @@
 /** @type {number} */
 var c_NumBases = 4;
 
+var c_RNA_Bases = ['A','C','G','U'];
+
 /** @type {object} */
 var c_BaseInds = {'A':0,'C':1,'G':2,'T':3};
 
@@ -12528,6 +12530,20 @@ function randomDNA(len) {
 
 }
 
+function randomRNA(len) {
+
+    var randRNA = '';
+
+    for (var i = 0;i < len;++i) {
+        var r = getRandomInt(0, c_NumBases - 1);
+        randRNA += c_RNA_Bases[r];
+    }
+
+
+    return randRNA;
+
+
+}
 
 function randomAminos(len) {
 

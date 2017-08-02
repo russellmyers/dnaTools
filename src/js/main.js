@@ -531,7 +531,7 @@ function setUpWorkerListeners() {
 					mfkProcessed = true;
 
                     tot = 0;
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
 
                     }
                     else {
@@ -554,7 +554,7 @@ function setUpWorkerListeners() {
 
                     numKmer = document.getElementById('numKmers');
                     numKmer.max = mfk.length;
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
                         numKmer.min = 0;
                         numKmer.value = 0;
                     }
@@ -567,7 +567,7 @@ function setUpWorkerListeners() {
                     numKmerVal = parseInt(numKmer.value);
                     dna = dnaMaster; // document.getElementById('dnaInput').value;
 
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
                         document.getElementById('kMerMostFreq').innerHTML = 'None';
                         document.getElementById('kMerRevCompl').innerHTML = 'None';
 
@@ -593,7 +593,7 @@ function setUpWorkerListeners() {
                             resString += el;
                             resString += ' ';
                         });
-                        if (resString.length == 0) {
+                        if (resString.length === 0) {
                             document.getElementById('debugText').value += '\nNone';
                         }
                         else {
@@ -621,7 +621,7 @@ function setUpWorkerListeners() {
 
                     var clumps = e.data.clumps;
                     tot = 0;
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
 
                     }
                     else {
@@ -642,7 +642,7 @@ function setUpWorkerListeners() {
 
                     numKmer = document.getElementById('numKmers');
                     numKmer.max = mfk.length;
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
                         numKmer.min = 0;
                         numKmer.value = 0;
                     }
@@ -655,7 +655,7 @@ function setUpWorkerListeners() {
                     numKmerVal = parseInt(numKmer.value);
                     dna = dnaMaster; //document.getElementById('dnaInput').value;
 
-                    if (mfk.length == 0) {
+                    if (mfk.length === 0) {
                         document.getElementById('kMerMostFreq').innerHTML = 'None';
                         document.getElementById('kMerRevCompl').innerHTML = 'None';
 
@@ -821,7 +821,7 @@ function processReturnedMotif(e) {
 	mfMotifProcessed = true;
 
     var tot = 0;
-    if (mfMotif.length == 0) {
+    if (mfMotif.length === 0) {
 
     }
     else {
@@ -836,7 +836,7 @@ function processReturnedMotif(e) {
 
     var numKmer = document.getElementById('numKmers');
     numKmer.max = mfMotif.length;
-    if (mfMotif.length == 0) {
+    if (mfMotif.length === 0) {
         numKmer.min = 0;
         numKmer.value = 0;
     }
@@ -849,7 +849,7 @@ function processReturnedMotif(e) {
   //  var numKmerVal = parseInt(numKmer.value);
     var dna = dnaMaster; // document.getElementById('dnaInput').value;
 
-    if (mfMotif.length == 0) {
+    if (mfMotif.length === 0) {
         document.getElementById('kMerMostFreq').innerHTML = 'None';
         document.getElementById('kMerRevCompl').innerHTML = 'None';
 
@@ -862,7 +862,7 @@ function processReturnedMotif(e) {
         document.getElementById('kMerRevCompl').innerHTML = reverseComplement(km);
     }
 
-	if (mfMotif.length == 0) {
+	if (mfMotif.length === 0) {
 
 	}
 	else {
@@ -877,7 +877,7 @@ function processReturnedMotif(e) {
 
 	var extraInfoAr = [];
 
-	if (mfMotif.length == 0) {
+	if (mfMotif.length === 0) {
 
 	}
 	else {
@@ -1019,7 +1019,7 @@ function readTextFileFromServer(fileName,fileId,onFinish) {
     client.setRequestHeader('Cache-Control', 'no-cache');
     client.onreadystatechange = function() {
 
-        if (client.readyState == 4 && client.status == 200) {
+        if (client.readyState === 4 && client.status === 200) {
 
             onFinish(fileName,fileId,client.responseText);
 
@@ -1038,7 +1038,7 @@ function readPamScoringMatrix() {
     client.open('GET', './data/pam250.txt');
     client.onreadystatechange = function() {
         var scoringArray = [];
-        if (client.readyState == 4 && client.status == 200) {
+        if (client.readyState === 4 && client.status === 200) {
 
             scoringArray = client.responseText.split('\n');
 
@@ -1080,7 +1080,7 @@ function readBlosum62ScoringMatrix() {
     client.open('GET', './data/blosum62.txt');
     client.onreadystatechange = function() {
         var scoringArray = [];
-        if (client.readyState == 4 && client.status == 200) {
+        if (client.readyState === 4 && client.status === 200) {
 
             scoringArray = client.responseText.split('\n');
 
@@ -1194,7 +1194,7 @@ function readAlignFile(e) {
     var file = e.target.files[0];
 
     var seqNum;
-    if (e.target.id == 'fileAlignInput2') {
+    if (e.target.id === 'fileAlignInput2') {
         seqNum = 2;
     }
     else {
@@ -1209,9 +1209,9 @@ function readAlignFile(e) {
         var contents = e.target.result;
         var tst = contents.split('\n');
         var newContents = '';
-        if (tst[0].substring(0,1) == '>') { //fasta
+        if (tst[0].substring(0,1) === '>') { //fasta
             for (var i = 1;i < tst.length;++i) {
-                if (tst[i].substring(0,1) == '>') {
+                if (tst[i].substring(0,1) === '>') {
 
                 }
                 else {
@@ -1249,7 +1249,7 @@ function readSBFile(e) {
     var file = e.target.files[0];
 
     var seqNum;
-    if (e.target.id == 'fileSBInput2') {
+    if (e.target.id === 'fileSBInput2') {
         seqNum = 2;
     }
     else {
@@ -1264,9 +1264,9 @@ function readSBFile(e) {
         var contents = e.target.result;
         var tst = contents.split('\n');
         var newContents = '';
-        if (tst[0].substring(0,1) == '>') { //fasta
+        if (tst[0].substring(0,1) === '>') { //fasta
             for (var i = 1;i < tst.length;++i) {
-                if (tst[i].substring(0,1) == '>') {
+                if (tst[i].substring(0,1) === '>') {
 
                 }
                 else {
@@ -1888,7 +1888,7 @@ function mostFrequentKmersBrute(e,variant) {
 
     }
 
-	if (dnaMaster == null || dnaMaster == '') {
+	if (dnaMaster === null || dnaMaster === '') {
 		errMsg('Please enter/load DNA first, then "Search"!');
 		return;
 	}
@@ -1986,7 +1986,7 @@ function mostFrequentKmersBrute(e,variant) {
 
 function mostFrequentKmersTree() {
 
-    if (dnaMaster == null || dnaMaster == '') {
+    if (dnaMaster === null || dnaMaster === '') {
 		errMsg('Please enter/load DNA first, then "Search"!');
 		return;
 	}
@@ -2177,7 +2177,7 @@ function runLTClump() {
     // var dnaTest = 'CTTGATCAAGACGTCCAACTAATGACAACTCAAAGTTCGCACCCATGTACTTAAAGTGAGGACGAACCGAGAGCGACACCTGATACCAACCTGGATTGCCTTCCACATCCATCACTTCAATGCGCGCAGCACGAAGTGGACGACGGCTACGTACGTCTGCAGGTGGGTTCTCTTGATCAGCAACGTATTGTTTGATCCATGAGTTCAGTTCACGCTCAAGATCTTGACGCTCTTTCCAAGCACCGATCTGCTCACGTTGCAGAACTTTCACATAGTGCGCCAAACGGTTGATGATCATCATGTACGGCAACTGGGTACCCAACTTGTAGTTGGTTTCCGCTTCTTTGCCTTCTTTGGTATTTGGGAAAACCTTAGGTTTTTGAATGGAGTTTGCAGAGAAGAACGCCGCGTTATCACTGCCTTTACGCATAGTAAGAGCAATAAAACCTTCTTCCGCCAGTTCAAACTCTTTACGGTCCGTGATCAGGACTTCGGTTGGGATCTTGCTTTGCAATGCACCCATAGATTCAAAGACATGCACCGGCAGATCTTCAACTGCACCACCACTTTGTGGACCGATAATGTTTGGACACCAGCGATATTTAGCAAAGCTATCCGTCAAACGAGTTGCGAAGGCAAATGCCGTGTTACCCCACAGGTAGTGCTCGTGCGAAGCACTGACGTTTTCCGCATAATTGAACGACTTCACTGGATTTTCGATTGGATCGTAAGGAACACGCAGCAGGAAACGAGGCGCAGTCAAACCAAGATAGCGCGCATCTTCCGATTCACGCAATGAACGCCATTTGGTGTATTTCGGGCTTTCAAATGTCGACTTGAGATCTTTAATGTTAGGCAGTTCTTCAAAAGAATCGATACCAAAGAATTCAGGACCTACGCTTGAAATGAAAGGAGCATGCGCCATGGCACCCAGTGCGCCCATGTATTGCAGCAGCTTCATATCTGGCGTTGAAGGGGTAAACGCATAGTTACCAATGATCGCGCCAACAGGTTCGCCACCAAATTGACCATAACCGGCAGAATAAACGTGCTTGTAAAGACCGGACTGAGCCGTTTCTGGAGCAAACTCGAAATCTTCCAGCAGTTCATCTTTGGTTACGTGAAGGATTTCGACTTTGTTATTTTCACGAAAATCAGTGCGATCCACGAACAGCTTCAAACCGCGCCACGCCGATTCCATCGCTTGAAATTGCGAGTTGTGCAGGATTTCATCCATCTGTGCACTGATTTTCTTATCCAGTTCAACCAACATTTGGTCAACCAGAGATTTGTTGACAGGCTCAGCAGAGTGTTGTGAACCCATAAGATTTTCGATAAACGCTGCAACACCTTTTTTCGCGATGTCGTAACCCTCTTCGCTTGGTGCGATACGGGTTTGCGCCATAATTTCATCAAGAAGGCTGCCTTGAGCAAGCTGTGGCCTTTCCAATACCTTTTCAGTCGTAGACATCATTAAGTTCCTAATGAGTGATTAATTGATTAATAACGTTTGCTTACGCTTGTGGCTCTTCTTGACCACTGAGCAGATTCAGTTCTGCCAACAGTTTTTCTCTCGACTCTTCTGAGTTGAGTAATGACTGTAAACGCTCACGAAATGCGGGAATGTTGCCTAGCGGCCCTTTAAGGGCAACTAACGCTTCACGCAACTCAATCAATTTTTTCAGTTCTGGAACTTGTGATGCCACCGCATCAGGAGCGAAGTCGGCTAAGGATTTGAAATTGAGTTCAACAGGAAGCTCGGCATTCTCATCATCAGTCAGCTTGTTTTTCACCGTGGCGGTGATTTTCAGCTCGCTCTCGCGCATTACGGCTTCAAAGTTGTTCTTAATCTACCGTGACTGTTGCACGCTCTTCCAATGGGGTTTGCTCCGCATGCCCTTTGAAATCACCTACAACTAGGGTTTTGAGTGGTAGCTCAACCTCAGCCTGTGCATCCCCCGTCGCCGGAATATACTTGATATTAATCCGCTCTTTGGGAGCTACACTTCCTTCTTTAGACATATTACGTCTCCAATACCTATGCCAAACGTTGTCAATGAAACAGTTGATTGAAATCATTCAATCAACCAAGAATCTTGAACTTATCCTTAGTGATAACTAAGGGCTCTCATTTCAAAATATGAAATAGAGTCAATCACTTCCGTGACACTGTGAGAAAATAAATCCCACACTAAGCCATGTCACAGAGTGTTGTTGTATTTTGATATATTGATGAAAAATGGGCTTATTATGCAAACTTATCATTAGCAGCTTTTTGCTGCCATGTATCAGTTATCTGGTATAAATATTGTTTGCGGTGATCTAATACCCAATAAATATGAGATGGCATTCTATTCATGGAGACAAAAAAGTAATCGAAAAAAAACCCGAAGCGTGATCTTTTACCCAAAAATATATCCAATAACCATACTTAAATAATACTTAACAGGGAACTAATTATCCCAGTAAGCATCATGGTTGAAAAAAGGCTGATAATTTTCGAGTTGAAGCTCTATTTTCTCTGCAATTTCTTTCTCATGCCCATTTAATTGCATTGAAATATCGAGCAGTTGCTTTTGGCTATTTTGGTAGACATGACTCAAGCGATCGCTGCCTGCCACTTCTAAATATCGATTGAAGTAAGCCTTGGCCTGCTTAAGATCAGGCTCGACAAAACGATAAAACTCACTCTGTCCACTGAGAATACCGCCCATCGCCACCAAAGAAGTGAGATCGCCACGCTGTACTGCCTGCTGGCGCCAATAATAGGCATCTTGGTATTTACCTTTATTTTCAAGAAGTTGAATATAGTTTCTTATCGCAGGGATATAGCCCGTTTGCGCCGCTTTCAGATACGTTTTTCGAGCTTCGGTTGCTCGGCTACCAGGCATGGGATAACTGCCCTCTCCTTGCTCAATCTGTTGCGCCATAAGCATCAGAGCTGCGGGGTGTTCAAATTCAACTGCAATCGTTAAATAATGCTGGGCAAGCTTGGGGTTATCCTTTTGATGGAACAGCGCGAGCTCATAAGCGGCCTGACTCGGTTCACGAGAGCCTAATTCAATCAAAGTATCGTAATAAGTTTGTTGCCATAAACTGCGTTCTGCAGCTCTGAGCCACTCACCGTTTTGATACAACACTCGCATCGCTTGACGGCTTCCACCTTGAGCGGCGAGCAATAAATAGTGCTGGCTTTCAGGCGGGGTTCGAATGGTAGTTCGGTAGTTGGCCACTTCCATCGCGTAAAGATAAGCCGCATTAGGCTCACCAAGGTCTGCCGCGTATTTCAAATATTCGCGAGCCGCTAAGTTCTTAAATTGCGCACGTAGCAAACGACCATTTTCGTAGGCTTGCTGAGCACTCAACTGCTGCATATCGTAGTTTTTTTCTTCGCTAAAACTACGTCCTATAAACAGAAGAGTTACGATGAAAATCAGAGTCTTAACCAATGTTGACACTGCTTGCTCCCTGTAATACGCCACCACAATCGACCGCATCTCCAACCCTTGCTGCGGGTTTTCCATCAATCATCACCGTCCCAGAACCCGCAGCAATCGCTCGGCCATGCGAGGGATGCTTTGGTTTATCGTGAGGGGCCAAGGGGTCCCCAAGCCGAGCAGCTGGAATCCCATCATAACGCACAGTTGCTGAGCCTGCGGTCACTGGCGTTGGCGGGAAACCATCATGATCTGTACCTAAATGCCCTACTACGATTCCGTTACCCATATTCTGTCCTCATCGGTTAGTAAAATGTGTTAAAGCAATTAATGTTCCATACTTTGGGAGGTCATTTTTGCTTATCAACCTCATGACTGGGCAATATATTGCCCAAAAACAACACCTCCCTGCTAGGCGGGCAAGATCTTACCTGAAAGGAAAAATTGTCATAGAAACGTCAGGAAAATATAAAACAATTCATTTTTGCGTTTCTTCTTCATTTAAAGTGAATATTAAAAGTGAATAAAGTTAATAGTGTTATTTCATTATCTCCTAATTGAGAAATCTATTAAATTAATACCCTTTCAGCCTCATAACTTAGTCGCAGAGTTTAATAGGATTAATTAGTTCATTCTTATTAAGCAATTTTTACTTAAGCGAATCCTAGACCATACATTAGAGTCAATAACCCTTTATCACGAACATTTGGCCAGAATTCACTCATATTGATGATATAACAGGCAAATACAACATTTGGAAATGATATGTTTTTGAAATGTAACATCGACCATTAATTAGGGTGAACAAATATCCCTACATTGAACTGTTGTAAGTTGAAAGAGCGATAACCAAACTACTTGGTGTTGCAGAAAGGTGGCAAGTAAGTTCATCATCATGAGCATAAATAAACTATGTGATTGGGGTGAGCGAACGTAACCCATATCGCTGCAACTTCAAGTAGGCACGGTATAGGTCAACAATCACCAATAGAAACATAGACTGACAAGTTTCACCCAAGCAGGTAAGATGCGTCTTTGCTTTACCCACTCTGTCATTTGTATGTCTGCACTGCCCGATTGCTTCACTCGTTTCACTTCTGTCATCGCTCATATCGCGCTACCCGAGCGCTTTACTTTTCCATTTTGTTATCAGCCACACCCACTGTCTGAAATTGCGGCCGATGAGCTACAGCAACATTTGCTCACTCAAACCGATTGGTATCACCCTTTTGGTTTAACGGAAACCGACCCACAAGCTCACGGCAAAATGTTTGGAGTACTGGTTGTGCAGCATCGCTCTGGAACCTTGGGTTATTTAGCGGCGTTCTCTGGTCAACTGGCTGAACAAAATCGGCTGCCGGGATTTGTTCCTCCTGTGTTTGATCGCTTTGCTGATGCGTCTTTTTTCAGAGTGGATGGCGATCAGATTGCGGCCATTAACCAACAAGTGCGAGAGCAAGAAACTGATCCGGAGCTTGCGGAACTCGCTAGTGCCCTTAAGCAATCTCAGTTACAAGCCGAGCATGAGCTGAGCCAGCGGCGTATATTGCACAACAAGCAGCGTCACTTTCGAAAACAGCAGCGCTTACAAGCAGAAGAGCTACCAGAAAAAGAAAAACACACTCTGTTGGCTCGCCTAGCGGAAGAAAGTGTGCAACAAAAGCGTCAGTTACAGTGCCTCAAACAAGAGTGGGAACAGCGTATTGCGGCTTTACAGCATAGGTTAGATCATAAACTCATGCGCATTGAGCAACTGAAACAGCAACGTAAACAGCGCTCTGCGGCGCTGCAGAAAAAACTGTTCTCCGCCTATCGTTTTACCAATATCCGTGGCGTTGAAAAGGATTTGGTTGAGCTATTTTCCGTGACCAAAAATCCGCTTCCACCCGCAGGTTCAGGCGAGTGCGCGGCTCCAAAACTATTACACTATGCGTTCCAACATCAGCTGCGACCCATTGCATTGGCAGAGTTCTGGTGGGGGCGCTCCCCCAAATCGGAAATTCGTCAGCATAAGAAGTTCTATCCTGCATGTCAGAGTAAATGCCAACCGATTTTGGCGCACATGTTAGAAGGGATGCCGCTGGAAGATAATCCACTGCTCAGCAATCCGGCGCAAGGTCAAGACATCACCATTGTGTATCAAGATGACGCCATCGTAGTGGTCAATAAGCCTGCTGAATTTCTCTCTGTCCCCGGTGTGCATGTGCATGATTCTGTGTTGACGCGCTTAAAGGCTCAATTTACCCAAGCAGAAGGGGTATTTGCCCTACATCGTCTCGATATGTCTACTTCTGGACTTTTGGTGTTTGCGCTGACGCGACGTGCTAACAAACAGTTGCAAAAGCAGTTTATTTCTCGTGCCGTCCAAAAGCGCTATGTCGCACTTATCGAAGGAAAATTAAGCGAAACACAAGGTGAGATCCAGTTGCCTTTGTGTGGCGATCTGGATGATAGACCAAGACAAAAAGTGTGCTGGCAGCAAGGTAAGCCTGCACTCACTCATTGGGAAACCGTGCAAGTGGAGCAAAACCGAACTCGTGTTTACCTCTACCCACATACAGGACGTACCCATCAATTGCGAGTACATTGCGCCCATCATCTTGGCTTAAATGCGCCGATTGTCGGTGACGATTTGTATGGCTTGCAAGACAAACGTTTGTTTTTGCATGCCGAACAACTGAGTTTTGCTCATCCCTACACTAAGCAGCCCATGACTTTCCAAGTCGATGCGGATTTTTAACCGAAAAAGAAAAGGGGCCCAATTTGAGCCCCTAACCATTCTTAAGCCACTTCGGTCGTGGTTGGTTTTAGCAACACGCTGATATCTGGTTCCTTCTGCACCACAGGGACATGGCCTTCTTCCATCGCACTTAGGTAACAACCACTCAGTTTGATGGCTAAATACATATCGGCACGCAGCACGATTCCCCCTTCAGCGGTATTGATCCCGGTGAGATCACACCAATGGCGTAAACTGCGCTTACGCCCCGCTAGAATGAGACGGATACCGCGTTTTTTCAGGATGCCATGTAAGTCAGCCAGCATCGCCATCACACTCAGATCTAAGTGGGTAAAACTGGCCACGGCATCAATGATCACACAACCCACTTGGGCGCCTTCACGCTCCGTCTGATCGAGAATACGCCGCTTAAAATAGGGCGCGTTAAAATAGGTCAGCGGTGAATTGAAACGGAAAATCACCATGCCGGGGATCGGTTTTGCTTTCTCTGAACCATCGAGTGTGCGCAGCGTTCCTTCCTCATCCAATCCCATCATTTGATCAGTGGGGCGCATCACCAATTTGAGAAATTGGAATAAACCCAGCAGTACCGCCAAAGTGATCCCTGGGATCACCCCAATCACTAACACTGCGATAAAGGTGATGAGTGCGAGGTAAAACGCATCTTTATCGCGCTTTCTTAAATTCCAAACGCCTTTTAAATCGAGCAGAGACAATGAGGCGATGATCAGCACCACGCCCAAAGCCGCGACAGGGATAAATTGCAAAGGCTGATAAGCAAAAACCGCCACCAGCGCAATAAACAAGGCTGCGATGACCGAAACCAGTTGCGATTTACCACCATTGGCGTCATTGACTGCGGTACGGGAATCGGCACCACTGATCGCAAAGCCTTGCGAAAAGGCGGCTGCGACATTCGCGACACCAAGCGCTCGGAACTCTTTATCCGCATCAATATCGTAGCCATTTTTAGCCGCAAAGCTGCGAGCGGTGAGCATCATACTCACAAAGCTCACCATCGCTAAGTTGAGCGCAGGCATAACGAGTTCACGGCTGATCCCTAAATCAAAAGCCGGAGCTTGGAACTCAGGTAAACCGCCTTGGATAACCCCCACCACTTGTACGCCCACACTTTCAAGATTCAGTGCCCACACCAGCAAGGCCGCGACCATGATTGCAAACATCGCCGCAGGCCATCTCGGCTGCCAGCGCTTGATCACTAAGTAAATCGCTAAAGTGAGCGCACTCAAACCCAAGGTTTGCCAATGCAAGGAGTACAGCAGCTCTGGCGCTTCAACAATCCGTTCAAGCAGATAACGTTTTTCATACTTGAGCCCCAATACTTTGGCAAACTGACCAACAATAATCGTCAGCGCCACCCCATTAAGCAGACCTAACAAAATCGGCCTTGAGAGAAAATCGGCGAAAATGCCCAGTTTGAGCCGACTCGCCAATATGCACCAAAAACCGGTCATGGCGGTCATGGTCATCACCAGTTGCCAGTGCTTGGTGGTATCTCCGGCAGCAAGAGGGGTAACCACGGCCGCAATCACCGCGCAAGTGGCGGCATCTGGCCCCACAATCAATTGGCGTGAGGTGCCCATCAGCGCATAGACCAACATAGGCAAAACACACGAATAAAGTCCGACAATAGCAGGCACACCGGTTAATTGCGCATAAGCGATCGCTACAGGCAGCGCTACAGCCACAACAGAAAAGGCGGCTCGTACATCATCGGTTAACCATCCCCGTTGATAATCTTTAAATTGGTAGAGTCCGGGGAACCACTGCCTTATCCACACTGCTTTCACTTCATTCACCTGCTGACACTAAATTGTCATTGTTTTGCAACATAGTTTAGCGGAAATTGCCGCAACTCTCTCGCTAATTTACTGATCTAAAATACCCTTATCTACTGATCCAACCACTACAGTTCTAAGTTTTGGGTTCTCTTGCATCAGGAAAGTATGGGACAATAGCCGCTCACTTTTTTGTGGTAGGTGGGAACGATGAACTTTCAAGCCGCTATTTTTGATATGGATGGTCTACTACTCGA';
     //var dnaTest = 'AGACTAACCCCATTAACTCGATGGAAGCGATGGAAGAGACTAACCTACCTAATTGCTTAGGTAGACTAACCCGATGGAAGCGATGGAAGCGATGGAAGCGATGGAAGAGACTAACCTACCTAATCGATGGAAGTACCTAATTGCTTAGGTCGATGGAAGCGATGGAAGCCATTAACTAGACTAACCAGACTAACCAGACTAACCCGATGGAAGTACCTAATCCATTAACTTACCTAATCCATTAACTTGCTTAGGTTACCTAATTGCTTAGGTCGATGGAAGTACCTAATCGATGGAAGCGATGGAAGTACCTAATCCATTAACTTACCTAATAGACTAACCAGACTAACCTGCTTAGGTTACCTAATAGACTAACCCCATTAACTCCATTAACTTACCTAATTGCTTAGGTAGACTAACCCCATTAACTAGACTAACCAGACTAACCCGATGGAAGCCATTAACTCCATTAACTCCATTAACTCCATTAACTCGATGGAAGAGACTAACCAGACTAACCTACCTAATCGATGGAAGTGCTTAGGTTACCTAATCCATTAACTCCATTAACTCCATTAACTTGCTTAGGTTGCTTAGGTTACCTAATAGACTAACCTGCTTAGGTAGACTAACCCGATGGAAGTACCTAATTACCTAATTACCTAATAGACTAACCCGATGGAAGCCATTAACTTACCTAATTACCTAATTGCTTAGGTCCATTAACTTACCTAATCGATGGAAGTGCTTAGGTTACCTAATCGATGGAAGCGATGGAAGCGATGGAAGTGCTTAGGTAGACTAACCAGACTAACCAGACTAACCAGACTAACCTGCTTAGGTTGCTTAGGT';
 
-	if (dnaMaster == null || dnaMaster == '') {
+	if (dnaMaster === null || dnaMaster === '') {
 		errMsg('Please enter/load DNA first, then "Search"!');
 		return;
 	}
@@ -2233,11 +2233,11 @@ function searchKmer(e) {
 	var kmer = document.getElementById('kmer').value;
     k = kmer.length;
 
-	if (dnaMaster == null || dnaMaster == '') {
+	if (dnaMaster === null || dnaMaster === '') {
 		errMsg('Please enter/load DNA  and target k-mer first, then "Search"!');
 		return;
 	}
-	else if (kmer == '') {
+	else if (kmer === '') {
 		errMsg('Please enter target k-mer first, then "Search"!');
 		return;
 	}
@@ -2297,7 +2297,7 @@ function EdgePrinter(edge,nodePSt,nodePEnd,backNum,forwardNum) {
 
     }
     else {
-        if( (this.nodePSt.linearNum == this.nodePEnd.linearNum - 1) && this.numForward == 0) {//adjacent forward
+        if( (this.nodePSt.linearNum === this.nodePEnd.linearNum - 1) && this.numForward === 0) {//adjacent forward
             this.point1 = this.stY - (NodePrinter.pointInc * this.numForward);
             this.point2 = this.endY - (NodePrinter.pointInc * this.numForward);
             this.stX = this.stX  + this.nodePSt.radius;
@@ -2408,7 +2408,7 @@ function NodePrinter(node,x,y,num) {
             ++this.numBackward;
         }
         else {
-            if( (this.linearNum == endPNode.linearNum - 1) && this.numForward == 0) {//adjacent forward
+            if( (this.linearNum === endPNode.linearNum - 1) && this.numForward === 0) {//adjacent forward
                 //point1 = stY - (NodePrinter.pointInc * this.numForward);
                 //point2 = endY - (NodePrinter.pointInc * this.numForward);
                 stX = stX  + this.radius;
@@ -2498,7 +2498,7 @@ function NodePrinter(node,x,y,num) {
            // ++this.numBackward;
         }
         else {
-            if( (this.linearNum == endPNode.linearNum - 1) && edgeNum == 0) {//adjacent forward
+            if( (this.linearNum === endPNode.linearNum - 1) && edgeNum === 0) {//adjacent forward
                 //point1 = stY - (NodePrinter.pointInc * edgeNum);
                 //point2 = endY - (NodePrinter.pointInc * edgeNum);
                 stX = stX  + this.radius;
@@ -2539,10 +2539,10 @@ NodePrinter.pointInc = 15;
 function miscParLoadedFromServer(fileName,parId,text) {
     //document.getElementById(parId).value = text;
     alert('file loaded from server: ' + fileName);
-    if (parId == 'loadedMiscPar1') {
+    if (parId === 'loadedMiscPar1') {
         loadedMiscPar1 = text;
     }
-    else if (parId == 'loadedMiscPar2') {
+    else if (parId === 'loadedMiscPar2') {
         loadedMiscPar2 = text;
     }
 
@@ -2645,2529 +2645,2205 @@ function executeMisc(e) {
 
     var dna,rna, pep, k,res,nodes,resArray,eqCount,neButSameLengthCount, path, splFloat, dist, resStr, adjList, spec, expSpec, N, debGraph, pairDist;
 
-    switch (val) {
-        case '1' :
-            var rev = reverseComplement(par1El.value);
-            resEl.value = rev;
-            break;
-        case '2' :
-            var ar1 = par1El.value.split('\n');
-            var ar2 = ar1.map(function(el) {
-                return el.trim();
-            });
-            var profMat = ar2.map(function(el) {
-                var spl = el.split(' ');
-                splFloat = spl.map(function(el2) {
-                        return parseFloat(el2);
-
-                    }
-                );
-                return splFloat;
-
-            });
-            dna = par2El.value;
-            k = parseInt(par3El.value);
-
-            res = profileMostProbable(profMat,dna,k);
-            resEl.value = 'Best kmer: \n' + res[0] + '\nBest prob:\n' + res[1];
-
-
-            break;
-        case '3': //Hamilton path
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-
-            resEl.value = 'results\n';
-            var hamGraph = new DGraph(dna,DGraph.fromDna,DGraph.hamGraph,k,false);
-
-            resEl.value+= hamGraph.sumInfo();
-            resEl.value += '\n' + hamGraph.getAdjList();
-
-
-            nodes = createHamNodes(dna,null,k);
-            resArray = [];
-
-           // hamiltonCanvas(nodes);
-
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                resArray.push(hamPath(nodes));
-
-            }
-
-            resEl.value+= '\nresults';
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            resArray.forEach(function(el,i) {
-
-                hamiltonCanvas(nodes,el[2]);
-
-                if (dna === el[1]) {
-                    resEl.value += '\n' + el[1];
-                    resEl.value+= ' Equal ' + i;
-                    ++eqCount;
-                }
-                else if (dna.length == el[1].length) {
-                    resEl.value += '\n' + el[1];
-                    resEl.value+= ' Nope sl ' + i;
-                    ++neButSameLengthCount;
-                }
-                else if (el[1] === '') {
-                    resEl.value+= ' \n' + 'First not found';
-                }
-
-            });
-            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
-                resEl.value+= ' \n' + 'None found';
-            }
-            //var res = hamPath(nodes);
-/*
-            resEl.value = 'nodes: ';
-            resEl.value += '\n' + res[1];
-            if (dna === res[1]) {
-                resEl.value+= '\nEqual';
-         }
-            else if (dna.length == res[1].length) {
-                resEl.value+= '\nNot Equal but same len';
-            }
-            else {
-                resEl.value+= '\nNot Equal';
-            }
-            res[0].forEach(function(el) {
-                var pred,succ;
-                pred = el.predecessors ? el.predecessors.length : 0;
-                succ = el.successors ? el.successors.length : 0;
-                resEl.value += '\n' + el.dna + ' p: ' + pred + ' s: ' + succ;
-
-            });
-            */
-            break;
-
-        case '4': //deb cycle from dna
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-            //var nodes = createDebNodes(dna,k);
-             debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,true);
-
-
-
-            resArray = [];
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                //resArray.push(debPath(nodes));
-             //   resArray.push(debGraph.debPath());
-                debGraph.debCycle();
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructed()]);
-            }
-            resEl.value = 'results\n';
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-           // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-            //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                if (dna === el[1]) {
-                    resEl.value += '\n' + el[1];
-                    resEl.value+= ' Equal ' + i;
-                    ++eqCount;
-                }
-                else if (dna.length == el[1].length) {
-                    var circ = false;
-
-
-                    for (var ch = 0;ch < dna.length - k;++ch) {
-                        if (dna === el[1].substring(ch) + el[1].substring(0,ch)) {
-                            resEl.value += '\n' + el[1];
-                            resEl.value+= ' Yep circ ' + i;
-                            ++neButSameLengthCount;
-                            circ = true;
-                            break;
-
-                        }
-                    }
-                    if (!circ) {
-                        resEl.value += '\n' + el[1];
-                        resEl.value += ' Nope sl ' + i;
-                        ++neButSameLengthCount;
-                    }
-                }
-                else if (el[1] === '') {
-                    resEl.value+= ' \n' + 'First not found';
-                }
-                else {
-                    resEl.value+= ' \n' + 'x' + el[1];
-                }
-
-            });
-
-            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
-                resEl.value+= ' \n' + 'None found';
-            }
-            break;
-
-        case '5':
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-            dist = parseInt(par3El.value);
-            res = kmerPairedComposition(dna,k,dist);
-
-            resEl.value = 'results: ';
-            res.forEach(function(el) {
-                resEl.value += '\n' + el[0] + ':' +  el[1];
-            });
-            //resEl.value = 'results: ' + res[0][0];
-
-            break;
-
-        case '6': //deb path from paired dna
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-            pairDist = parseInt(par3El.value);
-            //var nodes = createDebNodes(dna,k);
-            debGraph = new DGraph(dna,DGraph.fromPairedDna,DGraph.debGraph,k,false,pairDist);
-
-
-            resArray = [];
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
-                debGraph.debPath();
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructedPairs()]);
-            }
-            resEl.value = 'results\n';
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                if (dna === el[1]) {
-                    resEl.value += '\n' + el[1];
-                    resEl.value+= ' Equal ' + i;
-                    ++eqCount;
-                }
-                else if (dna.length == el[1].length) {
-                    var circ = false;
-
-
-                    for (var ch = 0;ch < dna.length - k;++ch) {
-                        if (dna === el[1].substring(ch) + el[1].substring(0,ch)) {
-                            resEl.value += '\n' + el[1];
-                            resEl.value+= ' Yep circ ' + i;
-                            ++neButSameLengthCount;
-                            circ = true;
-                            break;
-
-                        }
-                    }
-                    if (!circ) {
-                        resEl.value += '\n' + el[1];
-                        resEl.value += ' Nope sl ' + i;
-                        ++neButSameLengthCount;
-                    }
-                }
-                else if (el[1] === '') {
-                    resEl.value+= ' \n' + 'First not found';
-                }
-                else {
-                    resEl.value+= ' \n' + 'x' + el[1];
-                }
-
-            });
-
-            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
-                resEl.value+= ' \n' + 'None found';
-            }
-            break;
-        case '7': //debruin path from reads
-           // var k = parseInt(par2El.value);
-           // par1El.value = cleanContents(par1El.value);
-           // var dna = par1El.value;
-            var reads = par1El.value.split('\n');
-
-            k = reads[0].length;
-
-            debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
-
-            resEl.value = 'results\n';
-
-            resArray = [];
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
-                debGraph.debPath();
-
-                resStr = '';
-                debGraph.nodes.forEach(function(node) {
-                    resStr += '\n' + node.dna + ' ->  ';
-                    node.successors.forEach(function(suc,i) {
-                        resStr += suc.targetNode.dna;
-                        if (i < node.successors.length - 1) {
-                            resStr += ',';
-                        }
-
-                    });
-
-                });
-                resEl.value+= resStr;
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructed()]);
-            }
-
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                resEl.value += '\n' + el[1] + ' ' + i;
-
-            });
-
-            break;
-
-
-        case '8': //debruijn path from dna
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-            //var nodes = createDebNodes(dna,k);
-
-            debGraph = new DGraph(dna,DGraph.fromDna,DGraph.debGraph,k,false);
+    if (val === '1') {
+        resEl.value = rev;
+    } else if (val === '2') {
+        dna = par2El.value;
+        k = parseInt(par3El.value);
+
+        res = profileMostProbable(profMat, dna, k);
+        resEl.value = 'Best kmer: \n' + res[0] + '\nBest prob:\n' + res[1];
+
+
+    } else if (val === '3') {//Hamilton path
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
 
         resEl.value = 'results\n';
 
-        resEl.value+= debGraph.sumInfo();
 
-          resArray = [];
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
+        resEl.value += hamGraph.sumInfo();
+        resEl.value += '\n' + hamGraph.getAdjList();
 
-                debGraph.debPath();
 
-                resStr = debGraph.getAdjList();
-                /*
-                resStr = '';
-                debGraph.nodes.forEach(function(node) {
-                    resStr += '\n' + node.dna + ' ->  ';
-                    node.successors.forEach(function(suc,i) {
-                        resStr += suc.targetNode.dna;
-                        if (i < node.successors.length - 1) {
-                            resStr += ',';
-                        }
+        nodes = createHamNodes(dna, null, k);
+        resArray = [];
 
-                    });
+        // hamiltonCanvas(nodes);
+
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            resArray.push(hamPath(nodes));
+
+        }
+
+        resEl.value += '\nresults';
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        resArray.forEach(function (el, i) {
+
+            hamiltonCanvas(nodes, el[2]);
+
+            if (dna === el[1]) {
+                resEl.value += '\n' + el[1];
+                resEl.value += ' Equal ' + i;
+                ++eqCount;
+            }
+            else if (dna.length === el[1].length) {
+                resEl.value += '\n' + el[1];
+                resEl.value += ' Nope sl ' + i;
+                ++neButSameLengthCount;
+            }
+            else if (el[1] === '') {
+                resEl.value += ' \n' + 'First not found';
+            }
+
+        });
+        if ((eqCount === 0) && (neButSameLengthCount === 0)) {
+            resEl.value += ' \n' + 'None found';
+        }
+        //var res = hamPath(nodes);
+        /*
+                resEl.value = 'nodes: ';
+                resEl.value += '\n' + res[1];
+                if (dna === res[1]) {
+                    resEl.value+= '\nEqual';
+             }
+                else if (dna.length == res[1].length) {
+                    resEl.value+= '\nNot Equal but same len';
+                }
+                else {
+                    resEl.value+= '\nNot Equal';
+                }
+                res[0].forEach(function(el) {
+                    var pred,succ;
+                    pred = el.predecessors ? el.predecessors.length : 0;
+                    succ = el.successors ? el.successors.length : 0;
+                    resEl.value += '\n' + el.dna + ' p: ' + pred + ' s: ' + succ;
 
                 });
                 */
+    } else if (val === '4') {//deb cycle from dna
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
+        //var nodes = createDebNodes(dna,k);
+        debGraph = new DGraph(dna, DGraph.fromDna, DGraph.debGraph, k, true);
 
-                resEl.value+= resStr;
+
+        resArray = [];
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debCycle();
+
+            debruijnCanvas(debGraph);
+
+            resArray.push([[], debGraph.edgePathReconstructed()]);
+        }
+        resEl.value = 'results\n';
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+        resArray.forEach(function (el, i) {
 
 
-                debruijnCanvas(debGraph);
-
-
-                resArray.push([[],debGraph.edgePathReconstructed()]);
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            if (dna === el[1]) {
+                resEl.value += '\n' + el[1];
+                resEl.value += ' Equal ' + i;
+                ++eqCount;
             }
+            else if (dna.length === el[1].length) {
+                var circ = false;
 
 
-
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                if (dna === el[1]) {
-                    resEl.value += '\n' + el[1];
-                    resEl.value+= ' Equal ' + i;
-                    ++eqCount;
-                }
-                else if (dna.length == el[1].length) {
-                    var circ = false;
-
-
-                    for (var ch = 0;ch < dna.length - k;++ch) {
-                        if (dna === el[1].substring(ch) + el[1].substring(0,ch)) {
-                            resEl.value += '\n' + el[1];
-                            resEl.value+= ' Yep circ ' + i;
-                            ++neButSameLengthCount;
-                            circ = true;
-                            break;
-
-                        }
-                    }
-                    if (!circ) {
+                for (var ch = 0; ch < dna.length - k; ++ch) {
+                    if (dna === el[1].substring(ch) + el[1].substring(0, ch)) {
                         resEl.value += '\n' + el[1];
-                        resEl.value += ' Nope sl ' + i;
+                        resEl.value += ' Yep circ ' + i;
                         ++neButSameLengthCount;
+                        circ = true;
+                        break;
+
                     }
                 }
-                else if (el[1] === '') {
-                    resEl.value+= ' \n' + 'First not found';
+                if (!circ) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value += ' Nope sl ' + i;
+                    ++neButSameLengthCount;
                 }
-                else {
-                    resEl.value+= ' \n' + 'x' + el[1];
+            }
+            else if (el[1] === '') {
+                resEl.value += ' \n' + 'First not found';
+            }
+            else {
+                resEl.value += ' \n' + 'x' + el[1];
+            }
+
+        });
+
+        if ((eqCount === 0) && (neButSameLengthCount === 0)) {
+            resEl.value += ' \n' + 'None found';
+        }
+    } else if (val === '5') {
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
+        dist = parseInt(par3El.value);
+        res = kmerPairedComposition(dna, k, dist);
+
+        resEl.value = 'results: ';
+        res.forEach(function (el) {
+            resEl.value += '\n' + el[0] + ':' + el[1];
+        });
+        //resEl.value = 'results: ' + res[0][0];
+
+    } else if (val === '6') {//deb path from paired dna
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
+        pairDist = parseInt(par3El.value);
+        //var nodes = createDebNodes(dna,k);
+        debGraph = new DGraph(dna, DGraph.fromPairedDna, DGraph.debGraph, k, false, pairDist);
+
+
+        resArray = [];
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debPath();
+
+            debruijnCanvas(debGraph);
+
+            resArray.push([[], debGraph.edgePathReconstructedPairs()]);
+        }
+        resEl.value = 'results\n';
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+        resArray.forEach(function (el, i) {
+
+
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            if (dna === el[1]) {
+                resEl.value += '\n' + el[1];
+                resEl.value += ' Equal ' + i;
+                ++eqCount;
+            }
+            else if (dna.length === el[1].length) {
+                var circ = false;
+
+
+                for (var ch = 0; ch < dna.length - k; ++ch) {
+                    if (dna === el[1].substring(ch) + el[1].substring(0, ch)) {
+                        resEl.value += '\n' + el[1];
+                        resEl.value += ' Yep circ ' + i;
+                        ++neButSameLengthCount;
+                        circ = true;
+                        break;
+
+                    }
                 }
-
-            });
-
-            if ((eqCount == 0) && (neButSameLengthCount == 0)) {
-                resEl.value+= ' \n' + 'None found';
+                if (!circ) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value += ' Nope sl ' + i;
+                    ++neButSameLengthCount;
+                }
             }
-            break;
-        case '9': //deb path from paired reads
-            k = parseInt(par2El.value);
-            //par1El.value = cleanContents(par1El.value);
-           // var dna = par1El.value;
-            reads = par1El.value.split('\n');
-
-            reads = reads.map(function(el) {
-               return el.split('|');
-            });
-
-            pairDist = parseInt(par3El.value);
-            //var nodes = createDebNodes(dna,k);
-            debGraph = new DGraph(reads,DGraph.fromPairedReads,DGraph.debGraph,k,false,pairDist);
-
-
-            resArray = [];
-            for (i = 0;i < 1;++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
-                debGraph.debPath();
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructedPairs()]);
+            else if (el[1] === '') {
+                resEl.value += ' \n' + 'First not found';
             }
-            resEl.value = 'results\n';
-            eqCount = 0;
-            neButSameLengthCount = 0;
+            else {
+                resEl.value += ' \n' + 'x' + el[1];
+            }
 
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+        });
 
-            resArray.forEach(function(el,i) {
+        if ((eqCount === 0) && (neButSameLengthCount === 0)) {
+            resEl.value += ' \n' + 'None found';
+        }
+    } else if (val === '7') {//debruin path from reads
+        // var k = parseInt(par2El.value);
+        // par1El.value = cleanContents(par1El.value);
+        // var dna = par1El.value;
 
 
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                resEl.value += '\n' + el[1] + ' ' + i;
-            });
+        k = reads[0].length;
 
-                break;
-        case '10': //pattern to number
+        debGraph = new DGraph(reads, DGraph.fromReads, DGraph.debGraph, k, false);
 
-            par1El.value = cleanContents(par1El.value);
-            // var dna = par1El.value;
-            resEl.value = 'results\n';
-            resEl.value+= kMerToInd(par1El.value);
+        resEl.value = 'results\n';
 
-            break;
+        resArray = [];
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debPath();
 
-        case '11': //number to pattern
-
-            var ind = par1El.value; //string, because can't handle really big ints
-            k = parseInt(par2El.value);
-            // var dna =         par1El.value;
-            resEl.value = 'results\n';
-            resEl.value+= indToKmer(ind,k);
-
-            break;
-
-        case '12': //d-neighbourhood
-            par1El.value = cleanContents(par1El.value);
-
-            var d = parseInt(par2El.value);
-
-            // var dna =         par1El.value;
-            resEl.value = 'results\n';
-            res = kMersWithMaxDist(par1El.value,d);
             resStr = '';
-            res.forEach(function(el) {
-                resStr+=el + '\n';
-            });
+            debGraph.nodes.forEach(function (node) {
+                resStr += '\n' + node.dna + ' ->  ';
+                node.successors.forEach(function (suc, i) {
+                    resStr += suc.targetNode.dna;
+                    if (i < node.successors.length - 1) {
+                        resStr += ',';
+                    }
 
-            resEl.value+= resStr;
+                });
 
-            break;
-
-        case '13': //dist pattern strings
-            par1El.value = cleanContents(par1El.value);
-
-            var strs = par2El.value.split(' ');
-
-            // var dna =         par1El.value;
-            resEl.value = 'results\n';
-            res = patternSequencesDist(par1El.value,strs);
-
-            resEl.value+= res;
-
-            break;
-
-
-
-
-        case '14': //kmer composition
-            k = parseInt(par2El.value);
-            par1El.value = cleanContents(par1El.value);
-            dna = par1El.value;
-            dist = parseInt(par3El.value);
-            res = kmerComposition(dna,k);
-
-            resEl.value = 'results: ';
-            resStr = '';
-            res.forEach(function(el) {
-                resStr += '\n' + el;
             });
             resEl.value += resStr;
-            //resEl.value = 'results: ' + res[0][0];
 
-            break;
+            debruijnCanvas(debGraph);
 
-        case '15': //str from genome path
-            path = par1El.value.split('\n');
+            resArray.push([[], debGraph.edgePathReconstructed()]);
+        }
 
-            res = stringFromGenomePath(path);
+        eqCount = 0;
+        neButSameLengthCount = 0;
 
-            resEl.value = 'results: ';
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
-            resEl.value += res;
-            //resEl.value = 'results: ' + res[0][0];
+        resArray.forEach(function (el, i) {
 
-            break;
 
-        /*
-        case '16': //overlap graph
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            resEl.value += '\n' + el[1] + ' ' + i;
 
-            //par1El.value = cleanContents(par1El.value);
-            reads = par1El.value.split('\n');
-            k = reads[0].length;
-            nodes = createHamNodes(null,reads,k);
-            resArray = [];
+        });
 
-            // hamiltonCanvas(nodes);
+    } else if (val === '8') {//debruijn path from dna
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
+        //var nodes = createDebNodes(dna,k);
 
-            res = hamPath(nodes);
+        debGraph = new DGraph(dna, DGraph.fromDna, DGraph.debGraph, k, false);
+
+        resEl.value = 'results\n';
+
+        resEl.value += debGraph.sumInfo();
+
+        resArray = [];
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+
+            debGraph.debPath();
+
+            resStr = debGraph.getAdjList();
+            /*
+                    resStr = '';
+                    debGraph.nodes.forEach(function(node) {
+                        resStr += '\n' + node.dna + ' ->  ';
+                        node.successors.forEach(function(suc,i) {
+                            resStr += suc.targetNode.dna;
+                            if (i < node.successors.length - 1) {
+                                resStr += ',';
+                            }
+
+                        });
+
+                    });
+                    */
+
+            resEl.value += resStr;
+
+
+            debruijnCanvas(debGraph);
+
+
+            resArray.push([[], debGraph.edgePathReconstructed()]);
+        }
+
+
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+        resArray.forEach(function (el, i) {
+
+
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            if (dna === el[1]) {
+                resEl.value += '\n' + el[1];
+                resEl.value += ' Equal ' + i;
+                ++eqCount;
+            }
+            else if (dna.length === el[1].length) {
+                var circ = false;
+
+
+                for (var ch = 0; ch < dna.length - k; ++ch) {
+                    if (dna === el[1].substring(ch) + el[1].substring(0, ch)) {
+                        resEl.value += '\n' + el[1];
+                        resEl.value += ' Yep circ ' + i;
+                        ++neButSameLengthCount;
+                        circ = true;
+                        break;
+
+                    }
+                }
+                if (!circ) {
+                    resEl.value += '\n' + el[1];
+                    resEl.value += ' Nope sl ' + i;
+                    ++neButSameLengthCount;
+                }
+            }
+            else if (el[1] === '') {
+                resEl.value += ' \n' + 'First not found';
+            }
+            else {
+                resEl.value += ' \n' + 'x' + el[1];
+            }
+
+        });
+
+        if ((eqCount === 0) && (neButSameLengthCount === 0)) {
+            resEl.value += ' \n' + 'None found';
+        }
+    } else if (val === '9') {
+        var reads;//deb path from paired reads
+        k = parseInt(par2El.value);
+        //par1El.value = cleanContents(par1El.value);
+        // var dna = par1El.value;
+        reads = par1El.value.split('\n');
+
+        reads = reads.map(function (el) {
+            return el.split('|');
+        });
+
+        pairDist = parseInt(par3El.value);
+        //var nodes = createDebNodes(dna,k);
+        debGraph = new DGraph(reads, DGraph.fromPairedReads, DGraph.debGraph, k, false, pairDist);
+
+
+        resArray = [];
+        for (i = 0; i < 1; ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debPath();
+
+            debruijnCanvas(debGraph);
+
+            resArray.push([[], debGraph.edgePathReconstructedPairs()]);
+        }
+        resEl.value = 'results\n';
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+        resArray.forEach(function (el, i) {
+
+
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            resEl.value += '\n' + el[1] + ' ' + i;
+        });
+
+    } else if (val === '10') {//pattern to number
+
+        par1El.value = cleanContents(par1El.value);
+        // var dna = par1El.value;
+        resEl.value = 'results\n';
+        resEl.value += kMerToInd(par1El.value);
+
+    } else if (val === '11') {//number to pattern
+
+        //string, because can't handle really big ints
+        k = parseInt(par2El.value);
+        // var dna =         par1El.value;
+        resEl.value = 'results\n';
+        resEl.value += indToKmer(ind, k);
+
+    } else if (val === '12') {//d-neighbourhood
+        par1El.value = cleanContents(par1El.value);
+
+
+        // var dna =         par1El.value;
+        resEl.value = 'results\n';
+        res = kMersWithMaxDist(par1El.value, d);
+        resStr = '';
+        res.forEach(function (el) {
+            resStr += el + '\n';
+        });
+
+        resEl.value += resStr;
+
+    } else if (val === '13') {//dist pattern strings
+        par1El.value = cleanContents(par1El.value);
+
+
+        // var dna =         par1El.value;
+        resEl.value = 'results\n';
+        res = patternSequencesDist(par1El.value, strs);
+
+        resEl.value += res;
+
+    } else if (val === '14') {//kmer composition
+        k = parseInt(par2El.value);
+        par1El.value = cleanContents(par1El.value);
+        dna = par1El.value;
+        dist = parseInt(par3El.value);
+        res = kmerComposition(dna, k);
+
+        resEl.value = 'results: ';
+        resStr = '';
+        res.forEach(function (el) {
+            resStr += '\n' + el;
+        });
+        resEl.value += resStr;
+        //resEl.value = 'results: ' + res[0][0];
+
+    } else if (val === '15') {//str from genome path
+        path = par1El.value.split('\n');
+
+        res = stringFromGenomePath(path);
+
+        resEl.value = 'results: ';
+
+        resEl.value += res;
+        //resEl.value = 'results: ' + res[0][0];
+
+    } else if (val === '17') {
+        k = parseInt(par2El.value);
+        //par1El.value = cleanContents(par1El.value);
+        // var dna = par1El.value;
+        adjList = par1El.value.split('\n');
+
+        //var nodes = createDebNodes(dna,k);
+        debGraph = new DGraph(adjList, DGraph.fromAdjList, DGraph.debGraph, k, false);
+        resEl.value = 'results\n';
+
+        resArray = [];
+        for (i = 0; i < 1; ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debCycle();
+
+            resEl.value += debGraph.edgePathToText();
 
             resStr = '';
+            /*
+                    debGraph.nodes.forEach(function(node) {
+                        resStr += '\n' + node.dna + ' ->  ';
+                        node.successors.forEach(function(suc,i) {
+                            resStr += suc.targetNode.dna;
+                            if (i < node.successors.length - 1) {
+                                resStr += ',';
+                            }
 
-            res[2].forEach(function(node) {
-                resStr+='\n'  + node.dna;
-                resStr+= ' -> ';
-                node.successors.forEach(function(suc) {
-                    resStr += suc.dna + ' ';
-
-                });
-
-            });
-            resEl.value = 'results';
-            resEl.value+= resStr;
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            //var el = res;
-
-            if (nodes.length < 30) {
-                hamiltonCanvas(nodes, res[2]);
-            }
-
-            break;
-            */
-        case '17':
-            k = parseInt(par2El.value);
-            //par1El.value = cleanContents(par1El.value);
-            // var dna = par1El.value;
-            adjList = par1El.value.split('\n');
-
-            //var nodes = createDebNodes(dna,k);
-            debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
-            resEl.value = 'results\n';
-
-            resArray = [];
-            for (i = 0;i < 1;++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
-                debGraph.debCycle();
-
-                resEl.value += debGraph.edgePathToText();
-
-                resStr = '';
-                /*
-                debGraph.nodes.forEach(function(node) {
-                    resStr += '\n' + node.dna + ' ->  ';
-                    node.successors.forEach(function(suc,i) {
-                        resStr += suc.targetNode.dna;
-                        if (i < node.successors.length - 1) {
-                            resStr += ',';
-                        }
+                        });
 
                     });
+                    resEl.value+= resStr;
+                    */
+
+            debruijnCanvas(debGraph);
+
+            resArray.push([[], debGraph.edgePathReconstructedPairs()]);
+        }
+
+        eqCount = 0;
+        neButSameLengthCount = 0;
+
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
+
+        resArray.forEach(function (el, i) {
+
+
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            // resEl.value += '\n' + el[1] + ' ' + i;
+        });
+
+    } else if (val === '18') {
+        k = parseInt(par2El.value);
+        adjList = par1El.value.split('\n');
+
+        debGraph = new DGraph(adjList, DGraph.fromAdjList, DGraph.debGraph, k, false);
+        resEl.value = 'results\n';
+
+        resArray = [];
+        for (i = 0; i < 1; ++i) {
+            debGraph.debPath();
+            resEl.value += debGraph.edgePathToText();
+
+            debruijnCanvas(debGraph);
+
+            resArray.push([[], debGraph.edgePathReconstructedPairs()]);
+        }
+
+
+    } else if (val === '19') {
+        var reads;
+        k = parseInt(par1El.value);
+
+        resEl.value = 'results\n';
+
+
+        reads = [];
+        for (i = 0; i < Math.pow(2, k); ++i) {
+            var binStr = (i >>> 0).toString(2);
+            binStr = pad + binStr;
+            binStr = binStr.substr(binStr.length - k);
+            reads.push(binStr);
+
+            // resEl.value +=  (i >>> 0).toString(2) + ' ';
+            resEl.value += binStr + '\n';
+        }
+
+
+        debGraph = new DGraph(reads, DGraph.fromReads, DGraph.debGraph, k, false);
+
+        resEl.value += 'results\n';
+
+        resArray = [];
+        lim = parseInt(par3El.value);
+        if (lim === 0) {
+            lim = 1;
+        }
+
+        for (i = 0; i < parseInt(par3El.value); ++i) {
+            //resArray.push(debPath(nodes));
+            //   resArray.push(debGraph.debPath());
+            debGraph.debPath();
+
+            resStr = '';
+            debGraph.nodes.forEach(function (node) {
+                resStr += '\n' + node.dna + ' ->  ';
+                node.successors.forEach(function (suc, i) {
+                    resStr += suc.targetNode.dna;
+                    if (i < node.successors.length - 1) {
+                        resStr += ',';
+                    }
 
                 });
-                resEl.value+= resStr;
-                */
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructedPairs()]);
-            }
-
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-               // resEl.value += '\n' + el[1] + ' ' + i;
-            });
-
-            break;
-
-        case '18':
-            k = parseInt(par2El.value);
-            adjList = par1El.value.split('\n');
-
-            debGraph = new DGraph(adjList,DGraph.fromAdjList,DGraph.debGraph,k,false);
-            resEl.value = 'results\n';
-
-            resArray = [];
-            for (i = 0;i < 1;++i) {
-               debGraph.debPath();
-                resEl.value += debGraph.edgePathToText();
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructedPairs()]);
-            }
-
-
-            break;
-
-        case '19':
-            k = parseInt(par1El.value);
-
-            resEl.value = 'results\n';
-
-            var pad = "00000000000000";
-
-            reads = [];
-            for (i = 0;i < Math.pow(2,k);++i) {
-                var binStr = (i >>> 0).toString(2);
-                binStr = pad + binStr;
-                binStr = binStr.substr(binStr.length - k);
-                reads.push(binStr);
-
-               // resEl.value +=  (i >>> 0).toString(2) + ' ';
-                resEl.value+= binStr + '\n';
-           }
-
-
-            debGraph = new DGraph(reads,DGraph.fromReads,DGraph.debGraph,k,false);
-
-            resEl.value+= 'results\n';
-
-            resArray = [];
-            lim = parseInt(par3El.value);
-            if (lim == 0) {
-                lim = 1;
-            }
-
-            for (i = 0;i < parseInt(par3El.value);++i) {
-                //resArray.push(debPath(nodes));
-                //   resArray.push(debGraph.debPath());
-                debGraph.debPath();
-
-                resStr = '';
-                debGraph.nodes.forEach(function(node) {
-                    resStr += '\n' + node.dna + ' ->  ';
-                    node.successors.forEach(function(suc,i) {
-                        resStr += suc.targetNode.dna;
-                        if (i < node.successors.length - 1) {
-                            resStr += ',';
-                        }
-
-                    });
-
-                });
-                resEl.value+= resStr;
-
-                debruijnCanvas(debGraph);
-
-                resArray.push([[],debGraph.edgePathReconstructed()]);
-            }
-
-            eqCount = 0;
-            neButSameLengthCount = 0;
-
-            // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
-
-            resArray.forEach(function(el,i) {
-
-
-                //resArray.forEach(function(el,i) {
-                //resEl.value += el[1];
-                resEl.value += '\n' + el[1] + ' ' + i;
 
             });
+            resEl.value += resStr;
 
-            break;
+            debruijnCanvas(debGraph);
 
-        case '20': //Genome path to string
+            resArray.push([[], debGraph.edgePathReconstructed()]);
+        }
 
-            path = par1El.value.split('\n');
+        eqCount = 0;
+        neButSameLengthCount = 0;
 
-            str = '';
-            path.forEach(function(el,i) {
-                if (i == 0) {
-                    str+=el;
+        // resEl.value += 'rec: ' + debGraph.edgePathReconstructed();
 
-                }
-                else {
-                    str+=el.substring(el.length - 1);
-                }
-
-            });
-            resEl.value = 'results\n';
-
-            resEl.value+=str;
+        resArray.forEach(function (el, i) {
 
 
-            break;
+            //resArray.forEach(function(el,i) {
+            //resEl.value += el[1];
+            resEl.value += '\n' + el[1] + ' ' + i;
 
-        case '21': //DNA to amino string
+        });
 
-            dna = new DNA(par1El.value);
+    } else if (val === '20') {//Genome path to string
 
-            rna = new RNA(dna.rnaTranscript());
+        path = par1El.value.split('\n');
 
-            pep = rna.translate(0,true);
-
-            resEl.value = 'results\n';
-
-            resEl.value = 'len: ' + dna.dna.length + '\n';
-
-            resEl.value +=rna.rna;
-
-            resEl.value +='\n' + pep.toShortString('');
-            break;
-
-        case '22': //RNA to amino string
-
-            rna = new RNA(par1El.value);
-
-            pep = rna.translate(0,true);
-
-            resEl.value = 'results\n';
-
-            resEl.value = 'len: ' + pep.peptide.length + '\n';
-
-            resEl.value +=pep.toShortString('');
-            break;
-
-        case '23': //Find Amino Acid Sequence in genome
-
-            dna = par1El.value;
-            var targetSeq = par2El.value;
-            var targetDNALen = targetSeq.length * Codon.len;
-
-            var seqs = [];
-
-
-
-            for (i = 0;i < dna.length - targetDNALen; ++i) {
-
-                var forwardFound = false;
-                var testDNA = new DNA(dna.substring(i,i + targetDNALen));
-                var testRNA = new RNA(testDNA.rnaTranscript());
-                var testProt = testRNA.translate(0,true);
-                if (testProt.toShortString('') == targetSeq) {
-                    forwardFound = true;
-                }
-                var reverseFound = false;
-                var testRevDNA = testDNA.reverseComplement();
-               // var tst = testRevDNA.rnaTranscript();
-                testRevRNA = new RNA(testRevDNA.rnaTranscript());
-                testRevProt = testRevRNA.translate(0,true);
-                if (testRevProt.toShortString('') == targetSeq) {
-                    reverseFound = true;
-                }
-
-                if (forwardFound || reverseFound) {
-                    seqs.push(testDNA.dna);
-                }
+        str = '';
+        path.forEach(function (el, i) {
+            if (i === 0) {
+                str += el;
 
             }
+            else {
+                str += el.substring(el.length - 1);
+            }
+
+        });
+        resEl.value = 'results\n';
+
+        resEl.value += str;
 
 
-            resEl.value = 'results\n';
+    } else if (val === '21') {//DNA to amino string
 
-            resEl.value = 'len: ' + dna.length + '\n';
+        dna = new DNA(par1El.value);
 
-            seqs.forEach(function(seq) {
-                resEl.value +=seq + '\n';
-            });
+        rna = new RNA(dna.rnaTranscript());
 
-            break;
+        pep = rna.translate(0, true);
 
-        case '24': //Spectrum
+        resEl.value = 'results\n';
 
+        resEl.value = 'len: ' + dna.dna.length + '\n';
 
-            pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
-            var cyc = (par2El.value == 1);
+        resEl.value += rna.rna;
 
-            resEl.value = 'results\n';
+        resEl.value += '\n' + pep.toShortString('');
+    } else if (val === '22') {//RNA to amino string
 
-            resEl.value += 'Peptide len: ' + pep.peptide.length + '\n';
+        rna = new RNA(par1El.value);
 
+        pep = rna.translate(0, true);
 
+        resEl.value = 'results\n';
 
-            spec = pep.spectrum(cyc);
+        resEl.value = 'len: ' + pep.peptide.length + '\n';
 
-            resEl.value += 'Spectrum len: ' + spec.length + '\n';
+        resEl.value += pep.toShortString('');
+    } else if (val === '23') {//Find Amino Acid Sequence in genome
 
-            spec.forEach(function(w) {
-                resEl.value += w + ' ';
-
-            });
-
-
-            break;
-
-        case '25': //Num peptides with mass
+        dna = par1El.value;
 
 
-            var mass = parseInt(par1El.value);
+        for (i = 0; i < dna.length - targetDNALen; ++i) {
+
+            var forwardFound = false;
+            var testDNA = new DNA(dna.substring(i, i + targetDNALen));
+            var testRNA = new RNA(testDNA.rnaTranscript());
+            var testProt = testRNA.translate(0, true);
+            if (testProt.toShortString('') === targetSeq) {
+                forwardFound = true;
+            }
+            var reverseFound = false;
+            var testRevDNA = testDNA.reverseComplement();
+            // var tst = testRevDNA.rnaTranscript();
+            testRevRNA = new RNA(testRevDNA.rnaTranscript());
+            testRevProt = testRevRNA.translate(0, true);
+            if (testRevProt.toShortString('') === targetSeq) {
+                reverseFound = true;
+            }
+
+            if (forwardFound || reverseFound) {
+                seqs.push(testDNA.dna);
+            }
+
+        }
 
 
-            resEl.value = 'results\n';
+        resEl.value = 'results\n';
 
-            res = allPossiblePeptidesWithWeight(mass);
+        resEl.value = 'len: ' + dna.length + '\n';
 
-            resEl.value +=  res;
-            break;
+        seqs.forEach(function (seq) {
+            resEl.value += seq + '\n';
+        });
 
-        case '26': //Cyclopeptide sequencing
-
-           // var paramObj = initialiseMotifParams();
-
-            var experimentalSpectrum = par1El.value;
+    } else if (val === '24') {//Spectrum
 
 
-            w.postMessage({
+        pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
+
+
+        resEl.value = 'results\n';
+
+        resEl.value += 'Peptide len: ' + pep.peptide.length + '\n';
+
+
+        spec = pep.spectrum(cyc);
+
+        resEl.value += 'Spectrum len: ' + spec.length + '\n';
+
+        spec.forEach(function (w) {
+            resEl.value += w + ' ';
+
+        });
+
+
+    } else if (val === '25') {//Num peptides with mass
+
+
+        resEl.value = 'results\n';
+
+        res = allPossiblePeptidesWithWeight(mass);
+
+        resEl.value += res;
+    } else if (val === '26') {//Cyclopeptide sequencing
+
+        // var paramObj = initialiseMotifParams();
+
+
+        w.postMessage({
             'task': 'seqCyclopeptide',
             'spectrum': experimentalSpectrum
-    }); // Start the worker.
+        }); // Start the worker.
 
 
+        //resEl.value = 'results\n';
 
-            //resEl.value = 'results\n';
+        // var res = cycloPeptideSequencing(experimentalSpectrum);
 
-           // var res = cycloPeptideSequencing(experimentalSpectrum);
+        // resEl.value +=  res;
 
-           // resEl.value +=  res;
+    } else if (val === '27') {//Cyclopeptide scoring
 
-            break;
+        pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
 
-        case '27': //Cyclopeptide scoring
+        expSpec = par2El.value.split(' ');
+        expSpec = expSpec.map(function (el) {
+            return parseInt(el);
+        });
 
-            pep = new Peptide(Peptide.AminoArrFromStr(par1El.value));
 
-            expSpec = par2El.value.split(' ');
-            expSpec = expSpec.map(function(el) {
-                return parseInt(el);
+        resEl.value = 'results\n';
+
+        res = pep.score(expSpec, useLinear);
+
+        resEl.value += res;
+    } else if (val === '28') {//Leaderboard Cyclopeptide sequencing
+
+        expSpec = par1El.value; //.split(' ');
+
+        N = parseInt(par2El.value);
+
+
+        // expSpec = expSpec.map(function(el) {
+        //     return parseInt(el);
+        // });
+
+        w.postMessage({
+            'task': 'seqLeaderboardCyclopeptide',
+            'spectrum': expSpec,
+            'M': M,
+            'N': N
+        }); // Start the worker.
+
+        //var res =leaderboardCyclopeptideSequencing(expSpec,N);
+
+        resEl.value = 'results\n';
+        resEl.value += res.toShortString('') + '\n';
+
+        resEl.value += res.toWeightString('');
+    } else if (val === '29') {//Trim leaderboard
+
+
+        leaders = leaders.map(function (el) {
+            return new Peptide(Peptide.AminoArrFromStr(el));
+
+        });
+        spec = par2El.value.split(' ');
+        spec = spec.map(function (el) {
+            return parseInt(el);
+        });
+
+        N = parseInt(par3El.value);
+
+        res = trimLeaderboard(leaders, spec, N);
+
+
+        resEl.value = 'results\n';
+
+
+        res.forEach(function (el) {
+            str += el.toShortString('') + ' ';
+
+        });
+        resEl.value += str;
+
+
+    } else if (val === '30') {//Convolution
+
+        spec = new Spectrum(par1El.value);
+        res = spec.convolutionStr();
+
+        resEl.value = 'results\n';
+
+
+        resEl.value += res;
+
+
+    } else if (val === '31') {//Edit Dist using bad/good
+
+
+        resEl.value = 'results\n';
+
+
+        if (loc === 'Y') {
+            res = al.align(true, 1);
+            resEl.value += '\nLocal edit dist: ' + res[0];
+            res[1].forEach(function (el) {
+                resEl.value += '\n' + el[0];
+                resEl.value += '\n' + el[1] + ' ' + el[2];
             });
+        }
+        else {
+            res = al.align(false, 1);
+            resEl.value += '\nGlobal edit dist: ' + res[0];
+            resEl.value += '\n' + res[1];
+            resEl.value += '\n' + res[2];
 
-            var useLinear = parseInt(par3El.value);
 
-            resEl.value = 'results\n';
+        }
 
-            res = pep.score(expSpec,useLinear);
 
-            resEl.value +=  res;
-            break;
-
-        case '28': //Leaderboard Cyclopeptide sequencing
-
-            expSpec = par1El.value; //.split(' ');
-
-            N = parseInt(par2El.value);
-
-            var M = parseInt(par3El.value);
-
-           // expSpec = expSpec.map(function(el) {
-           //     return parseInt(el);
-           // });
-
-            w.postMessage({
-                'task': 'seqLeaderboardCyclopeptide',
-                'spectrum': expSpec,
-                'M':M,
-                'N': N
-            }); // Start the worker.
-
-            //var res =leaderboardCyclopeptideSequencing(expSpec,N);
-
-            resEl.value = 'results\n';
-            resEl.value+= res.toShortString('') + '\n';
-
-            resEl.value +=  res.toWeightString('');
-            break;
-
-        case '29': //Trim leaderboard
-
-            var leaders = par1El.value.split(' ');
-
-            leaders = leaders.map(function(el) {
-                return new Peptide(Peptide.AminoArrFromStr(el));
-
+        if (loc === 'Y') {
+            res = al.align(true, 1, -1);
+            resEl.value += '\nLocal edit dist: ' + res[0];
+            res[1].forEach(function (el) {
+                resEl.value += '\n' + el[0];
+                resEl.value += '\n' + el[1] + ' ' + el[2];
             });
-            spec = par2El.value.split(' ');
-            spec = spec.map(function(el) {
-                return parseInt(el);
-            });
-
-            N = parseInt(par3El.value);
-
-            res =  trimLeaderboard(leaders,spec,N);
-
-
-
-            resEl.value = 'results\n';
-
-            var str = '';
-
-            res.forEach(function(el) {
-                str+= el.toShortString('') + ' ';
-
-            });
-            resEl.value += str;
-
-
-            break;
-
-        case '30': //Convolution
-
-            spec = new Spectrum(par1El.value);
-            res =  spec.convolutionStr();
-
-            resEl.value = 'results\n';
-
-
-            resEl.value += res;
-
-
-            break;
-
-        case '31': //Edit Dist using bad/good
-
-            var p = par1El.value;
-            var t = par2El.value;
-            var loc = par3El.value;
-            var al = new Aligner(p,t,2);
-
-            resEl.value = 'results\n';
-
-
-            if (loc == 'Y') {
-                res = al.align(true,1);
-                resEl.value += '\nLocal edit dist: ' + res[0];
-                res[1].forEach(function(el) {
-                    resEl.value += '\n' + el[0];
-                    resEl.value += '\n' + el[1] + ' ' + el[2];
-                });
-            }
-            else {
-                res = al.align(false,1);
-                resEl.value += '\nGlobal edit dist: ' + res[0];
-                resEl.value += '\n' + res[1];
-                resEl.value += '\n' + res[2];
-
-
-
-            }
-
-
-
-
-            break;
-
-            if (loc == 'Y') {
-                res = al.align(true,1,-1);
-                resEl.value += '\nLocal edit dist: ' + res[0];
-                res[1].forEach(function(el) {
-                    resEl.value += '\n' + el[0];
-                    resEl.value += '\n' + el[1] + ' ' + el[2];
-                });
-            }
-            else {
-                res = al.align(false,1,-1);
-                resEl.value += '\nGlobal edit dist: ' + res[0];
-                resEl.value += '\n' + res[1];
-                resEl.value += '\n' + res[2];
-
-
-
-            }
-
-
-            /*
-                        if (loc == 'Y') {
-                            var res = al.editDist(true);
-                            resEl.value += '\nLocal edit dist: ' + res[0];
-                            res[1].forEach(function(el) {
-                                resEl.value += '\n' + el[0];
-                                resEl.value += '\n' + el[1] + ' ' + el[2];
-                            });
-                        }
-                        else {
-                            var res = al.editDist(false);
-                            resEl.value += '\nGlobal edit dist: ' + res[0];
-                            resEl.value += '\n' + res[1];
-                            resEl.value += '\n' + res[2];
-
-
-
-                        }
-            */
-
-           // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
-            resEl.value +='\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
-
-
-
-
-            break;
-
-        case '32': //Lowest coins
-
-            var amt = parseInt(par1El.value);
-            var coins = par2El.value.split(',');
-            coins = coins.map(function(el) {
-                return parseInt(el);
-            });
-
-            var l = lowestCoins(amt,coins);
-
-
-            resEl.value = 'results\n';
-
-            resEl.value += '\nLowest coins: ' + l;
-            break;
-
-        case '33': //Align DNA using bad/good
-
-            p = par1El.value;
-            t = par2El.value;
-            loc = par3El.value;
-            al = new Aligner(p,t,2);
-
-
-            resEl.value = 'results\n';
-
-            if (loc == 'Y') {
-                res = al.align(true,3,-6);
-                resEl.value += '\nLocal align: ' + res[0];
-                res[1].forEach(function(el) {
-                    resEl.value += '\n' + el[0];
-                    resEl.value += '\n' + el[1] + ' ' + el[2];
-                });
-            }
-            else {
-                res = al.align(false,3,-8);
-                resEl.value += '\nGlobal align: ' + res[0];
-                resEl.value += '\n' + res[1];
-                resEl.value += '\n' + res[2];
-
-
-
-            }
-
-
-            break;
-
-
-            /*
-             if (loc == 'Y') {
-             var res = al.editDist(true);
-             resEl.value += '\nLocal edit dist: ' + res[0];
-             res[1].forEach(function(el) {
-             resEl.value += '\n' + el[0];
-             resEl.value += '\n' + el[1] + ' ' + el[2];
-             });
-             }
-             else {
-             var res = al.editDist(false);
-             resEl.value += '\nGlobal edit dist: ' + res[0];
-             resEl.value += '\n' + res[1];
-             resEl.value += '\n' + res[2];
-
-
-
-             }
-             */
-
-            // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
-            resEl.value +='\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
-
-            resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
-
-
-            break;
-
-        case '34': //Align Blosum using bad/good
-
-            p = par1El.value;
-            t = par2El.value;
-            loc = par3El.value;
-            al = new Aligner(p,t,2);
-
-
-            resEl.value = 'results\n';
-
-            if (loc == 'Y') {
-                res = al.align(true,2,-5);
-                resEl.value += '\nLocal align: ' + res[0];
-                res[1].forEach(function(el) {
-                    resEl.value += '\n' + el[0];
-                    resEl.value += '\n' + el[1] + ' ' + el[2];
-                });
-            }
-            else {
-                res = al.align(false,2,-5);
-                resEl.value += '\nGlobal align: ' + res[0];
-                resEl.value += '\n' + res[1];
-                resEl.value += '\n' + res[2];
-
-
-
-            }
-
-
-            break;
-
-        case '35': //Align LCS using bad/good
-
-            p = par1El.value;
-            t = par2El.value;
-            loc = par3El.value;
-            al = new Aligner(p,t,2);
-
-
-            resEl.value = 'results\n';
-
-            if (loc == 'Y') {
-                res = al.align(true,4,0);
-                resEl.value += '\nLocal LCS: ' + res[0];
-                res[1].forEach(function(el) {
-                    resEl.value += '\n' + el[0];
-                    resEl.value += '\n' + el[1] + ' ' + el[2];
-                });
-            }
-            else {
-                var lcs = '';
-                res = al.align(false,4,0);
-                resEl.value += '\nGlobal LCS: ' + res[0];
-                resEl.value += '\n' + res[1];
-                resEl.value += '\n' + res[2];
-                for (i = 0;((i < res[1].length) && (i < res[2].length));++i) {
-                    if (res[1][i] == res[2][i]) {
-                        lcs+=res[1][i];
-                    }
-                }
-                resEl.value += '\nlcs: ' + lcs;
-
-
-
-
-
-
-            }
-
-
-            break;
-
-        case '36': //Longest Path DAG
-
-            var source = par1El.value;
-            var sink = par2El.value;
-            adjList = par3El.value.split('\n');
-
-
-
-            var g = new DGGraph(adjList,DGraph.fromAdjList,DGraph.alignTypeGlobal);
-
-            g.initGraph();
-
-
-            g.longestPathsDynamic(source,sink);
-
-
-             var pathData = g.longestPathBacktrack(sink,source);
-             path = pathData[1];
-             var longest = pathData[0];
-
-             var pathStr = '';
-             for (i = path.length - 1;i >=0;--i) {
-             pathStr += path[i];
-             if (i > 0)  {
-             pathStr += '->';
-             }
-
-             }
-
-             resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
-
-
-            break;
-
-
-
-
-        case '37': //Longest Path Manhattan Grid
-
-            //var source = par1El.value;
-            //var sink = par2El.value;
-            // adjList = par3El.value.split('\n');
-
-            var rows = parseInt(par1El.value.split('x')[0]);
-            var cols = parseInt(par1El.value.split('x')[1]);
-
-            var downWeights = par2El.value.split('\n');
-            downWeights = downWeights.map(function(el) {
-                var spl = el.split(' ');
-                return spl.map(function(el) {
-                    return parseInt(el);
-                });
-
-            });
-
-            var rightWeights = par3El.value.split('\n');
-            rightWeights = rightWeights.map(function(el) {
-                var spl = el.split(' ');
-                return spl.map(function(el) {
-                    return parseInt(el);
-                });
-            });
-
-            //var diagWeights = [[1,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,1],[0,0,0,1,1]];
-
-            g = new DGGridGraph(rows,cols,DGraph.alignTypeGlobal,downWeights,rightWeights);
-
-            g.initGraph();
-
-            var sourceNum  = 0;
-            source = sourceNum.toString();
-            var sinkNum  =  rows * cols - 1;
-            sink = sinkNum.toString();
-
-            g.longestPathsDynamic(source,sink);
-
-            pathData = g.longestPathBacktrack(sink,source);
-            path = pathData[1];
-            longest = pathData[0];
-
-            pathStr = '';
-            for (i = path.length - 1;i >=0;--i) {
-                pathStr += path[i];
-                if (i > 0)  {
-                    pathStr += '->';
-                }
-
-            }
-
-            resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
-
-
-
-            /*
-
-            var pathData = g.longestPathBacktrack(sink,source);
-            var path = pathData[1];
-            var longest = pathData[0];
-
-            var pathStr = '';
-            for (var i = path.length - 1;i >=0;--i) {
-                pathStr += path[i];
-                if (i > 0)  {
-                    pathStr += '->';
-                }
-
-            }
-
-            resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
-            */
-
-            break;
-
-
-
-        case '38': //Topological ordering from adj list
-
-            adjList = par1El.value.split('\n');
-
-            var topList = [];
-
-            adjList.forEach(function(el) {
-                var spl = el.split(' -> ');
-                var source = spl[0];
-                var target = spl[1].split(',');
-                target.forEach(function(t) {
-                    if (topList.indexOf(t) == -1) {
-                        topList.push(t);
-                    }
-                });
-                if (topList.indexOf(source) == -1) {
-                    topList.unshift(source);
-                }
-
-           });
-
-           //var earliestTarget = 99999;
-            target.forEach(function(t) {
-                /*
-                var pos = topList.indexOf(t);
-                if (pos > -1) {
-                    if (pos < earliestTarget) {
-                        pos = earliestTarget;
-                    }
-                }
+        }
+        else {
+            res = al.align(false, 1, -1);
+            resEl.value += '\nGlobal edit dist: ' + res[0];
+            resEl.value += '\n' + res[1];
+            resEl.value += '\n' + res[2];
+
+
+        }
+
+
+        /*
+                            if (loc == 'Y') {
+                                var res = al.editDist(true);
+                                resEl.value += '\nLocal edit dist: ' + res[0];
+                                res[1].forEach(function(el) {
+                                    resEl.value += '\n' + el[0];
+                                    resEl.value += '\n' + el[1] + ' ' + el[2];
+                                });
+                            }
+                            else {
+                                var res = al.editDist(false);
+                                resEl.value += '\nGlobal edit dist: ' + res[0];
+                                resEl.value += '\n' + res[1];
+                                resEl.value += '\n' + res[2];
+
+
+
+                            }
                 */
 
+        // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
+        resEl.value += '\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+        //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+        resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+        resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
+
+
+    } else if (val === '32') {//Lowest coins
+
+
+        coins = coins.map(function (el) {
+            return parseInt(el);
+        });
+
+
+        resEl.value = 'results\n';
+
+        resEl.value += '\nLowest coins: ' + l;
+    } else if (val === '33') {
+        var t;
+        var p;
+        var loc;
+        var al;//Align DNA using bad/good
+
+        p = par1El.value;
+        t = par2El.value;
+        loc = par3El.value;
+        al = new Aligner(p, t, 2);
+
+
+        resEl.value = 'results\n';
+
+        if (loc === 'Y') {
+            res = al.align(true, 3, -6);
+            resEl.value += '\nLocal align: ' + res[0];
+            res[1].forEach(function (el) {
+                resEl.value += '\n' + el[0];
+                resEl.value += '\n' + el[1] + ' ' + el[2];
             });
+        }
+        else {
+            res = al.align(false, 3, -8);
+            resEl.value += '\nGlobal align: ' + res[0];
+            resEl.value += '\n' + res[1];
+            resEl.value += '\n' + res[2];
 
 
-            break;
+        }
 
 
-        case '39': //Greedy Rev Dist
+        /*
+                 if (loc == 'Y') {
+                 var res = al.editDist(true);
+                 resEl.value += '\nLocal edit dist: ' + res[0];
+                 res[1].forEach(function(el) {
+                 resEl.value += '\n' + el[0];
+                 resEl.value += '\n' + el[1] + ' ' + el[2];
+                 });
+                 }
+                 else {
+                 var res = al.editDist(false);
+                 resEl.value += '\nGlobal edit dist: ' + res[0];
+                 resEl.value += '\n' + res[1];
+                 resEl.value += '\n' + res[2];
 
-            var genomeStr = par1El.value;
-            genomeStr = genomeStr.replace('(','');
-            genomeStr = genomeStr.replace(')','');
-            var genome = genomeStr.split(' ');
 
-            var steps = greedyReversal(genome);
 
-            steps = steps.map(function(el) {
-                var str = '(';
-                el.forEach(function(el2,i) {
-                    str += el2;
-                    if (i == el.length - 1) {
-                        str += ')';
-                    }
-                    else {
-                        str += ' ';
-                    }
-                });
+                 }
+                 */
 
-                return str;
+        // var al = new Aligner('ACTTCGGACGTGTGCTGTAGGCGAACGTCTCACACTGAA','AGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTTAGCCACGTAGCTGATGCTGTGCTGATCGTAGCTAGTCACTTCGGACGTCTCACACTGAAGATGCTAGCTAGCTAGGCAGGTCGTAGCGCATACTTCGGACGTCTCACACTGGCACGGCTGTGAGCGTCGTGCTGATGCGTCGTAGTCGTGACGATCGGCTAGCTGCTGTCGTGCATGCTGTCGATGCGACTTCACTGAGACACTGCGGAACGTAGCTACAGCTAGCTGATCGTAGCTGTGCTAGTCGGCTAGTGCGCATGCTGCGTCGATGCACTTCGGACGTCTCACACTGGCTAACTTCGGACGTCTCACACTGAAGCTGTCGTACGTGTCACACGTT');
+        resEl.value += '\nnaive mm: ' + al.matchString(al.naiveWithMismatch(2)) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
 
+        //resEl.value += '\nnaive: ' + al.matchString(al.naive()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+        resEl.value += '\nbm: ' + al.matchString(al.boyerMoore()) + ' comps: ' + al.debugComparisons + ' time: ' + al.debugTime;
+
+        resEl.value += '\nbad chars: ' + JSON.stringify(al.badChars);
+
+
+    } else if (val === '34') {
+        var t;
+        var p;
+        var loc;
+        var al;//Align Blosum using bad/good
+
+        p = par1El.value;
+        t = par2El.value;
+        loc = par3El.value;
+        al = new Aligner(p, t, 2);
+
+
+        resEl.value = 'results\n';
+
+        if (loc === 'Y') {
+            res = al.align(true, 2, -5);
+            resEl.value += '\nLocal align: ' + res[0];
+            res[1].forEach(function (el) {
+                resEl.value += '\n' + el[0];
+                resEl.value += '\n' + el[1] + ' ' + el[2];
             });
+        }
+        else {
+            res = al.align(false, 2, -5);
+            resEl.value += '\nGlobal align: ' + res[0];
+            resEl.value += '\n' + res[1];
+            resEl.value += '\n' + res[2];
 
-            resEl.value += '\nrev: ';
 
-            steps.forEach(function(el) {
-                resEl.value += '\n' + el;
+        }
+
+
+    } else if (val === '35') {
+       //var t;
+       // var p;
+       // var loc;
+       // var al;//Align LCS using bad/good
+
+        p = par1El.value;
+        t = par2El.value;
+        loc = par3El.value;
+        al = new Aligner(p, t, 2);
+
+
+        resEl.value = 'results\n';
+
+        if (loc === 'Y') {
+            res = al.align(true, 4, 0);
+            resEl.value += '\nLocal LCS: ' + res[0];
+            res[1].forEach(function (el) {
+                resEl.value += '\n' + el[0];
+                resEl.value += '\n' + el[1] + ' ' + el[2];
             });
-
-
-
-            break;
-
-        case '40': //Num breakpoints
-
-            genomeStr = par1El.value;
-            genomeStr = genomeStr.replace('(','');
-            genomeStr = genomeStr.replace(')','');
-            genome = genomeStr.split(' ');
-
-            var bp = numBreakpointsGenome(genome);
-
-
-
-            resEl.value += '\nBreakpoints: ' + bp;
-
-           break;
-
-        case '41': //Breakpoint graph
-
-            source = par1El.value;
-
-            var bpGraph = new DBasicGraph(source,DGraph.fromBreakpoint);
-
-            bpGraph.initGraph();
-
-            bpGraph.numBlocks();
-            numCycles = bpGraph.numCycles();
-
-            bpGraph.twoBreakDistance();
-
-           // bpGraph.graphToGenome('red');
-
-            var genomeStages = [];
-
-
-
-           genomeStages = bpGraph.findEdgeInNonTrivialCycle();
-
-           resStr = '';
-
-            genomeStages.forEach(function(el) {
-               resStr += '\n' + el;
-           }) ;
-
-
-
-            resEl.value += '\nStages: ' + resStr;
-
-            break;
-
-        case '42': //Shared kmers
-
-            var par1 = '';
-            var par2 = '';
-
-            par1 = par1El.value;
-            par2 = par2El.value;
-
-            if (par1  == '') {
-                if (loadedMiscPar1 ==  '') {
-
-                }
-                else {
-                    par1 = loadedMiscPar1;
-
+        }
+        else {
+            var lcs = '';
+            res = al.align(false, 4, 0);
+            resEl.value += '\nGlobal LCS: ' + res[0];
+            resEl.value += '\n' + res[1];
+            resEl.value += '\n' + res[2];
+            for (i = 0; ((i < res[1].length) && (i < res[2].length)); ++i) {
+                if (res[1][i] === res[2][i]) {
+                    lcs += res[1][i];
                 }
             }
-            if (par2  == '') {
-                if (loadedMiscPar2 ==  '') {
+            resEl.value += '\nlcs: ' + lcs;
 
-                }
-                else {
-                    par2 = loadedMiscPar2;
 
-                }
+        }
+
+
+    } else if (val === '36') {//Longest Path DAG
+
+
+        adjList = par3El.value.split('\n');
+
+
+        g.initGraph();
+
+
+        g.longestPathsDynamic(source, sink);
+
+
+        path = pathData[1];
+
+
+        for (i = path.length - 1; i >= 0; --i) {
+            pathStr += path[i];
+            if (i > 0) {
+                pathStr += '->';
             }
 
-/*
-            var pars = par1.split('\n');
-            var s = pars[1];
-            var t = pars[2];
-            var k = parseInt(pars[0]);
-*/
+        }
 
-            var s = par1;
-            t = par2;
-            k = parseInt(par3El.value);
+        resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
 
 
-            var tNumAtATime;
-            if (t.length < 1000000) {
-                tNumAtATime = t.length; //do whole thing at once
+    } else if (val === '37') {
+        var pathStr;
+        var sink;
+        var g;
+        var longest;
+        var source;
+        var pathData;//Longest Path Manhattan Grid
+
+        //var source = par1El.value;
+        //var sink = par2El.value;
+        // adjList = par3El.value.split('\n');
+
+
+        downWeights = downWeights.map(function (el) {
+            var spl = el.split(' ');
+            return spl.map(function (el) {
+                return parseInt(el);
+            });
+
+        });
+
+
+        rightWeights = rightWeights.map(function (el) {
+            var spl = el.split(' ');
+            return spl.map(function (el) {
+                return parseInt(el);
+            });
+        });
+
+        //var diagWeights = [[1,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,1],[0,0,0,1,1]];
+
+        g = new DGGridGraph(rows, cols, DGraph.alignTypeGlobal, downWeights, rightWeights);
+
+        g.initGraph();
+
+
+        source = sourceNum.toString();
+
+        sink = sinkNum.toString();
+
+        g.longestPathsDynamic(source, sink);
+
+        pathData = g.longestPathBacktrack(sink, source);
+        path = pathData[1];
+        longest = pathData[0];
+
+        pathStr = '';
+        for (i = path.length - 1; i >= 0; --i) {
+            pathStr += path[i];
+            if (i > 0) {
+                pathStr += '->';
+            }
+
+        }
+
+        resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
+
+
+        /*
+
+                var pathData = g.longestPathBacktrack(sink,source);
+                var path = pathData[1];
+                var longest = pathData[0];
+
+                var pathStr = '';
+                for (var i = path.length - 1;i >=0;--i) {
+                    pathStr += path[i];
+                    if (i > 0)  {
+                        pathStr += '->';
+                    }
+
+                }
+
+                resEl.value += '\nlongest: ' + longest + '\nPath: ' + pathStr;
+                */
+
+    } else if (val === '38') {//Topological ordering from adj list
+
+        adjList = par1El.value.split('\n');
+
+
+        adjList.forEach(function (el) {
+            var spl = el.split(' -> ');
+            var source = spl[0];
+            var target = spl[1].split(',');
+            target.forEach(function (t) {
+                if (topList.indexOf(t) === -1) {
+                    topList.push(t);
+                }
+            });
+            if (topList.indexOf(source) === -1) {
+                topList.unshift(source);
+            }
+
+        });
+
+        //var earliestTarget = 99999;
+        target.forEach(function (t) {
+            /*
+                    var pos = topList.indexOf(t);
+                    if (pos > -1) {
+                        if (pos < earliestTarget) {
+                            pos = earliestTarget;
+                        }
+                    }
+                    */
+
+        });
+
+
+    } else if (val === '39') {//Greedy Rev Dist
+
+
+        genomeStr = genomeStr.replace('(', '');
+        genomeStr = genomeStr.replace(')', '');
+
+
+        steps = steps.map(function (el) {
+            var str = '(';
+            el.forEach(function (el2, i) {
+                str += el2;
+                if (i === el.length - 1) {
+                    str += ')';
+                }
+                else {
+                    str += ' ';
+                }
+            });
+
+            return str;
+
+        });
+
+        resEl.value += '\nrev: ';
+
+        steps.forEach(function (el) {
+            resEl.value += '\n' + el;
+        });
+
+
+    } else if (val === '40') {
+        var genomeStr;
+        var genome;//Num breakpoints
+
+        genomeStr = par1El.value;
+        genomeStr = genomeStr.replace('(', '');
+        genomeStr = genomeStr.replace(')', '');
+        genome = genomeStr.split(' ');
+
+
+        resEl.value += '\nBreakpoints: ' + bp;
+
+    } else if (val === '41') {
+        var source;//Breakpoint graph
+
+        source = par1El.value;
+
+
+        bpGraph.initGraph();
+
+        bpGraph.numBlocks();
+        numCycles = bpGraph.numCycles();
+
+        bpGraph.twoBreakDistance();
+
+        // bpGraph.graphToGenome('red');
+
+
+        genomeStages = bpGraph.findEdgeInNonTrivialCycle();
+
+        resStr = '';
+
+        genomeStages.forEach(function (el) {
+            resStr += '\n' + el;
+        });
+
+
+        resEl.value += '\nStages: ' + resStr;
+
+    } else if (val === '42') {
+        var t;//Shared kmers
+
+
+        par1 = par1El.value;
+        par2 = par2El.value;
+
+        if (par1 === '') {
+            if (loadedMiscPar1 === '') {
+
             }
             else {
-                tNumAtATime = 500000;
+                par1 = loadedMiscPar1;
+
             }
+        }
+        if (par2 === '') {
+            if (loadedMiscPar2 === '') {
 
-            var sharedAr = [];
-            var tOffset = 0;
-            while (tOffset < t.length) {
-                var shared = partSharedKmers(k,tOffset,tNumAtATime,s,t);
-                sharedAr = sharedAr.concat(shared);
-                tOffset += tNumAtATime;
             }
+            else {
+                par2 = loadedMiscPar2;
 
-            /*
-
-            var sharedAr = [];
-
-            var tDict = {};
-
-            for (var i = 0;i <  t.length - k + 1;++i) {
-                var kmer = t.substring(i,i+k);
-                if (kmer in tDict) {
-                    tDict[kmer].push(i);
-                }
-                else {
-                    tDict[kmer] = [i];
-                }
             }
+        }
 
-            var numShared = 0;
+        /*
+                var pars = par1.split('\n');
+                var s = pars[1];
+                var t = pars[2];
+                var k = parseInt(pars[0]);
+    */
 
-            for (i = 0;i < s.length - k + 1;++i) {
-                if (i % 500000 == 0) {
-                    j = 0;
-                }
-                kmer = s.substring(i, i + k);
-                var kmerRev = reverseComplement(kmer);
 
-                if (kmer in tDict) {
-                    for (var j = 0;j < tDict[kmer].length; ++j) {
-                        var el = tDict[kmer][j];
-                   // tDict[kmer].forEach(function (el) {
-                        sharedAr.push('(' + i + ', ' + el + ')');
-                        ++numShared;
+        t = par2;
+        k = parseInt(par3El.value);
+
+
+        if (t.length < 1000000) {
+            tNumAtATime = t.length; //do whole thing at once
+        }
+        else {
+            tNumAtATime = 500000;
+        }
+
+
+        while (tOffset < t.length) {
+            var shared = partSharedKmers(k, tOffset, tNumAtATime, s, t);
+            sharedAr = sharedAr.concat(shared);
+            tOffset += tNumAtATime;
+        }
+
+        /*
+
+                var sharedAr = [];
+
+                var tDict = {};
+
+                for (var i = 0;i <  t.length - k + 1;++i) {
+                    var kmer = t.substring(i,i+k);
+                    if (kmer in tDict) {
+                        tDict[kmer].push(i);
+                    }
+                    else {
+                        tDict[kmer] = [i];
                     }
                 }
 
+                var numShared = 0;
 
-                if (kmer == kmerRev) {
-                }
-                else {
-                    if (kmerRev in tDict) {
-                        for (var j = 0;j < tDict[kmerRev].length;++j) {
-                            var el = tDict[kmerRev][j];
-                      //  tDict[kmerRev].forEach(function (el) {
+                for (i = 0;i < s.length - k + 1;++i) {
+                    if (i % 500000 == 0) {
+                        j = 0;
+                    }
+                    kmer = s.substring(i, i + k);
+                    var kmerRev = reverseComplement(kmer);
+
+                    if (kmer in tDict) {
+                        for (var j = 0;j < tDict[kmer].length; ++j) {
+                            var el = tDict[kmer][j];
+                       // tDict[kmer].forEach(function (el) {
                             sharedAr.push('(' + i + ', ' + el + ')');
                             ++numShared;
                         }
                     }
-                }
-
-            }
-            */
 
 
-
-
-            resStr = '';
-
-
-            sharedAr.forEach(function(el) {
-               resStr += '\n' + el;
-            });
-
-            resEl.value += '\nShared: ' + resStr;
-
-            break;
-
-        case '43': //Synteny block construction
-
-            par1 = '';
-            par2 = '';
-
-            par1 = par1El.value;
-            par2 = par2El.value;
-
-            if (par1  == '') {
-                if (loadedMiscPar1 ==  '') {
-
-                }
-                else {
-                    par1 = loadedMiscPar1;
-
-                }
-            }
-            if (par2  == '') {
-                if (loadedMiscPar2 ==  '') {
-
-                }
-                else {
-                    par2 = loadedMiscPar2;
-
-                }
-            }
-
-
-
-            var anchorsList = par1.split('\n');
-            anchorsList.shift();
-
-            anchorsList = anchorsList.filter(function(el) {
-                return el != '';
-            });
-
-            anchorsList = anchorsList.map(function(el) {
-                el = el.replace(/\r/g,'');
-                var spl = el.split('\t');
-                var d = {};
-                d['id'] = spl[0];
-                d['chr1'] = spl[1];
-                d['start1'] = parseInt(spl[2]);
-                d['end1'] = parseInt(spl[3]);
-                d['chr2'] = spl[4];
-                d['start2'] = parseInt(spl[5]);
-                d['end2'] = parseInt(spl[6]);
-                d['sign'] = spl[7];
-                return d;
-            });
-
-            anchorsList.sort(function(a,b) {
-
-                return (a['start1'] - b['start1']);
-            });
-
-
-            var points = anchorsList.map(function(el) {
-                var xMid = el['end1'] - el['start1'] / 2;
-                var yMid = el['end2'] - el['start2'] / 2;
-                return[xMid,yMid,'C:W'];
-            });
-
-            plot(document.getElementById('skewCanvas'),points);
-
-
-
-
-            var par2Split = par2.split('\n');
-            var maxDist = parseInt(par2Split[0]);
-            var maxDistBetweenCycles = parseInt(par2Split[1]);
-            var zoomStart = -1;
-            var zoomEnd = -1;
-            if (par2Split.length > 2) {
-                zoomStart = parseInt(par2Split[2]);
-                zoomEnd = parseInt(par2Split[3]);
-            }
-
-            var minSize = parseInt(par3El.value);
-
-            var gr = new DBasicGraph(null,null);
-
-
-            anchorsList.forEach(function(anch,i) {
-                var st = anch['end1'];
-                //var lim = st + maxDist;
-                for (var j = i+1;j < anchorsList.length;++j) {
-                    var comp = anchorsList[j];
-
-                    /*
-                    if (comp['sign'] != anch['sign']) {
-                        break;
-                    }
-                    */
-                    var dist1,dist2;
-                    dist1 = comp['start1'] - anch['end1'];
-
-                    if (comp['sign'] == '-') {
-
-                        dist2 = anch['start2'] - comp['end2'];
+                    if (kmer == kmerRev) {
                     }
                     else {
-
-                        dist2 = comp['start2'] - anch['end2'];
-                    }
-
-                    var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
-                    var grad = Math.abs(dist2 / dist1);
-                    var tempMaxDist;
-
-                    if ((grad >= 1) && (grad <= 0)) {
-                        tempMaxDist = maxDist*10;
-                    }
-                    else {
-                        tempMaxDist = maxDist;
-                    }
-
-                    if (comp['start1'] > st + tempMaxDist) {
-                        break;
-                    }
-
-                    if (dist > tempMaxDist) {
-                        //
-                    }
-                    else {
-
-                        if (anch['id'] in gr.nodes) {
-
+                        if (kmerRev in tDict) {
+                            for (var j = 0;j < tDict[kmerRev].length;++j) {
+                                var el = tDict[kmerRev][j];
+                          //  tDict[kmerRev].forEach(function (el) {
+                                sharedAr.push('(' + i + ', ' + el + ')');
+                                ++numShared;
+                            }
                         }
-                        else {
-                            gr.nodes[anch['id']] = new DGNode(anch['id']);
-
-                        }
-                        if (comp['id'] in gr.nodes) {
-
-                        }
-                        else {
-                            gr.nodes[comp['id']] = new DGNode(comp['id']);
-                        }
-
-                        gr.connectNodesUndirected(gr.nodes[anch['id']], gr.nodes[comp['id']]);
-
-
-                       // var k = 0;
                     }
+
                 }
-
-            });
-
-            numCycles = gr.numCycles(minSize);
-
-
-            anchorsList = anchorsList.map(function(el) {
-                if (el['id'] in gr.nodes) {
-                    var node = gr.nodes[el['id']];
-                    el['cycleNum'] = node.cycleNum;
-                }
-                else {
-                    el['cycleNum'] = 0;
-                }
-                return el;
-
-
-            });
-
-
-
-            var synPoints = anchorsList.filter(function(el) {
-
-                if (el['id'] in gr.nodes) {
-                    var node = gr.nodes[el['id']];
-                    return (node.cycleNum > 0);
-                }
-                else {
-                    return false;
-                }
-
-            });
-
-
-            var stX, stY, endX, endY;
-            stX = -1;
-            stY = -1;
-            endX = -1;
-            endY = -1;
-            var currCycNum = 1;
-
-
-            var cycSummary = [];
-
-            var currCycEntries = [];
-
-
-            maxDistBetweenCycles = 0; // disabled
-
-            synPoints.forEach(function(el,ii) {
-               el['xNum'] = ii;
-               var cyc = el.cycleNum;
-               if (cyc == 0) {
-
-               }
-                else {
-                   if (cyc == currCycNum)  {
-                       currCycEntries.push(el);
-
-                   }
-                   else {
-
-
-                       var dist1,dist2;
-                       var comp = el;
-                       var anch = currCycEntries[currCycEntries.length -1 ];
-                       dist1 = comp['start1'] - anch['end1'];
-                       dist2 = comp['start2'] - anch['end2'];
-                       var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
-                       var grad = Math.abs(dist2/dist1);
-
-                       var tempMaxDistBetweenCycles;
-                       if ((grad >= 0.5) && (grad <= 2.0)) {
-                           tempMaxDistBetweenCycles = maxDistBetweenCycles * 10;
-                       }
-                       else {
-                           tempMaxDistBetweenCycles = maxDistBetweenCycles;
-                       }
-
-                       if (dist < tempMaxDistBetweenCycles) {
-                           currCycEntries.forEach(function(currEntry) {
-                               currEntry['cycleNum'] = cyc; // make previous cyc mum = curr one
-                           });
-                           currCycEntries.push(el);
-                       }
-                       else {
-
-                           cycSummary.push([currCycEntries[0],currCycEntries[currCycEntries.length -1]]);
-
-                           currCycEntries = [el];
-                       }
-
-                   currCycNum = cyc;
-
-                   }
-
-               }
-            });
-            cycSummary.push([currCycEntries[0],currCycEntries[currCycEntries.length -1]]);
-
-
-
-            synPoints = synPoints.map(function(el) {
-                var xMid = el['end1'] - el['start1'] / 2;
-                var yMid = el['end2'] - el['start2'] / 2;
-
-                /*
-                var node = gr.nodes[el['id']];
-                var num = node.cycleNum % 7;
                 */
-                var num = el['cycleNum'] % 7;
-                var col = 'W';
-                switch (num) {
-                    case 0:
-                        col = 'W';
-                        break;
-                    case 1:
-                        col = 'B';
-                        break;
-                    case 2:
-                        col = 'G';
-                        break;
-                    case 3:
-                        col = 'R';
-                        break;
-                    case 4:
-                        col = 'U';
-                        break;
-                    case 5:
-                        col = 'Y';
-                        break;
-                    case 6:
-                        col = 'O';
-                        break;
-                    default:
-                        col = 'W';
-
-                }
-                return[xMid,yMid,'C:' + col,el['id']];
-
-            });
 
 
+        resStr = '';
 
-            if (zoomStart == -1) {
+
+        sharedAr.forEach(function (el) {
+            resStr += '\n' + el;
+        });
+
+        resEl.value += '\nShared: ' + resStr;
+
+    } else if (val === '43') {
+        var par2;
+        var par1;//Synteny block construction
+
+        par1 = '';
+        par2 = '';
+
+        par1 = par1El.value;
+        par2 = par2El.value;
+
+        if (par1 === '') {
+            if (loadedMiscPar1 === '') {
 
             }
             else {
-                synPoints = synPoints.filter(function (el, ii) {
+                par1 = loadedMiscPar1;
 
-                    return !((ii < zoomStart) || (ii > zoomEnd));
-                });
             }
+        }
+        if (par2 === '') {
+            if (loadedMiscPar2 === '') {
+
+            }
+            else {
+                par2 = loadedMiscPar2;
+
+            }
+        }
 
 
+        anchorsList.shift();
+
+        anchorsList = anchorsList.filter(function (el) {
+            return el != '';
+        });
+
+        anchorsList = anchorsList.map(function (el) {
+            el = el.replace(/\r/g, '');
+            var spl = el.split('\t');
+            var d = {};
+            d['id'] = spl[0];
+            d['chr1'] = spl[1];
+            d['start1'] = parseInt(spl[2]);
+            d['end1'] = parseInt(spl[3]);
+            d['chr2'] = spl[4];
+            d['start2'] = parseInt(spl[5]);
+            d['end2'] = parseInt(spl[6]);
+            d['sign'] = spl[7];
+            return d;
+        });
+
+        anchorsList.sort(function (a, b) {
+
+            return (a['start1'] - b['start1']);
+        });
 
 
+        plot(document.getElementById('skewCanvas'), points);
 
 
-
-                plot(document.getElementById('skewCanvas'),synPoints);
-
-
-
-            resStr = '';
+        if (par2Split.length > 2) {
+            zoomStart = parseInt(par2Split[2]);
+            zoomEnd = parseInt(par2Split[3]);
+        }
 
 
-            resStr += '\nanchors length: ' + anchorsList.length + ' num cycles: ' + numCycles;
+        anchorsList.forEach(function (anch, i) {
+            var st = anch['end1'];
+            //var lim = st + maxDist;
+            for (var j = i + 1; j < anchorsList.length; ++j) {
+                var comp = anchorsList[j];
 
-            resEl.value = resStr;
+                /*
+                        if (comp['sign'] != anch['sign']) {
+                            break;
+                        }
+                        */
+                var dist1, dist2;
+                dist1 = comp['start1'] - anch['end1'];
 
-            resEl.value+='\n' + 'amalgamated cycles: ' + cycSummary.length;
+                if (comp['sign'] === '-') {
 
-            var cycSummStr = '';
-            cycSummary.forEach(function(el) {
-                cycSummStr += '\n' + el[0]['xNum'] + '-' + el[1]['xNum'] + '..' +  el[0]['start1'] + '-' + el[1]['end1'];
-
-            });
-
-            resEl.value += '\n' + cycSummStr;
-
-
-
-
-            break;
-
-        case '44': //Turnpike problem
-
-            var turnAr = par1El.value.split(' ');
-
-            var numZeros = 0;
-
-            turnAr = turnAr.map(function(el) {
-                if (el == "0") {
-                    ++numZeros;
-                }
-                return parseInt(el);
-            });
-
-            turnAr = turnAr.filter(function(el) {
-                    return (el >= 0);
-            });
-
-            var prev = 0;
-            var count = 0;
-
-            var turnDict = {};
-            var maxCount = 0;
-
-            turnAr.forEach(function(el) {
-                if (el == prev) {
-                    ++count;
-                    ++maxCount;
+                    dist2 = anch['start2'] - comp['end2'];
                 }
                 else {
-                    turnDict[prev] = count;
-                    prev = el;
-                    count = 1;
-                    ++maxCount;
+
+                    dist2 = comp['start2'] - anch['end2'];
                 }
-            });
-            turnDict[prev] = count;
 
-            prev = -1;
+                var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
+                var grad = Math.abs(dist2 / dist1);
+                var tempMaxDist;
 
-
-            var highest = turnAr[turnAr.length - 1];
-
-            var uniqueNums = [];
-
-            turnAr.forEach(function(el) {
-                if (el == prev) {
-
+                if ((grad >= 1) && (grad <= 0)) {
+                    tempMaxDist = maxDist * 10;
                 }
                 else {
-                    uniqueNums.push(el);
-                    prev = el;
-
+                    tempMaxDist = maxDist;
                 }
-            });
 
-            var valid = [];
-            var validDict = {};
-
-            for (i = 0;i < uniqueNums.length;++i) {
-                for (var j = 0;j < uniqueNums.length;++j) {
-
-                        if (i == j) {
-
-                        }
-                    else {
-
-
-                            if (uniqueNums[i] + uniqueNums[j] == highest) {
-                                valid.push(uniqueNums[i]);
-
-                                break;
-                            }
-                        }
-
-                }
-            }
-
-            valid.forEach(function(el,i) {
-                validDict[el] = {'ind':i,'numRem':valid.length - i - 1}; //excludes last element, as this is put in first
-            });
-
-            //var finished = false;
-
-            var candidates = [];
-            ind = 0;
-
-
-
-            var newCandidates = [];
-            var popSize = 20;
-            for (i = 0;i < popSize;++i) {
-                newCandidates.push(turnpikeGenerateRandomCand(valid,numZeros));
-            }
-
-            res = turnpikeScore(newCandidates,turnDict);
-            var scores = res[0];
-            var maxScore = res[1];
-            var maxInd = res[2];
-
-            for (i = 0;i < scores.length;++i) {
-                if (scores[i] == maxCount) {
-                    resEl.value = '\nValid turnpike nat sel: ' + newCandidates[i];
+                if (comp['start1'] > st + tempMaxDist) {
                     break;
                 }
-            }
 
-            var numGens = 50000;
-
-            for (g = 0;g < numGens;++g) {
-
-                if (g % 100 == 0) {
-                    console.log('gen turnpike: ' + g + ' score: ' + maxScore + ' ' + newCandidates[maxInd][0] + ' ' + newCandidates[maxInd][1] + ' ' + newCandidates[maxInd][2] + ' '  +   newCandidates[maxInd][3] + ' ' + newCandidates[maxInd][4] + ' ' + newCandidates[maxInd][5]  +  ' ' + newCandidates[maxInd][6] + ' ' + newCandidates[maxInd][7] + ' ' + newCandidates[maxInd][8] + ' ' +  newCandidates[maxInd][9] + ' ' + newCandidates[maxInd][10] + ' ' + newCandidates[maxInd][11] );
-                }
-
-                candidates = [];
-                newCandidates.forEach(function (el) {
-                    candidates.push(el);
-                });
-                newCandidates = [];
-                newCandidates.push(candidates[maxInd]); // best goes into next pop as is
-                for (p = 1;p < popSize;++p) {
-                    var r = getRandomInt(0,8);
-                    var numMutes = getRandomInt(0,12);
-                    //var mutated = candidates[scores[r][1]].map(function(el) {
-                    //    return el;
-
-                   // });
-                    var mutated = [];
-                    for (var m = 0;m < candidates[scores[r][1]].length;++m) {
-                        mutated.push(candidates[scores[r][1]][m]);
-                    }
-
-                    for (m = 0;m < numMutes;++m) {
-                        mutated = turnpikeMutateOne(mutated, valid);
-                    }
-                    newCandidates.push(mutated);
-                }
-
-                res = turnpikeScore(newCandidates,turnDict);
-                scores = res[0];
-                maxScore = res[1];
-                maxInd = res[2];
-
-
-
-            }
-
-            resEl.value = '\nValid turnpike nat sel. Score: ' + maxScore + '\n' +  newCandidates[maxInd].sort(function(a,b) {
-                    return  parseInt(a) - parseInt(b);
-                });
-
-
-
-
-            //var good = boundTurnpike(turnAr,[[0,2,4,7,10],[0,2,6,7,10]]);
-
-
-
-
-            /* branch and bound
-
-            var newCandidates = [[highest,0]];
-            while (!finished) {
-                candidates = [];
-                newCandidates.forEach(function(el) {
-                    candidates.push(el);
-
-                });
-
-                newCandidates = [];
-
-                for (var i = 0;i < candidates.length;++i) {
-                    if (i % 10000 == 0) {
-                        console.log('turnpike branch. i = ' + i);
-                    }
-                    var currInd = validDict[candidates[i][candidates[i].length - 1]]['ind'];
-                    for (var j = currInd + 1;j < valid.length;++j) {
-                        var nextRem = validDict[valid[j]]['numRem'];
-                        if (nextRem + candidates[i].length < numZeros) {
-                            break;
-                        }
-                        var newEntry = candidates[i].concat([valid[j]]);
-                        newCandidates.push(newEntry);
-                    }
-                }
-
-                var scores = turnpikeScore(newCandidates,turnDict);
-
-                newCandidates = boundTurnpikeDict(turnAr,newCandidates,turnDict);
-
-                for (var nc = 0;nc < newCandidates.length;++nc) {
-                    if (newCandidates[nc].length == numZeros) {
-                        finished = true;
-                        resEl.value = '\nValid turnpike: ' + newCandidates[nc]
-                        break;
-                    }
-                }
-
-            }
-            //end branch and bound
-            */
-
-
-
-                break;
-
-        case '45': //Dist matrix from tree
-
-            adjList = par1El.value;
-
-            //var builderRos = new DGraphBuilder('0->4:11\n1->4:2\n2->5:6\n3->5:7\n4->0:11\n4->1:2\n4->5:4\n5->4:4\n5->3:7\n5->2:6',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
-            var builderRos = new DGraphBuilder(adjList,new DTreeNodeBuilder(), new DTreeEdgeBuilder());
-            //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
-            var xx = 1;
-            var grRos = new DBTreeGraph(builderRos);
-            var distMat = grRos.distanceMatrixFromTree();
-            xx = 2;
-
-            numZeros = 0;
-
-            res = '';
-            distMat.forEach(function(row) {
-                row.forEach(function(el) {
-                   res += el;
-                   res += ' ';
-                });
-                res+='\n';
-            });
-            resEl.value = res;
-
-            break;
-
-        case '46': //Limb Lengths
-
-            var leafNum = par2El.value;
-            distMat = par1El.value;
-
-
-            var builder = new DGraphTreeFromDistBuilder(distMat);
-            gr = new DBTreeGraph(builder);
-            var limbLen = builder.limbLength(leafNum);
-
-            resEl.value = limbLen;
-
-            break;
-
-
-        case '47': //Additive Phylogeny from dist matrix
-
-            var mat = par1El.value;
-
-
-            builder = new DGraphTreeFromDistBuilder(mat);
-
-            gr = new DBTreeGraph(builder);
-
-            resEl.value = gr.toAdjacencyList();
-
-
-
-            break;
-        case '48': //Additive Phylogeny from alignments
-
-            var alignments = par1El.value;
-
-
-            builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(alignments));
-
-            gr = new DBTreeGraph(builder);
-
-            resEl.value = gr.toAdjacencyList();
-
-
-
-            break;
-
-        case '49': //Ultrametric tree from dist mat
-
-            mat = par1El.value;
-
-
-            builder = new DGraphUltraTreeFromDistBuilder(mat);
-
-            builder.minDistInMatrix(builder.matrix);
-
-            gr = new DBTreeGraph(builder);
-
-            var nd = gr.centralNode();
-
-            resEl.value = gr.toAdjacencyList();
-
-            var canv = document.getElementById('evenMoreCanvas');
-            var ctx = canv.getContext('2d');
-            r = new DBRect(30,30,30,30);
-
-
-            var gView = new DBGraphView(ctx,r,gr);
-            gView.display();
-
-
-
-            break;
-
-        case '50': //Test graph printing
-
-            mat = par1El.value;
-            builder = new DGraphTreeFromDistBuilder(mat);
-          // var adj = par1El.value;
-          // var builder = new DGraphBuilder(adj,new DTreeNodeBuilder(),new DTreeEdgeBuilder());
-
-            gr = new DBTreeGraph(builder);
-
-            gr.centralNode();
-
-            //var copiedGr = gr.copyGraph();
-
-            //copiedGr.stripLeaves();
-
-           // copiedGr.deleteNode(copiedGr.nodes[1]);
-
-            canv = document.getElementById('evenMoreCanvas');
-
-
-            var gvCont = new DBGraphViewController(gr);
-            //var gvCont = new DBTestSimpleController();
-
-            pGraphView = new DBGraphView(canv,gvCont);
-            pGraphView.display();
-
-
-
-            break;
-
-        case '51': //Alg - fibonacci numbers
-
-            var n = parseInt(par1El.value);
-
-            //var fibN = n + 1;
-            var fibAr = [];
-
-            fibAr.push(0);
-            fibAr.push(1);
-
-
-            for (i = 2;i < n + 1;++i) {
-                var newFib = fibAr[i -2] + fibAr[i - 1];
-                fibAr.push(newFib);
-            }
-
-            resEl.value = fibAr;
-
-
-
-            break;
-
-
-
-        case '52': //Alg -  binary search
-
-            var sortedTxtAr = par1El.value.split(' ');
-            var sortedAr = sortedTxtAr.map(function(el) {
-                return parseInt(el);
-            });
-            var testingTxtAr = par2El.value.split(' ');
-            var testingAr = testingTxtAr.map(function(el) {
-                return parseInt(el);
-            });
-
-            var indAr = [];
-            testingAr.forEach(function(tstNum) {
-                var ind = binarySearch(tstNum,sortedAr);
-                indAr.push(ind);
-            });
-
-
-
-
-
-            resEl.value = arrayToString(indAr);
-
-
-
-            break;
-
-        case '53': //Alg -  insertion sort
-
-            var txtAr  = par1El.value.split(' ');
-            var ar = txtAr.map(function(el) {
-                return parseInt(el);
-            });
-
-
-
-            var ret = insertionSort(ar,true);
-
-            resEl.value = arrayToString(ret[0]) + '\n' + 'Num swaps: ' + ret[1];
-
-
-
-            break;
-
-        case '54': //Alg -  majority element
-
-            var resultAr = [];
-            var arArray = par1El.value.split('\n');
-
-            arArray.forEach(function(str) {
-                var txtAr  = str.split(' ');
-                var ar = txtAr.map(function(el) {
-                    return parseInt(el);
-
-                });
-
-                var res = majorityElement(ar);
-                resultAr.push(res);
-
-            });
-
-            var resString = '';
-
-            resultAr.forEach(function(el) {
-                if (el[0]) {
-                    resString+= el[1];
+                if (dist > tempMaxDist) {
+                    //
                 }
                 else {
-                    resString += -1;
-                }
 
-                resString += ' ';
-            });
-
-
-            resEl.value = resString;
-
-
-
-            break;
-
-        case '55': //Alg -  merge sorted arrays
-
-
-            var txtAr1 = par1El.value.split(' ');
-            ar1 = txtAr1.map(function(el) {
-                return parseInt(el);
-
-            });
-
-            var txtAr2 = par2El.value.split(' ');
-            ar2 = txtAr2.map(function(el) {
-                return parseInt(el);
-
-            });
-
-            var merged = mergeSorted(ar1,ar2);
-
-            resEl.value = arrayToString(merged);
-
-
-
-            break;
-
-        case '56': //Alg -  merge sort
-
-
-            txtAr = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
-
-            });
-
-
-            var sorted = mergeSort(ar);
-
-            resEl.value = arrayToString(sorted);
-
-
-
-            break;
-
-        case '57': //Alg -  count inversions
-
-
-            txtAr = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
-
-            });
-
-
-            var invs = countInversions(ar);
-
-            resEl.value = invs;
-
-
-
-            break;
-
-        case '58': //Alg -   2Sum
-
-
-            resultAr = [];
-            arArray = par1El.value.split('\n');
-
-            var pairs = [];
-            arArray.forEach(function(str) {
-                var txtAr  = str.split(' ');
-                var ar = txtAr.map(function(el) {
-                    return parseInt(el);
-
-                });
-
-                var uniqueDict = {};
-                var pair = [];
-                for (var i = 0;i < ar.length;++i) {
-                    if (ar[i] * -1 in uniqueDict) {
-                        pair = [uniqueDict[ar[i] * -1] + 1,i + 1]; //1 based index
-                        pairs.push(pair);
-                        break;
-
-                    }
-                    else if (ar[i] in uniqueDict) {
+                    if (anch['id'] in gr.nodes) {
 
                     }
                     else {
-                        uniqueDict[ar[i]] = i;
+                        gr.nodes[anch['id']] = new DGNode(anch['id']);
+
+                    }
+                    if (comp['id'] in gr.nodes) {
+
+                    }
+                    else {
+                        gr.nodes[comp['id']] = new DGNode(comp['id']);
                     }
 
+                    gr.connectNodesUndirected(gr.nodes[anch['id']], gr.nodes[comp['id']]);
+
+
+                    // var k = 0;
                 }
-                if (pair.length == 0) {
-                    pairs.push([]);
-                }
+            }
+
+        });
+
+        numCycles = gr.numCycles(minSize);
 
 
-            });
+        anchorsList = anchorsList.map(function (el) {
+            if (el['id'] in gr.nodes) {
+                var node = gr.nodes[el['id']];
+                el['cycleNum'] = node.cycleNum;
+            }
+            else {
+                el['cycleNum'] = 0;
+            }
+            return el;
 
-            res = '';
 
-            pairs.forEach(function(el) {
-                if (el.length == 0) {
-                    res += -1 + '\n';
+        });
+
+
+        stX = -1;
+        stY = -1;
+        endX = -1;
+        endY = -1;
+
+
+        maxDistBetweenCycles = 0; // disabled
+
+        synPoints.forEach(function (el, ii) {
+            el['xNum'] = ii;
+            var cyc = el.cycleNum;
+            if (cyc === 0) {
+
+            }
+            else {
+                if (cyc === currCycNum) {
+                    currCycEntries.push(el);
+
                 }
                 else {
-                    res += el[0] + ' ' + el[1] + '\n';
-                }
-
-            });
-
-            resEl.value = res;
 
 
+                    var dist1, dist2;
+                    var comp = el;
+                    var anch = currCycEntries[currCycEntries.length - 1];
+                    dist1 = comp['start1'] - anch['end1'];
+                    dist2 = comp['start2'] - anch['end2'];
+                    var dist = Math.sqrt(dist1 * dist1 + dist2 * dist2);
+                    var grad = Math.abs(dist2 / dist1);
 
-            break;
-
-        case '59': //Alg -   3Sum
-
-
-            resultAr = [];
-            arArray = par1El.value.split('\n');
-
-            var trios = [];
-            arArray.forEach(function(str) {
-                var txtAr  = str.split(' ');
-                var ar = txtAr.map(function(el) {
-                    return parseInt(el);
-
-                });
-
-                var uniqueDict = {};
-                var trio;
-                for (var i = 0;i < ar.length;++i) {
-                    for (j = i+1; j < ar.length; ++j) {
-                        if ((ar[i] + ar[j]) in uniqueDict) {
-
-
-                        }
-
-                        else {
-                            uniqueDict[ar[i] + ar[j]] = [i, j];
-                        }
-
+                    var tempMaxDistBetweenCycles;
+                    if ((grad >= 0.5) && (grad <= 2.0)) {
+                        tempMaxDistBetweenCycles = maxDistBetweenCycles * 10;
+                    }
+                    else {
+                        tempMaxDistBetweenCycles = maxDistBetweenCycles;
                     }
 
+                    if (dist < tempMaxDistBetweenCycles) {
+                        currCycEntries.forEach(function (currEntry) {
+                            currEntry['cycleNum'] = cyc; // make previous cyc mum = curr one
+                        });
+                        currCycEntries.push(el);
+                    }
+                    else {
+
+                        cycSummary.push([currCycEntries[0], currCycEntries[currCycEntries.length - 1]]);
+
+                        currCycEntries = [el];
+                    }
+
+                    currCycNum = cyc;
 
                 }
 
-                trio = [];
+            }
+        });
+        cycSummary.push([currCycEntries[0], currCycEntries[currCycEntries.length - 1]]);
 
-                for (i = 0;i < ar.length;++i) {
-                    if (ar[i] * -1  in uniqueDict) {
-                        if (i <= uniqueDict[ar[i] * -1][1]) {
+
+        synPoints = synPoints.map(function (el) {
+            var xMid = el['end1'] - el['start1'] / 2;
+            var yMid = el['end2'] - el['start2'] / 2;
+
+            /*
+                    var node = gr.nodes[el['id']];
+                    var num = node.cycleNum % 7;
+                    */
+            var num = el['cycleNum'] % 7;
+            var col = 'W';
+            switch (num) {
+                case 0:
+                    col = 'W';
+                    break;
+                case 1:
+                    col = 'B';
+                    break;
+                case 2:
+                    col = 'G';
+                    break;
+                case 3:
+                    col = 'R';
+                    break;
+                case 4:
+                    col = 'U';
+                    break;
+                case 5:
+                    col = 'Y';
+                    break;
+                case 6:
+                    col = 'O';
+                    break;
+                default:
+                    col = 'W';
+
+            }
+            return [xMid, yMid, 'C:' + col, el['id']];
+
+        });
+
+
+        if (zoomStart === -1) {
+
+        }
+        else {
+            synPoints = synPoints.filter(function (el, ii) {
+
+                return !((ii < zoomStart) || (ii > zoomEnd));
+            });
+        }
+
+
+        plot(document.getElementById('skewCanvas'), synPoints);
+
+
+        resStr = '';
+
+
+        resStr += '\nanchors length: ' + anchorsList.length + ' num cycles: ' + numCycles;
+
+        resEl.value = resStr;
+
+        resEl.value += '\n' + 'amalgamated cycles: ' + cycSummary.length;
+
+
+        cycSummary.forEach(function (el) {
+            cycSummStr += '\n' + el[0]['xNum'] + '-' + el[1]['xNum'] + '..' + el[0]['start1'] + '-' + el[1]['end1'];
+
+        });
+
+        resEl.value += '\n' + cycSummStr;
+
+
+    } else if (val === '44') {
+        var p;
+        var ind;
+        var g;//Turnpike problem
+
+
+        turnAr = turnAr.map(function (el) {
+            if (el == "0") {
+                ++numZeros;
+            }
+            return parseInt(el);
+        });
+
+        turnAr = turnAr.filter(function (el) {
+            return (el >= 0);
+        });
+
+
+        turnAr.forEach(function (el) {
+            if (el === prev) {
+                ++count;
+                ++maxCount;
+            }
+            else {
+                turnDict[prev] = count;
+                prev = el;
+                count = 1;
+                ++maxCount;
+            }
+        });
+        turnDict[prev] = count;
+
+        prev = -1;
+
+
+        turnAr.forEach(function (el) {
+            if (el === prev) {
+
+            }
+            else {
+                uniqueNums.push(el);
+                prev = el;
+
+            }
+        });
+
+
+        for (i = 0; i < uniqueNums.length; ++i) {
+            for (var j = 0; j < uniqueNums.length; ++j) {
+
+                if (i == j) {
+
+                }
+                else {
+
+
+                    if (uniqueNums[i] + uniqueNums[j] === highest) {
+                        valid.push(uniqueNums[i]);
+
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        valid.forEach(function (el, i) {
+            validDict[el] = {'ind': i, 'numRem': valid.length - i - 1}; //excludes last element, as this is put in first
+        });
+
+        //var finished = false;
+
+
+        ind = 0;
+
+
+        for (i = 0; i < popSize; ++i) {
+            newCandidates.push(turnpikeGenerateRandomCand(valid, numZeros));
+        }
+
+        res = turnpikeScore(newCandidates, turnDict);
+
+
+        for (i = 0; i < scores.length; ++i) {
+            if (scores[i] === maxCount) {
+                resEl.value = '\nValid turnpike nat sel: ' + newCandidates[i];
+                break;
+            }
+        }
+
+
+        for (g = 0; g < numGens; ++g) {
+
+            if (g % 100 === 0) {
+                console.log('gen turnpike: ' + g + ' score: ' + maxScore + ' ' + newCandidates[maxInd][0] + ' ' + newCandidates[maxInd][1] + ' ' + newCandidates[maxInd][2] + ' ' + newCandidates[maxInd][3] + ' ' + newCandidates[maxInd][4] + ' ' + newCandidates[maxInd][5] + ' ' + newCandidates[maxInd][6] + ' ' + newCandidates[maxInd][7] + ' ' + newCandidates[maxInd][8] + ' ' + newCandidates[maxInd][9] + ' ' + newCandidates[maxInd][10] + ' ' + newCandidates[maxInd][11]);
+            }
+
+            candidates = [];
+            newCandidates.forEach(function (el) {
+                candidates.push(el);
+            });
+            newCandidates = [];
+            newCandidates.push(candidates[maxInd]); // best goes into next pop as is
+            for (p = 1; p < popSize; ++p) {
+                var r = getRandomInt(0, 8);
+                var numMutes = getRandomInt(0, 12);
+                //var mutated = candidates[scores[r][1]].map(function(el) {
+                //    return el;
+
+                // });
+                var mutated = [];
+                for (var m = 0; m < candidates[scores[r][1]].length; ++m) {
+                    mutated.push(candidates[scores[r][1]][m]);
+                }
+
+                for (m = 0; m < numMutes; ++m) {
+                    mutated = turnpikeMutateOne(mutated, valid);
+                }
+                newCandidates.push(mutated);
+            }
+
+            res = turnpikeScore(newCandidates, turnDict);
+            scores = res[0];
+            maxScore = res[1];
+            maxInd = res[2];
+
+
+        }
+
+        resEl.value = '\nValid turnpike nat sel. Score: ' + maxScore + '\n' + newCandidates[maxInd].sort(function (a, b) {
+            return parseInt(a) - parseInt(b);
+        });
+
+
+        //var good = boundTurnpike(turnAr,[[0,2,4,7,10],[0,2,6,7,10]]);
+
+
+        /* branch and bound
+
+                var newCandidates = [[highest,0]];
+                while (!finished) {
+                    candidates = [];
+                    newCandidates.forEach(function(el) {
+                        candidates.push(el);
+
+                    });
+
+                    newCandidates = [];
+
+                    for (var i = 0;i < candidates.length;++i) {
+                        if (i % 10000 == 0) {
+                            console.log('turnpike branch. i = ' + i);
                         }
-                        else {
-                            trio = [uniqueDict[ar[i]*-1][0] + 1,uniqueDict[ar[i]*-1][1] + 1,i + 1]; // 1 based index
+                        var currInd = validDict[candidates[i][candidates[i].length - 1]]['ind'];
+                        for (var j = currInd + 1;j < valid.length;++j) {
+                            var nextRem = validDict[valid[j]]['numRem'];
+                            if (nextRem + candidates[i].length < numZeros) {
+                                break;
+                            }
+                            var newEntry = candidates[i].concat([valid[j]]);
+                            newCandidates.push(newEntry);
+                        }
+                    }
+
+                    var scores = turnpikeScore(newCandidates,turnDict);
+
+                    newCandidates = boundTurnpikeDict(turnAr,newCandidates,turnDict);
+
+                    for (var nc = 0;nc < newCandidates.length;++nc) {
+                        if (newCandidates[nc].length == numZeros) {
+                            finished = true;
+                            resEl.value = '\nValid turnpike: ' + newCandidates[nc]
                             break;
                         }
                     }
+
                 }
-                trios.push(trio);
+                //end branch and bound
+                */
 
-                //var bb = 1;
+
+    } else if (val === '45') {
+        var numZeros;//Dist matrix from tree
+
+        adjList = par1El.value;
+
+        //var builderRos = new DGraphBuilder('0->4:11\n1->4:2\n2->5:6\n3->5:7\n4->0:11\n4->1:2\n4->5:4\n5->4:4\n5->3:7\n5->2:6',new DTreeNodeBuilder(), new DTreeEdgeBuilder());
+
+        //var builder = new DGraphBuilder('I<->A:11\nJ<->A:2\nA<->B:4\nB<->K:6\N\nB<->L:7',new DTreeNodeBuilder());
 
 
+        xx = 2;
+
+        numZeros = 0;
+
+        res = '';
+        distMat.forEach(function (row) {
+            row.forEach(function (el) {
+                res += el;
+                res += ' ';
             });
+            res += '\n';
+        });
+        resEl.value = res;
 
-            res = '';
-
-            trios.forEach(function(el) {
-                if (el.length == 0) {
-                    res += -1 + '\n';
-                }
-                else {
-                    res += el[0] + ' ' + el[1] + ' ' + el[2] +  '\n';
-                }
-
-            });
-
-            resEl.value = res;
-
-            break;
-
-        case '60': //Alg -   Binary Heap
+    } else if (val === '46') {
+        var gr;
+        var distMat;//Limb Lengths
 
 
+        distMat = par1El.value;
 
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
+
+        gr = new DBTreeGraph(builder);
+
+
+        resEl.value = limbLen;
+
+    } else if (val === '47') {
+        var gr;
+        var builder;//Additive Phylogeny from dist matrix
+
+
+        builder = new DGraphTreeFromDistBuilder(mat);
+
+        gr = new DBTreeGraph(builder);
+
+        resEl.value = gr.toAdjacencyList();
+
+
+    } else if (val === '48') {
+        var gr;
+        var builder;//Additive Phylogeny from alignments
+
+
+        builder = new DGraphTreeFromDistBuilder(DGraphTreeFromDistBuilder.AlignmentsToDistMatrix(alignments));
+
+        gr = new DBTreeGraph(builder);
+
+        resEl.value = gr.toAdjacencyList();
+
+
+    } else if (val === '49') {
+        var gr;
+        var mat;
+        var builder;//Ultrametric tree from dist mat
+
+        mat = par1El.value;
+
+
+        builder = new DGraphUltraTreeFromDistBuilder(mat);
+
+        builder.minDistInMatrix(builder.matrix);
+
+        gr = new DBTreeGraph(builder);
+
+
+        resEl.value = gr.toAdjacencyList();
+
+
+        r = new DBRect(30, 30, 30, 30);
+
+
+        gView.display();
+
+
+    } else if (val === '50') {
+        var gr;
+        var mat;
+        var canv;
+        var builder;//Test graph printing
+
+        mat = par1El.value;
+        builder = new DGraphTreeFromDistBuilder(mat);
+        // var adj = par1El.value;
+        // var builder = new DGraphBuilder(adj,new DTreeNodeBuilder(),new DTreeEdgeBuilder());
+
+        gr = new DBTreeGraph(builder);
+
+        gr.centralNode();
+
+        //var copiedGr = gr.copyGraph();
+
+        //copiedGr.stripLeaves();
+
+        // copiedGr.deleteNode(copiedGr.nodes[1]);
+
+        canv = document.getElementById('evenMoreCanvas');
+
+
+        //var gvCont = new DBTestSimpleController();
+
+        pGraphView = new DBGraphView(canv, gvCont);
+        pGraphView.display();
+
+
+    } else if (val === '51') {//Alg - fibonacci numbers
+
+
+        //var fibN = n + 1;
+
+
+        fibAr.push(0);
+        fibAr.push(1);
+
+
+        for (i = 2; i < n + 1; ++i) {
+            var newFib = fibAr[i - 2] + fibAr[i - 1];
+            fibAr.push(newFib);
+        }
+
+        resEl.value = fibAr;
+
+
+    } else if (val === '52') {//Alg -  binary search
+
+
+        testingAr.forEach(function (tstNum) {
+            var ind = binarySearch(tstNum, sortedAr);
+            indAr.push(ind);
+        });
+
+
+        resEl.value = arrayToString(indAr);
+
+
+    } else if (val === '53') {//Alg -  insertion sort
+
+
+        resEl.value = arrayToString(ret[0]) + '\n' + 'Num swaps: ' + ret[1];
+
+
+    } else if (val === '54') {//Alg -  majority element
+
+
+        arArray.forEach(function (str) {
+            var txtAr = str.split(' ');
+            var ar = txtAr.map(function (el) {
                 return parseInt(el);
 
             });
 
-            var h  = new Heap(ar);
-            h.init();
+            var res = majorityElement(ar);
+            resultAr.push(res);
+
+        });
 
 
-            resEl.value = arrayToString(h.heapAr);
+        resultAr.forEach(function (el) {
+            if (el[0]) {
+                resString += el[1];
+            }
+            else {
+                resString += -1;
+            }
 
-            break;
-
-        case '61': //Alg -   Heap sort
-
+            resString += ' ';
+        });
 
 
-        txtAr  = par1El.value.split(' ');
-        ar = txtAr.map(function(el) {
+        resEl.value = resString;
+
+
+    } else if (val === '55') {
+        var ar1;
+        var ar2;//Alg -  merge sorted arrays
+
+
+        ar1 = txtAr1.map(function (el) {
             return parseInt(el);
 
         });
 
-        h  = new Heap(ar);
+
+        ar2 = txtAr2.map(function (el) {
+            return parseInt(el);
+
+        });
+
+
+        resEl.value = arrayToString(merged);
+
+
+    } else if (val === '56') {
+        var txtAr;
+        var ar;//Alg -  merge sort
+
+
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
+
+        });
+
+
+        resEl.value = arrayToString(sorted);
+
+
+    } else if (val === '57') {
+        var txtAr;
+        var ar;//Alg -  count inversions
+
+
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
+
+        });
+
+
+        resEl.value = invs;
+
+
+    } else if (val === '58') {
+        var arArray;
+        var resultAr;//Alg -   2Sum
+
+
+        resultAr = [];
+        arArray = par1El.value.split('\n');
+
+
+        arArray.forEach(function (str) {
+            var txtAr = str.split(' ');
+            var ar = txtAr.map(function (el) {
+                return parseInt(el);
+
+            });
+
+            var uniqueDict = {};
+            var pair = [];
+            for (var i = 0; i < ar.length; ++i) {
+                if (ar[i] * -1 in uniqueDict) {
+                    pair = [uniqueDict[ar[i] * -1] + 1, i + 1]; //1 based index
+                    pairs.push(pair);
+                    break;
+
+                }
+                else if (ar[i] in uniqueDict) {
+
+                }
+                else {
+                    uniqueDict[ar[i]] = i;
+                }
+
+            }
+            if (pair.length == 0) {
+                pairs.push([]);
+            }
+
+
+        });
+
+        res = '';
+
+        pairs.forEach(function (el) {
+            if (el.length == 0) {
+                res += -1 + '\n';
+            }
+            else {
+                res += el[0] + ' ' + el[1] + '\n';
+            }
+
+        });
+
+        resEl.value = res;
+
+
+    } else if (val === '59') {
+        var arArray;
+        var resultAr;//Alg -   3Sum
+
+
+        resultAr = [];
+        arArray = par1El.value.split('\n');
+
+
+        arArray.forEach(function (str) {
+            var txtAr = str.split(' ');
+            var ar = txtAr.map(function (el) {
+                return parseInt(el);
+
+            });
+
+            var uniqueDict = {};
+            var trio;
+            for (var i = 0; i < ar.length; ++i) {
+                for (j = i + 1; j < ar.length; ++j) {
+                    if ((ar[i] + ar[j]) in uniqueDict) {
+
+
+                    }
+
+                    else {
+                        uniqueDict[ar[i] + ar[j]] = [i, j];
+                    }
+
+                }
+
+
+            }
+
+            trio = [];
+
+            for (i = 0; i < ar.length; ++i) {
+                if (ar[i] * -1 in uniqueDict) {
+                    if (i <= uniqueDict[ar[i] * -1][1]) {
+                    }
+                    else {
+                        trio = [uniqueDict[ar[i] * -1][0] + 1, uniqueDict[ar[i] * -1][1] + 1, i + 1]; // 1 based index
+                        break;
+                    }
+                }
+            }
+            trios.push(trio);
+
+            //var bb = 1;
+
+
+        });
+
+        res = '';
+
+        trios.forEach(function (el) {
+            if (el.length == 0) {
+                res += -1 + '\n';
+            }
+            else {
+                res += el[0] + ' ' + el[1] + ' ' + el[2] + '\n';
+            }
+
+        });
+
+        resEl.value = res;
+
+    } else if (val === '60') {
+        var txtAr;
+        var ar;//Alg -   Binary Heap
+
+
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
+
+        });
+
+
         h.init();
 
+
+        resEl.value = arrayToString(h.heapAr);
+
+    } else if (val === '61') {
+        var h;
+        var txtAr;
+        var sorted;
+        var ar;//Alg -   Heap sort
+
+
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
+
+        });
+
+        h = new Heap(ar);
+        h.init();
 
 
         sorted = h.sort();
@@ -5176,315 +4852,921 @@ function executeMisc(e) {
         resEl.value = arrayToString(sorted);
 
 
+    } else if (val === '62') {
+        var h;
+        var txtAr;
+        var sorted;
+        var ar;//Alg -   Heap sort partial
 
 
-        break;
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
-        case '62': //Alg -   Heap sort partial
+        });
 
 
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
+        h = new MinHeap(ar);
+        h.init();
+
+
+        sorted = h.sort(num);
+
+
+        resEl.value = arrayToString(sorted);
+
+
+    } else if (val === '63') {
+        var gr;
+        var builder;//Alg -   Degree
+
+
+        adjList = par1El.value;
+
+        builder = new DGraphBuilder(adjList);
+
+        gr = new DBGraph(builder);
+
+
+        gr.nodes.forEach(function (el) {
+            var ind = parseInt(el.label) - 1;
+            nodeAr[ind] = el.degree();
+        });
+
+        resEl.value = arrayToString(nodeAr);
+
+
+    } else if (val === '64') {
+        var gr;
+        var nodeAr;
+        var builder;//Alg -   Double Degree
+
+
+        adjList = par1El.value;
+
+        builder = new DGraphBuilder(adjList);
+
+        gr = new DBGraph(builder);
+
+        nodeAr = gr.nodes.map(function () {
+            return 0;
+        });
+
+        gr.nodes.forEach(function (el) {
+            var ind = parseInt(el.label) - 1;
+            var totDeg = 0;
+            var sucs = el.getPredecessors();
+            sucs.forEach(function (suc) {
+                totDeg += suc.degree();
+
 
             });
+            nodeAr[ind] = totDeg;
+        });
 
-            var num = parseInt(par2El.value);
+        resEl.value = arrayToString(nodeAr);
 
-            h  = new MinHeap(ar);
-            h.init();
 
+    } else if (val === '65') {
+        var txtAr;
+        var ar;//Alg - Two way partition
 
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
-            sorted = h.sort(num);
+        });
 
 
-            resEl.value = arrayToString(sorted);
+        twoWayPartition(ar);
 
+        resEl.value = arrayToString(ar);
 
 
+    } else if (val === '66') {
+        var txtAr;
+        var ar;//Alg - Three way partition
 
-            break;
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
-        case '63': //Alg -   Degree
+        });
 
 
-            adjList = par1El.value;
+        if (vTxt == '') {
+            v = ar[0];
+        }
+        else {
+            v = parseInt(vTxt);
+        }
 
-            builder = new DGraphBuilder(adjList);
 
-            gr = new DBGraph(builder);
+        resEl.value = inds + '\n' + arrayToString(ar);
 
-            var nodeAr = gr.nodes.map(function() {
-               return 0;
-            });
 
-            gr.nodes.forEach(function(el) {
-                var ind = parseInt(el.label) - 1;
-                nodeAr[ind] = el.degree();
-            });
+    } else if (val === '67') {
+        var txtAr;
+        var ar;//Alg - Median
 
-            resEl.value = arrayToString(nodeAr);
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
+        });
 
 
+        if (kTxt == '') {
+            k = Math.floor(ar.length / 2);// ie look for median
+        }
+        else {
+            k = parseInt(kTxt);
+        }
 
-            break;
+        m = kthSmallest(ar, k);
 
-        case '64': //Alg -   Double Degree
 
+        resEl.value = m;
 
-            adjList = par1El.value;
 
-            builder = new DGraphBuilder(adjList);
+    } else if (val === '68') {
+        var txtAr;
+        var sorted;
+        var ar;//Alg - Quick Sort
 
-            gr = new DBGraph(builder);
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
-            nodeAr = gr.nodes.map(function() {
-                return 0;
-            });
+        });
 
-            gr.nodes.forEach(function(el) {
-                var ind = parseInt(el.label) - 1;
-                var totDeg = 0;
-                var sucs = el.getPredecessors();
-                sucs.forEach(function(suc) {
-                    totDeg += suc.degree();
 
+        sorted = quickSort(ar);
 
-                });
-                nodeAr[ind] = totDeg;
-            });
 
-            resEl.value = arrayToString(nodeAr);
+        resEl.value = arrayToString(sorted);
 
 
+    } else if (val === '69') {
+        var gr;
+        var resString;
+        var builder;//Top order DAG
 
 
-            break;
+        adjList = par1El.value;
 
-        case '65': //Alg - Two way partition
+        builder = new DGraphBuilder(adjList);
 
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
+        gr = new DBGraph(builder);
 
-            });
 
+        gr.resetNodesVisited();
 
 
+        while (!done) {
 
-            twoWayPartition(ar);
+            done = true;
 
-            resEl.value = arrayToString(ar);
+            gr.nodes.forEach(function (el) {
 
 
-            break;
+                if (el.visited) {
 
-        case '66': //Alg - Three way partition
-
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
-
-            });
-
-            var vTxt = par2El.value;
-            if (vTxt == '') {
-                v = ar[0];
-            }
-            else {
-                v = parseInt(vTxt);
-            }
-
-
-
-
-
-            var inds = threeWayPartitionNonInPlace(ar,v);
-
-            resEl.value = inds + '\n' + arrayToString(ar);
-
-
-            break;
-
-        case '67': //Alg - Median
-
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
-
-            });
-
-            var kTxt = par2El.value;
-            if (kTxt == '') {
-                k = Math.floor(ar.length / 2);// ie look for median
-            }
-            else {
-                k = parseInt(kTxt);
-            }
-
-            m = kthSmallest(ar,k);
-
-
-
-            resEl.value = m;
-
-
-            break;
-
-        case '68': //Alg - Quick Sort
-
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
-
-            });
-
-
-            sorted = quickSort(ar);
-
-
-
-            resEl.value = arrayToString(sorted);
-
-
-            break;
-
-        case '69': //Top order DAG
-
-
-            adjList = par1El.value;
-
-            builder = new DGraphBuilder(adjList);
-
-            gr = new DBGraph(builder);
-
-
-            var done = false;
-
-            gr.resetNodesVisited();
-
-            var order = [];
-
-            while (!done) {
-
-                done = true;
-
-                gr.nodes.forEach(function (el) {
-
-
-
-                    if (el.visited) {
-
+                }
+                else {
+                    var preds = el.getPredecessors();
+                    if (preds.length == 0) {
+                        el.visited = true;
+                        order.push(el);
                     }
                     else {
-                        var preds = el.getPredecessors();
-                        if (preds.length == 0) {
+                        var allPredDone = true;
+                        preds.forEach(function (pred) {
+                            if (!(pred.visited)) {
+                                allPredDone = false;
+                            }
+                        });
+                        if (allPredDone) {
                             el.visited = true;
                             order.push(el);
                         }
                         else {
-                            var allPredDone = true;
-                            preds.forEach(function(pred) {
-                               if (!(pred.visited)) {
-                                   allPredDone = false;
-                               }
-                            });
-                            if (allPredDone) {
-                                el.visited = true;
-                                order.push(el);
-                            }
-                            else {
-                                done = false;
-                            }
+                            done = false;
                         }
                     }
-
-                });
-            }
-
-            resString = '';
-
-            order.forEach(function(ord,i) {
-                resString+=ord.label;
-                if (i < order.length - 1) {
-                    resString += ', ';
                 }
 
             });
+        }
 
-            resEl.value =resString;
+        resString = '';
+
+        order.forEach(function (ord, i) {
+            resString += ord.label;
+            if (i < order.length - 1) {
+                resString += ', ';
+            }
+
+        });
+
+        resEl.value = resString;
 
 
+    } else if (val === '70') {
+        var txtAr;
+        var ar;//Turnpike
 
 
-            break;
+        txtAr = par1El.value.split(' ');
+        ar = txtAr.map(function (el) {
+            return parseInt(el);
 
-        case '70': //Turnpike
+        });
+
+        //  var delta = deltaTurnpike([0,4,7,8,10]);
 
 
-            txtAr  = par1El.value.split(' ');
-            ar = txtAr.map(function(el) {
-                return parseInt(el);
+        // var tr = turnpikeBacktrack(ar);
+
+
+        //var tr = turnpikeRecursive([0,0,2]);
+
+        //  turnpike(ar);
+
+
+        resEl.value = arrayToString(tr);
+
+    } else if (val === '71') {
+        var gr;
+        var order;
+        var done;
+        var resString;
+        var nd;
+        var builder;//Alg - depth-first search
+
+        //check number of connected components
+        // Note: par2 can hold the  number of vertices/edges (separated by space)
+        // If so: need to check number of nodes. If less than vertices specified, there are
+        // more (isolated) connected components, ie extra vertices which have no connections
+
+
+        adjList = par1El.value;
+
+
+        if (info.length == 0) {
+
+        }
+        else {
+            var infoSplit = info.split(' ');
+            numVertices = parseInt(infoSplit[0]);
+            numEdges = parseInt(infoSplit[1]);
+        }
+
+        builder = new DGraphBuilder(adjList);
+
+        gr = new DBGraph(builder);
+
+
+        done = false;
+
+        gr.resetNodesVisited();
+
+        order = [];
+
+        done = false;
+
+        while (!done) {
+
+            var foundNonVisited = false;
+            for (i = 0; i < gr.nodes.length; ++i) {
+                if (gr.nodes[i].visited) {
+
+                }
+                else {
+                    foundNonVisited = true;
+                    ++connectedComponents;
+                    break;
+                }
+            }
+            if (foundNonVisited) {
+                nd = gr.nodes[i];
+                gr.getConnected(nd);
+            }
+            else {
+                done = true;
+            }
+
+        }
+
+
+        if (numVertices == -1) {
+
+        }
+        else {
+            //check for extra non-used vertices
+            if (numVertices > numNodes) {
+                connectedComponents += (numVertices - numNodes);
+            }
+        }
+
+
+        resString = connectedComponents;
+
+
+        resEl.value = resString;
+
+
+    } else if (val === '72') {
+        var gr;
+        var numEdges;
+        var order;
+        var info;
+        var numVertices;
+        var done;
+        var resString;
+        var builder;//Alg - breadth-first search
+
+        //return list of path lengths from first node to all other nodes
+        // Note: par2 can hold the  number of vertices/edges (separated by space)
+        // If so: need to check number of nodes. If less than vertices specified, there are
+        // more (isolated) connected components, ie extra vertices which have no connections
+
+        adjList = par1El.value;
+        //convert adjlist to directed adj list (assuming first named nodes are source and second are target
+
+
+        workingAr.forEach(function (el, i) {
+            var sourceTarg = el.split(' ');
+            workingString += sourceTarg[0] + ' -> ' + sourceTarg[1];
+            if (i < workingAr.length - 1) {
+                workingString += '\n';
+            }
+
+        });
+        adjList = workingString;
+
+
+        info = par2El.value;
+
+
+        numVertices = -1;
+        numEdges = -1;
+        if (info.length == 0) {
+
+        }
+        else {
+            infoSplit = info.split(' ');
+            numVertices = parseInt(infoSplit[0]);
+            numEdges = parseInt(infoSplit[1]);
+        }
+
+
+        for (i = 0; i < numVertices; ++i) {
+            pathList.push(-1);
+        }
+
+
+        builder = new DGraphBuilder(adjList);
+
+        gr = new DBGraph(builder);
+
+
+        done = false;
+
+        gr.resetNodesVisited();
+
+        order = [];
+
+        done = false;
+
+
+        first.visited = true;
+
+
+        pathList[0] = 0;
+
+
+        while (depthQueue.length > 0) {
+
+            var newQueue = [];
+
+            depthQueue.forEach(function (nd) {
+                var succs = nd.getSuccessorNodes();
+                succs.forEach(function (suc) {
+                    if (suc.visited) {
+
+                    }
+                    else {
+                        newQueue.push(suc);
+                        suc.visited = true;
+                    }
+                });
+
 
             });
 
-          //  var delta = deltaTurnpike([0,4,7,8,10]);
-          var delta = deltaTurnpike([0,4,7,8,10]);
+            ++level;
+            newQueue.forEach(function (el) {
+                var ind = parseInt(el.label) - 1;
+                pathList[ind] = level;
 
-           // var tr = turnpikeBacktrack(ar);
-            var tr= turnpikeBacktrack(ar);
+            });
 
-            //var tr = turnpikeRecursive([0,0,2]);
+            depthQueue = newQueue;
 
-          //  turnpike(ar);
-
-
-            resEl.value =arrayToString(tr);
-
-            break;
+        }
 
 
-        case '71': //Alg - depth-first search
-
-           //check number of connected components
-           // Note: par2 can hold the  number of vertices/edges (separated by space)
-           // If so: need to check number of nodes. If less than vertices specified, there are
-           // more (isolated) connected components, ie extra vertices which have no connections
+        resString = arrayToString(pathList);
 
 
-            adjList = par1El.value;
+        resEl.value = resString;
 
-            var info = par2El.value;
+
+    } else if (val === '73') {
+        var gr;
+        var str;
+        var resString;
+        var nd;
+        var builder;//Nearest Neighbours
+
+
+        adjList = par1El.value;
+
+
+        adjArray.forEach(function (el) {
+            var n1 = el.split('->')[0];
+            var n2 = el.split('->')[1];
+
+            if (n1 == edgeToUseLabFrom) {
+                if (n2 == edgeToUseLabTo) {
+                }
+                else {
+                    if (firstFrom == '') {
+                        firstFrom = n2;
+                    }
+                }
+            }
+            if (n2 == edgeToUseLabFrom) {
+                if (n1 == edgeToUseLabTo) {
+                }
+                else {
+                    if (firstFrom == '') {
+                        firstFrom = n1;
+                    }
+                }
+            }
+            if (n1 == edgeToUseLabTo) {
+                if (n2 == edgeToUseLabFrom) {
+                }
+                else {
+                    if (firstTo == '') {
+                        firstTo = n2;
+                    }
+                }
+            }
+            if (n2 == edgeToUseLabTo) {
+                if (n1 == edgeToUseLabFrom) {
+                }
+                else {
+                    if (firstTo == '') {
+                        firstTo = n1;
+                    }
+                }
+            }
+
+
+        });
+
+        builder = new DGraphTreeBuilder(adjList);
+
+        gr = new DBTreeGraph(builder);
+
+        nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
+
+
+        nd.edges.forEach(function (el) {
+
+            if ((el.sourceNode.label == edgeToUseLabTo) ||
+                (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
+                edge = el;
+            }
+
+        });
+
+
+        if (edge.sourceNode.label == edgeToUseLabFrom) {
+            fromNode1 = edge.sourceNode;
+            fromNode2 = edge.targetNode;
+            edgeNum = 0;
+            otherEdgeNum = 1;
+        }
+        else {
+            fromNode1 = edge.targetNode;
+            fromNode2 = edge.sourceNode;
+            edgeNum = 1;
+            otherEdgeNum = 0;
+        }
+
+
+        //var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
+
+
+        //var toTwoLab = neighb[otherEdgeNum][1].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][1].targetNode.label : neighb[otherEdgeNum][1].sourceNode.label;
+
+
+//if ( parseInt(fromOneLab) > parseInt(fromTwoLab) ) {
+        if (fromOneLab == firstFrom) {
+            fromSwapper = 1;
+        }
+        else {
+            fromSwapper = 0;
+        }
+
+
+//if ( parseInt(toOneLab) < parseInt(toTwoLab) ) {
+        if (toOneLab == firstTo) {
+            toSwapper1 = 0;
+            toSwapper2 = 1;
+        }
+        else {
+            toSwapper1 = 1;
+            toSwapper2 = 0;
+        }
+
+
+        gr.builder.swapEdges(neighb[edgeNum][fromSwapper], neighb[otherEdgeNum][toSwapper1], fromNode1, fromNode2);
+
+
+        str = gr.toAdjacencyList(0, false, true, true);
+
+        builder = new DGraphTreeBuilder(adjList);
+
+        gr = new DBTreeGraph(builder);
+
+        nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
+
+
+        nd.edges.forEach(function (el) {
+
+            if ((el.sourceNode.label == edgeToUseLabTo) ||
+                (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
+                edge = el;
+            }
+
+        });
+
+        neighb = edge.neighbouringEdges();
+
+
+        if (edge.sourceNode.label == edgeToUseLabFrom) {
+            fromNode1 = edge.sourceNode;
+            fromNode2 = edge.targetNode;
+            edgeNum = 0;
+            otherEdgeNum = 1;
+        }
+        else {
+            fromNode1 = edge.targetNode;
+            fromNode2 = edge.sourceNode;
+            edgeNum = 1;
+            otherEdgeNum = 0;
+        }
+
+
+        gr.builder.swapEdges(neighb[edgeNum][fromSwapper], neighb[otherEdgeNum][toSwapper2], fromNode1, fromNode2);
+
+
+        str += '\n' + '\n' + gr.toAdjacencyList(0, false, true, true);
+
+
+        resString = str;
+
+
+        resEl.value = resString;
+
+
+    } else if (val === '74') {//BA8A Farthest First Traversal
+
+
+        //var params = parseAr.shift();
+        console.log('params: ' + params);
+
+        k = parseFloat(params.split(' ')[0]);
+
+
+        pSpace.movePointToCentres(pSpace.points[0], true);
+
+        /*
+              var centres = [];
+              centres.push(parseAr.shift());
+              */
+
+
+        while (pSpace.centres.length < k) {
+
+            var p = pSpace.findFarthestPointFromCentres();
+
+            pSpace.movePointToCentres(p, true);
+
+        }
+
+        pSpace.allocatePointsToClusters();
+
+        resStr = pSpace.centresToString(); //+ '\nSq distort: ' + dist;
+
+
+        resEl.value = resStr;
+
+    } else if (val === '75') {//BA8B Squared Distortion
+
+
+        //var params = parseAr.shift();
+        console.log('params: ' + params);
+
+        k = parseFloat(params.split(' ')[0]);
+
+
+        centAr.forEach(function (str) {
+            pSpace.addCentre(str);
+        });
+
+
+        resStr = 'Sq dist:\n' + dist;
+
+
+        resEl.value = resStr;
+
+    } else if (val === '76') {
+        var resString;//Peptide Vector
+
+
+        pepStr = par1El.value;
+
+        pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+
+
+        resString = '';
+
+        resString += arrayToString(vect);
+
+
+        resEl.value = resString;
+
+    } else if (val === '77') {
+        var resString;//Peptide from Vector
+
+
+        pep = new Peptide(Peptide.AminoArrFromVector(vecStr));
+
+
+        resString = '';
+
+        resString += pep.toShortString('');
+
+
+        resEl.value = resString;
+
+    } else if (val === '78') {
+        var vecStr;
+        var resString;//Peptide Identification
+
+
+        vecStr = par1El.value;
+        proteome = par2El.value;
+
+        res = peptideIdentification(vecStr, proteome);
+
+        /*
+
+              var vecAr = vecStr.split(' ');
+
+              vecAr = vecAr.map(function(el) {
+                 return parseInt(el);
+              });
+
+              var pepWeight = vecAr.length;
+
+
+
+              var candidates = [];
+
+
+              for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
+                  //find candidate peptide starting at stPos with correct weight
+                  var candFound = false;
+                  for (var endPos = stPos;endPos <= proteome.length - 1;++endPos) {
+                      var pepStr = proteome.substring(stPos,endPos+1);
+                      var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+                      var w = pep.getIntegerWeight();
+                      if (w == pepWeight) {
+                          candFound = true;
+                          candidates.push(pep);
+                      }
+                      if (w >= pepWeight) {
+                          break;
+                      }
+                  }
+              }
+
+
+              var bestCand = '';
+              var bestScore = DGraph.infinity * -1;
+
+              candidates.forEach(function(cand,i) {
+                  var score = cand.scoreAgainstSpectralVector(vecAr);
+                  if (score > bestScore) {
+                      bestCand = cand.toShortString('');
+                      bestScore = score;
+                  }
+
+              });
+
+              */
+
+        resString = '';
+
+        resString += '\nBest score: ' + res[1] + '\nBest Candidate: ' + res[0];
+
+
+        resEl.value = resString;
+
+    } else if (val === '79') {
+        var resString;//PSM
+
+
+        proteome = par2El.value;
+        threshold = parseInt(par3El.value);
+
+
+        vecArs.forEach(function (vecStr) {
+            var res = peptideIdentification(vecStr, proteome);
+            if (res[1] > threshold) {
+                psmMatches.push(res[0]);
+            }
+
+        });
+
+
+        resString = '';
+
+        resString += '\nPS Matches: \n' + arrayToString(psmMatches, '\n');
+
+
+        resEl.value = resString;
+
+    } else if (val === '80') {
+        var vecStr;
+        var t;
+        var resString;//Spectral Dictionary Size
+
+
+        vecStr = par1El.value;
+
+        threshold = parseInt(par2El.value);
+
+
+        vecAr = vecStr.split(' ');
+
+        vecAr = vecAr.map(function (el) {
+            return parseInt(el);
+        });
+
+
+        for (t = threshold; t <= max_score; ++t) {
+            size = spectralDictSize(vecAr, t, [], useToy);
+            totSize += size;
+        }
+
+
+        /*
+              var totNum = numPeptidesWithSpectralVector(vecAr,[], useToy);
+              */
+
+
+        for (t = threshold; t <= max_score; ++t) {
+            prob = spectralDictProbability(vecAr, t, [], useToy);
+            totProb += prob;
+        }
+
+
+        resString = '';
+
+        resString += '\nSpectral Dict Size: \n' + totSize + '\nProb: \n' + totProb;
+
+
+        resEl.value = resString;
+
+    } else if (val === '81') {
+        var delta;
+        var rows;
+        var cols;
+        var vecStr;
+        var resString;
+        var builder;//Spectral Alignment
+
+        par1El.placeholder = 'blah';
+
+        pepStr = par1El.value;
+        vecStr = par2El.value;
+
+
+        k = parseInt(par3El.value);
+
+        vecAr = vecStr.split(' ');
+
+        vecAr = vecAr.map(function (el) {
+            return parseInt(el);
+        });
+
+        pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
+
+
+        delta = vecAr.length - pepWeight;
+
+        rows = pepWeight + 1;
+        cols = vecAr.length + 1;
+        //var lays = k + 1;
+
+        builder = new DGraphGridFromSpecAlignBuilder([pep, vecAr, k]);
+
+
+        res = gg.longestPathNodeWeighted(gg.getSourceNode(), gg.getSinkNode());
+
+        resString = '';
+
+        resString += 'Best Modified Peptide: ' + res[0] + ' Score: ' + res[1];
+
+
+        resEl.value = resString;
+
+    } else if (val === '82') {
+        var done;
+        var resString;//Alg - acyclic check
+
+        //check graph is acyclic
+
+        params = par1El.value.split('\n');
+
+        k = parseInt(params.shift());
+
+        params.shift();
+
+        done = false;
+
+
+        while (params.length > 0) {
+            adjList = [];
+            var adj = params.shift();
+            if (adj == '') {
+                break;
+            }
+            while (adj && adj != '') {
+                adjList.push(adj);
+                adj = params.shift();
+
+            }
+            adjLists.push(adjList);
+
+
+        }
+
+
+        adjLists.forEach(function (adjList) {
+
+
+            var info = adjList.shift();
             var numVertices = -1;
-            var numEdges = -1;
+            //var numEdges = -1;
             if (info.length == 0) {
 
             }
             else {
                 var infoSplit = info.split(' ');
                 numVertices = parseInt(infoSplit[0]);
-                numEdges = parseInt(infoSplit[1]);
+                //numEdges = parseInt(infoSplit[1]);
             }
 
-            builder = new DGraphBuilder(adjList);
+            adjList = adjList.join('\n');
+            var builder = new DGraphBuilder(adjList);
 
-            gr = new DBGraph(builder);
+            var gr = new DBGraph(builder);
 
-
-            done = false;
+            var done;
 
             gr.resetNodesVisited();
 
-            order = [];
+            // var order = [];
+
 
             done = false;
             var connectedComponents = 0;
+
+            var cycleExists = false;
+
             while (!done) {
 
                 var foundNonVisited = false;
-                for (i = 0;i < gr.nodes.length;++i) {
+                for (var i = 0; i < gr.nodes.length; ++i) {
                     if (gr.nodes[i].visited) {
 
                     }
@@ -5495,14 +5777,22 @@ function executeMisc(e) {
                     }
                 }
                 if (foundNonVisited) {
-                    nd = gr.nodes[i];
-                    gr.getConnected(nd);
+                    var nd = gr.nodes[i];
+                    var cycleFound = gr.checkCycle(nd);
+                    if (cycleFound) {
+                        cycleExists = true;
+                        break;
+                    }
+
                 }
                 else {
                     done = true;
                 }
 
             }
+
+            aCyclicFlags.push(cycleExists ? "-1" : "1");
+
 
             var numNodes = gr.nodes.length;
 
@@ -5516,940 +5806,180 @@ function executeMisc(e) {
                 }
             }
 
+        });
 
 
+        resString = arrayToString(aCyclicFlags);
 
 
+        resEl.value = resString;
 
-            resString = connectedComponents;
 
+    } else if (val === '83') {//BA8C K-means clustering
 
-            resEl.value =resString;
 
+        //var params = parseAr.shift();
+        console.log('params: ' + params);
 
 
+        k = spl[0];
 
-            break;
+        if (spl.length > 1) {
+            runs = parseInt(spl[1]);
+        }
 
 
-
-        case '72': //Alg - breadth-first search
-
-            //return list of path lengths from first node to all other nodes
-            // Note: par2 can hold the  number of vertices/edges (separated by space)
-            // If so: need to check number of nodes. If less than vertices specified, there are
-            // more (isolated) connected components, ie extra vertices which have no connections
-
-            adjList = par1El.value;
-            //convert adjlist to directed adj list (assuming first named nodes are source and second are target
-            var workingAr = adjList.split('\n');
-            var workingString = '';
-            workingAr.forEach(function(el,i) {
-                var sourceTarg = el.split(' ');
-                workingString+=sourceTarg[0] + ' -> ' + sourceTarg[1];
-                if (i < workingAr.length - 1) {
-                    workingString+='\n';
-                }
-
-            });
-            adjList = workingString;
-
-
-            info = par2El.value;
-
-            var pathList = [];
-
-            numVertices = -1;
-            numEdges = -1;
-            if (info.length == 0) {
-
-            }
-            else {
-                infoSplit = info.split(' ');
-                numVertices = parseInt(infoSplit[0]);
-                numEdges = parseInt(infoSplit[1]);
-            }
-
-
-            for (i = 0;i < numVertices;++i) {
-                pathList.push(-1);
-            }
-
-
-
-            builder = new DGraphBuilder(adjList);
-
-            gr = new DBGraph(builder);
-
-
-            done = false;
-
-            gr.resetNodesVisited();
-
-            order = [];
-
-            done = false;
-
-            var first = gr.getNodeFromLabel('1');
-
-            first.visited = true;
-
-            var depthQueue = [first];
-            pathList[0] = 0;
-
-            var level = 0;
-
-            while (depthQueue.length > 0) {
-
-                var newQueue =[];
-
-                depthQueue.forEach(function(nd) {
-                    var succs = nd.getSuccessorNodes();
-                    succs.forEach(function(suc) {
-                        if (suc.visited) {
-
-                        }
-                        else {
-                            newQueue.push(suc);
-                            suc.visited = true;
-                        }
-                    });
-
-
-
-                });
-
-                ++level;
-                newQueue.forEach(function(el) {
-                    var ind = parseInt(el.label) - 1;
-                    pathList[ind] = level;
-
-                });
-
-                depthQueue = newQueue;
-
-            }
-
-
-            resString = arrayToString(pathList);
-
-
-            resEl.value =resString;
-
-
-
-
-            break;
-
-        case '73': //Nearest Neighbours
-
-
-            adjList = par1El.value;
-
-            var edgeToUse = par2El.value;
-            var edgeToUseLabFrom = edgeToUse.split(' ')[0];
-            var edgeToUseLabTo = edgeToUse.split(' ')[1];
-
-            var firstFrom = '';
-            var firstTo = '';
-
-            var adjArray = adjList.split('\n');
-            adjArray.forEach(function(el) {
-                var n1 = el.split('->')[0];
-                var n2 = el.split('->')[1];
-
-                if (n1 == edgeToUseLabFrom)  {
-                      if (n2 == edgeToUseLabTo) {
-                      }
-                      else {
-                         if (firstFrom == '') {
-                            firstFrom = n2;
-                         }
-                      }
-                }
-                if (n2 == edgeToUseLabFrom)  {
-                      if (n1 == edgeToUseLabTo) {
-                      }
-                      else {
-                         if (firstFrom == '') {
-                            firstFrom = n1;
-                         }
-                      }
-                }
-                if (n1 == edgeToUseLabTo)  {
-                      if (n2 == edgeToUseLabFrom) {
-                      }
-                      else {
-                         if (firstTo == '') {
-                            firstTo = n2;
-                         }
-                      }
-                }
-                if (n2 == edgeToUseLabTo)  {
-                      if (n1 == edgeToUseLabFrom) {
-                      }
-                      else {
-                         if (firstTo == '') {
-                            firstTo = n1;
-                         }
-                      }
-                }
-
-
-            });
-
-            builder = new DGraphTreeBuilder(adjList);
-
-            gr = new DBTreeGraph(builder);
-
-            nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
-
-            var edge = null;
-
-            nd.edges.forEach(function(el) {
-
-                if ((el.sourceNode.label == edgeToUseLabTo) ||
-                   (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
-                    edge = el;
-                }
-
-            });
-
-            var neighb = edge.neighbouringEdges();
-            var fromNode1;
-            var fromNode2;
-
-            var edgeNum = 0;
-            var otherEdgeNum = 1;
-            if (edge.sourceNode.label == edgeToUseLabFrom) {
-                 fromNode1 = edge.sourceNode;
-                 fromNode2 = edge.targetNode;
-                 edgeNum = 0;
-                 otherEdgeNum = 1;
-            }
-            else {
-                fromNode1 = edge.targetNode;
-                fromNode2 = edge.sourceNode;
-                edgeNum = 1;
-                otherEdgeNum = 0;
-            }
-
-
-
-            var fromOneLab = neighb[edgeNum][0].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][0].targetNode.label : neighb[edgeNum][0].sourceNode.label;
-            //var fromTwoLab = neighb[edgeNum][1].sourceNode.label == edgeToUseLabFrom ? neighb[edgeNum][1].targetNode.label : neighb[edgeNum][1].sourceNode.label;
-
-
-            var toOneLab = neighb[otherEdgeNum][0].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][0].targetNode.label : neighb[otherEdgeNum][0].sourceNode.label;
-            //var toTwoLab = neighb[otherEdgeNum][1].sourceNode.label == edgeToUseLabTo ? neighb[otherEdgeNum][1].targetNode.label : neighb[otherEdgeNum][1].sourceNode.label;
-
-var fromSwapper = 1;
-//if ( parseInt(fromOneLab) > parseInt(fromTwoLab) ) {
-if (fromOneLab == firstFrom) {
-      fromSwapper = 1;
-}
-else {
-      fromSwapper = 0;
-}
-
-var toSwapper1 = 0;
-var toSwapper2 = 1;
-
-//if ( parseInt(toOneLab) < parseInt(toTwoLab) ) {
-if (toOneLab == firstTo) {
-      toSwapper1 = 0;
-      toSwapper2 = 1;
-}
-else {
-      toSwapper1 = 1;
-      toSwapper2 = 0;
-}
-
-
-
-
-            gr.builder.swapEdges(neighb[edgeNum][fromSwapper],neighb[otherEdgeNum][toSwapper1],fromNode1,fromNode2);
-
-
-            str = gr.toAdjacencyList(0,false,true,true);
-
-            builder = new DGraphTreeBuilder(adjList);
-
-            gr = new DBTreeGraph(builder);
-
-            nd = gr.builder.findNodes(edgeToUseLabFrom)[0];
-
-
-            nd.edges.forEach(function(el) {
-
-                if ((el.sourceNode.label == edgeToUseLabTo) ||
-                    (el.targetNode.label == edgeToUseLabTo)) { //assuming undirected
-                    edge = el;
-                }
-
-            });
-
-            neighb = edge.neighbouringEdges();
-
-
-            if (edge.sourceNode.label == edgeToUseLabFrom) {
-                 fromNode1 = edge.sourceNode;
-                 fromNode2 = edge.targetNode;
-                 edgeNum = 0;
-                 otherEdgeNum = 1;
-            }
-            else {
-                fromNode1 = edge.targetNode;
-                fromNode2 = edge.sourceNode;
-                edgeNum = 1;
-                otherEdgeNum = 0;
-            }
-
-
-
-
-            gr.builder.swapEdges(neighb[edgeNum][fromSwapper],neighb[otherEdgeNum][toSwapper2],fromNode1,fromNode2);
-
-
-
-            str += '\n' + '\n' + gr.toAdjacencyList(0,false,true,true);
-
-
-           resString = str;
-
-
-            resEl.value =resString;
-
-
-
-
-            break;
-
-		case '74': //BA8A Farthest First Traversal
-
-
-
-
-		  var params = par1El.value;
-		  //var params = parseAr.shift();
-		  console.log('params: ' + params);
-
-		  k = parseFloat(params.split(' ')[0]);
-
-
-		  var pSpace = new PointSpace(par2El.value);
-
-		  pSpace.movePointToCentres(pSpace.points[0],true);
-
-		   /*
-		  var centres = [];
-		  centres.push(parseAr.shift());
-		  */
-
-
-		  while (pSpace.centres.length < k) {
-
-			  var p = pSpace.findFarthestPointFromCentres();
-
-			  pSpace.movePointToCentres(p,true);
-
-		  }
-
-		    pSpace.allocatePointsToClusters();
-
-		    resStr = pSpace.centresToString(); //+ '\nSq distort: ' + dist;
-
-
-            resEl.value =resStr;
-
-            break;
-
-		case '75': //BA8B Squared Distortion
-
-
-		  var params = par1El.value;
-		  //var params = parseAr.shift();
-		  console.log('params: ' + params);
-
-		  k = parseFloat(params.split(' ')[0]);
-
-		  var pSpace = new PointSpace(par3El.value);
-
-		  var centAr = par2El.value.split('\n');
-		  centAr.forEach(function(str) {
-			 pSpace.addCentre(str);
-		  });
-
-		  var dist = pSpace.sqDistortion();
-
-		    resStr = 'Sq dist:\n' + dist;
-
-
-            resEl.value =resStr;
-
-            break;
-
-
-
-		case '76': //Peptide Vector
-
-
-		  pepStr = par1El.value;
-
-		  pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
-
-		  var vect = pep.toPeptideVector();
-
-
-		  resString = '';
-
-		  resString += arrayToString(vect);
-
-
-          resEl.value =resString;
-
-            break;
-
-	case '77': //Peptide from Vector
-
-
-		  var vecStr = par1El.value;
-
-		  pep = new Peptide(Peptide.AminoArrFromVector(vecStr));
-
-
-
-		  resString = '';
-
-		  resString += pep.toShortString('');
-
-
-          resEl.value =resString;
-
-            break;
-
-	case '78': //Peptide Identification
-
-
-		  vecStr = par1El.value;
-		  proteome = par2El.value;
-
-		  res = peptideIdentification(vecStr,proteome);
-
-		  /*
-
-		  var vecAr = vecStr.split(' ');
-
-		  vecAr = vecAr.map(function(el) {
-			 return parseInt(el);
-		  });
-
-		  var pepWeight = vecAr.length;
-
-
-
-		  var candidates = [];
-
-
-		  for (var stPos = 0;stPos <= proteome.length - 1;++stPos) {
-			  //find candidate peptide starting at stPos with correct weight
-			  var candFound = false;
-			  for (var endPos = stPos;endPos <= proteome.length - 1;++endPos) {
-				  var pepStr = proteome.substring(stPos,endPos+1);
-				  var pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
-				  var w = pep.getIntegerWeight();
-				  if (w == pepWeight) {
-					  candFound = true;
-					  candidates.push(pep);
-				  }
-				  if (w >= pepWeight) {
-					  break;
-				  }
-			  }
-		  }
-
-
-		  var bestCand = '';
-		  var bestScore = DGraph.infinity * -1;
-
-		  candidates.forEach(function(cand,i) {
-			  var score = cand.scoreAgainstSpectralVector(vecAr);
-			  if (score > bestScore) {
-				  bestCand = cand.toShortString('');
-				  bestScore = score;
-			  }
-
-		  });
-
-          */
-
-		  resString = '';
-
-		  resString += '\nBest score: '  + res[1] + '\nBest Candidate: ' + res[0];
-
-
-          resEl.value =resString;
-
-            break;
-
-	case '79': //PSM
-
-
-		  var vecStrs = par1El.value;
-		  var vecArs = vecStrs.split('\n');
-		  proteome = par2El.value;
-		  threshold = parseInt(par3El.value);
-
-		  var psmMatches = [];
-
-		  vecArs.forEach(function(vecStr) {
-			  var res = peptideIdentification(vecStr,proteome);
-			  if (res[1] > threshold) {
-				  psmMatches.push(res[0]);
-			  }
-
-		  });
-
-
-
-
-		  resString = '';
-
-		  resString += '\nPS Matches: \n' + arrayToString(psmMatches,'\n');
-
-
-          resEl.value =resString;
-
-            break;
-
-	case '80': //Spectral Dictionary Size
-
-
-		  vecStr = par1El.value;
-
-		  threshold = parseInt(par2El.value);
-		  var max_score = parseInt(par3El.value);
-
-		  vecAr = vecStr.split(' ');
-
-	      vecAr = vecAr.map(function(el) {
-			 return parseInt(el);
-		  });
-
-
-		  var totSize = 0;
-
-		  var useToy = false;
-
-		  for (t = threshold;t <=max_score;++t) {
-			  size = spectralDictSize(vecAr,t,[],useToy);
-			  totSize += size;
-		  }
-
-
-		  /*
-		  var totNum = numPeptidesWithSpectralVector(vecAr,[], useToy);
-		  */
-		  var totProb = 0;
-
-		  for (t = threshold;t <=max_score;++t) {
-			  prob = spectralDictProbability(vecAr,t,[],useToy);
-			  totProb += prob;
-		  }
-
-
-
-		  resString = '';
-
-		  resString += '\nSpectral Dict Size: \n' + totSize +   '\nProb: \n' + totProb;
-
-
-          resEl.value =resString;
-
-            break;
-
-case '81': //Spectral Alignment
-
-          par1El.placeholder = 'blah';
-
-          pepStr = par1El.value;
-		  vecStr = par2El.value;
-
-
-		  k  = parseInt(par3El.value);
-
-		  vecAr = vecStr.split(' ');
-
-	      vecAr = vecAr.map(function(el) {
-			 return parseInt(el);
-		  });
-
-		  pep = new Peptide(Peptide.AminoArrFromStr(pepStr));
-
-		  var pepWeight = pep.getIntegerWeight();
-
-		  delta = vecAr.length - pepWeight;
-
-		  rows = pepWeight + 1;
-		  cols = vecAr.length + 1;
-		  //var lays = k + 1;
-
-		  builder = new DGraphGridFromSpecAlignBuilder([pep,vecAr,k]);
-
-		  var gg = new DBGridGraph(builder,'generic grid');
-
-
-
-          res = gg.longestPathNodeWeighted(gg.getSourceNode(),gg.getSinkNode());
-
-		  resString = '';
-
-		  resString += 'Best Modified Peptide: ' + res[0] + ' Score: ' + res[1];
-
-
-          resEl.value =resString;
-
-            break;
-
-        case '82': //Alg - acyclic check
-
-            //check graph is acyclic
-
-            params = par1El.value.split('\n');
-
-            k = parseInt(params.shift());
-
-            params.shift();
-
-            done = false;
-
-            var adjLists = [];
-
-            while (params.length > 0) {
-                adjList = [];
-                var adj = params.shift();
-                if (adj == '') {
-                    break;
-                }
-                while (adj && adj != '') {
-                    adjList.push(adj);
-                    adj = params.shift();
-
-                }
-                adjLists.push(adjList);
-
-
-            }
-
-
-            var aCyclicFlags = [];
-
-            adjLists.forEach(function(adjList) {
-
-
-                var info = adjList.shift();
-                var numVertices = -1;
-                //var numEdges = -1;
-                if (info.length == 0) {
-
-                }
-                else {
-                    var infoSplit = info.split(' ');
-                    numVertices = parseInt(infoSplit[0]);
-                    //numEdges = parseInt(infoSplit[1]);
-                }
-
-                adjList = adjList.join('\n');
-                var builder = new DGraphBuilder(adjList);
-
-                var gr = new DBGraph(builder);
-
-                var done;
-
-                gr.resetNodesVisited();
-
-               // var order = [];
-
-
-                done = false;
-                var connectedComponents = 0;
-
-                var cycleExists = false;
-
-                while (!done) {
-
-                    var foundNonVisited = false;
-                    for (var i = 0;i < gr.nodes.length;++i) {
-                        if (gr.nodes[i].visited) {
-
-                        }
-                        else {
-                            foundNonVisited = true;
-                            ++connectedComponents;
-                            break;
-                        }
-                    }
-                    if (foundNonVisited) {
-                        var nd = gr.nodes[i];
-                        var cycleFound = gr.checkCycle(nd);
-                        if (cycleFound) {
-                            cycleExists = true;
-                            break;
-                        }
-
-                    }
-                    else {
-                        done = true;
-                    }
-
-                }
-
-                aCyclicFlags.push(cycleExists ? "-1" : "1");
-
-
-                var numNodes = gr.nodes.length;
-
-                if (numVertices == -1) {
-
-                }
-                else {
-                    //check for extra non-used vertices
-                    if (numVertices > numNodes) {
-                        connectedComponents += (numVertices - numNodes);
-                    }
-                }
-
-            });
-
-
-
-            resString = arrayToString(aCyclicFlags);
-
-
-            resEl.value =resString;
-
-
-
-
-            break;
-
-
-		case '83': //BA8C K-means clustering
-
-
-
-
-		  var params = par1El.value;
-		  //var params = parseAr.shift();
-		  console.log('params: ' + params);
-
-          var spl =   params.split(' ');
-		  k = spl[0];
-          var runs = 1;
-          if (spl.length > 1) {
-              runs = parseInt(spl[1]);
-          }
-
-
-		  var pSpace = new PointSpace(par2El.value);
-
-		  /*
-		  for (var i = 0;i < k;++i) {
-		     pSpace.movePointToCentres(pSpace.points[i],true);
-		  }
-
-
-		  pSpace.allocatePointsToClusters();
-		  */
-
-          resStr = '';
-          var lowestDist = DGraph.infinity;
-          var lowestRunNum = -1;
-
-          for (var i = 0;i < runs;++i) {
-              pSpace.kMeans(k,true);
-
-              var sqErr = pSpace.sqDistortion();
-
-              resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
-
-              resStr += '\nSq Err: ' + sqErr + '\n\n';
-              if (sqErr < lowestDist) {
-                  lowestDist = sqErr;
-                  lowestRunNum = i + 1;
+        /*
+              for (var i = 0;i < k;++i) {
+                 pSpace.movePointToCentres(pSpace.points[i],true);
               }
 
-          }
-          if (i > 1) {
-              resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
-          }
 
-          resEl.value=resStr;
+              pSpace.allocatePointsToClusters();
+              */
 
-            break;
-
-        case '84': //BA8D Soft K-means clustering
+        resStr = '';
 
 
-            var params = par1El.value;
-            //var params = parseAr.shift();
-            console.log('params: ' + params);
+        for (var i = 0; i < runs; ++i) {
+            pSpace.kMeans(k, true);
 
-            var lines = params.split('\n');
-            var spl =   lines[0].split(' ');
-            k = spl[0];
-            var runs = 1;
-            if (lines.length > 1) {
-                runs = parseInt(lines[1]);
+            var sqErr = pSpace.sqDistortion();
+
+            resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
+
+            resStr += '\nSq Err: ' + sqErr + '\n\n';
+            if (sqErr < lowestDist) {
+                lowestDist = sqErr;
+                lowestRunNum = i + 1;
             }
 
-            var stiff = 1;
-            if (lines.length > 2) {
-                stiff = parseFloat(lines[2]);
+        }
+        if (i > 1) {
+            resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
+        }
+
+        resEl.value = resStr;
+
+    } else if (val === '84') {//BA8D Soft K-means clustering
+
+
+        //var params = parseAr.shift();
+        console.log('params: ' + params);
+
+
+        k = spl[0];
+
+        if (lines.length > 1) {
+            runs = parseInt(lines[1]);
+        }
+
+
+        if (lines.length > 2) {
+            stiff = parseFloat(lines[2]);
+        }
+
+
+        if (lines.length > 3) {
+            maxItersPerRun = parseInt(lines[3]);
+        }
+
+
+        resStr = '';
+
+
+        for (var i = 0; i < runs; ++i) {
+            pSpace.softKMeans(k, false, null, stiff, maxItersPerRun);
+
+            var sqErr = pSpace.sqDistortion();
+
+            resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
+
+            resStr += '\nSq Err: ' + sqErr + '\n\n';
+            if (sqErr < lowestDist) {
+                lowestDist = sqErr;
+                lowestRunNum = i + 1;
             }
 
-            var maxItersPerRun = 1000;
-            if (lines.length > 3) {
-                maxItersPerRun = parseInt(lines[3]);
+        }
+        if (i > 1) {
+            resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
+        }
+
+        resEl.value = resStr;
+
+    } else if (val === '85') {//SNP Pairwise Diff
+
+
+        for (var i = 0; i < tVecAr.length; ++i) {
+            for (var j = i + 1; j < tVecAr.length; ++j) {
+                if (tVecAr[i] === tVecAr[j]) {
+
+                }
+                else {
+
+                    diffTPairs.push([i, j]);
+                }
             }
+        }
 
-            var pSpace = new PointSpace(par2El.value);
+
+        diffTPairs.forEach(function (el) {
+            if (sVecAr[el[0]] === sVecAr[el[1]]) {
+
+            }
+            else {
+                ++diffS;
+            }
+        });
+
+        resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
 
 
-            resStr = '';
-            var lowestDist = DGraph.infinity;
-            var lowestRunNum = -1;
+    } else if (val === '86') {//SNP Matrix Pairwise Diff
 
-            var initCentres = [new Point([-2.5]),new Point([2.5])];
 
-            for (var i = 0;i < runs;++i) {
-                pSpace.softKMeans(k,false,null,stiff,maxItersPerRun);
+        sVecAr = sVecAr.map(function (el) {
+            return el.split(',');
+        });
 
-                var sqErr = pSpace.sqDistortion();
+        sVecAr = sVecAr[0].map(function (col, i) {
+            return sVecAr.map(function (row) {
+                return row[i];
+            });
+        });
 
-                resStr += 'Run: ' + (i + 1) + '\n' + pSpace.centresToString(); //+ '\nSq distort: ' + dist;
 
-                resStr += '\nSq Err: ' + sqErr + '\n\n';
-                if (sqErr < lowestDist) {
-                    lowestDist = sqErr;
-                    lowestRunNum = i + 1;
+        for (var i = 0; i < tVecAr.length; ++i) {
+            for (var j = i + 1; j < tVecAr.length; ++j) {
+                if (tVecAr[i] === tVecAr[j]) {
+
+                }
+                else {
+
+                    diffTPairs.push([i, j]);
+                }
+            }
+        }
+
+
+        diffTPairs.forEach(function (el) {
+            for (var n = 0; n < sVecAr[0].length; ++n) {
+                if (sVecAr[el[0]][n] === sVecAr[el[1]][n]) {
+                }
+                else {
+                    ++diffS;
+                    break;
                 }
 
             }
-            if (i > 1) {
-                resStr += 'Lowest: ' + lowestDist + ' Run: ' + lowestRunNum;
-            }
 
-            resEl.value=resStr;
+        });
 
-            break;
-
-	    case '85': //SNP Pairwise Diff
-
-			var sVecStr = par1El.value;
-			var tVecStr = par2El.value;
+        resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
 
 
-			var sVecStr = sVecStr.replace(/ /g,'');
-			var sVecAr = sVecStr.split(',');
-
-			var tVecStr = tVecStr.replace(/ /g,'');
-			var tVecAr =  tVecStr.split(',');
-
-
-
-			var diffTPairs = [];
-
-			for (var i = 0;i < tVecAr.length;++i) {
-				for (var j = i+1;j < tVecAr.length;++j) {
-					if (tVecAr[i] === tVecAr[j]) {
-
-					}
-					else {
-
-						diffTPairs.push([i,j]);
-					}
-				}
-			}
-
-
-			var diffS = 0;
-			diffTPairs.forEach(function(el) {
-				if (sVecAr[el[0]] === sVecAr[el[1]]) {
-
-				}
-				else {
-					++diffS;
-				}
-			});
-
-			resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
-
-
-			break;
-
-	    case '86': //SNP Matrix Pairwise Diff
-
-			var sVecStr = par1El.value;
-			var tVecStr = par2El.value;
-
-
-			var sVecStr = sVecStr.replace(/ /g,'');
-			var sVecAr = sVecStr.split('\n');
-			sVecAr = sVecAr.map(function(el) {
-				return el.split(',');
-			});
-
-			sVecAr =  sVecAr[0].map(function(col, i) {
-                     return sVecAr.map(function(row) {
-                          return row[i] ;
-                     });
-            });
-
-			var tVecStr = tVecStr.replace(/ /g,'');
-			var tVecAr =  tVecStr.split(',');
-
-
-
-			var diffTPairs = [];
-
-			for (var i = 0;i < tVecAr.length;++i) {
-				for (var j = i+1;j < tVecAr.length;++j) {
-					if (tVecAr[i] === tVecAr[j]) {
-
-					}
-					else {
-
-						diffTPairs.push([i,j]);
-					}
-				}
-			}
-
-
-			var diffS = 0;
-			diffTPairs.forEach(function(el) {
-				for (var n = 0;n < sVecAr[0].length;++n) {
-					if (sVecAr[el[0]][n] === sVecAr[el[1]][n]) {
-					}
-					else {
-						++diffS;
-						break;
-					}
-
-				}
-
-			});
-
-			resEl.value = ' Num t diffs: ' + diffTPairs.length + '\nNum s diffs for t diffs: ' + diffS + '\nDiff (s,t): ' + (diffS / diffTPairs.length);
-
-
-			break;
-
-
-
-
-        default:
-            break;
+    } else {
     }
 
 /*
@@ -10711,6 +10241,8 @@ function colourMotifs(dna,view,bases,mark) {
      }
         var b = document.createElement('br');
         view.appendChild(b);
+        b = document.createElement('br');
+        view.appendChild(b);
     }
 
 
@@ -13295,11 +12827,15 @@ function randTransPressed(event) {
    // document.getElementById('dnaInput').value = randomDNA(randNVal);
    // dnaInput();
 
-    dnaMaster =  randomDNA(randNVal);
+    var transRadioInputId = getSelectedRadioEl('trInput').id;
 
-	document.getElementById('transInput').value = dnaMaster;
+    dnaStr = transRadioInputId === 'trRNA' ? randomRNA(randNVal) : randomDNA(randNVal);
 
-    dnaMasterChanged();
+
+
+	document.getElementById('transInput').value = dnaStr;
+
+    transInput();
 
 
 }
@@ -13447,7 +12983,7 @@ function randPhylogenyPressed(event) {
         document.getElementById('sequencingStrings').value = arrayToString(reads, '\n');
 
         sequencingInput();
-        return;
+
     }
 
 
@@ -13478,7 +13014,7 @@ function randAlignPressed(event) {
 
     for (var i = 0;i < numSequencesToGen;++i) {
         var offset;
-        if (i == 0) {
+        if (i === 0) {
             offset = offsetRange; //biggest first esp for fitting alignment
         }
         else {
@@ -13587,12 +13123,12 @@ function pagePressed(inc) {
 
     var dna = dnaMaster; //document.getElementById('dnaInput').value;
 
-    if (inc == -1000) {
+    if (inc === -1000) {
         dnaPage = 0;
         dnaPageOffset = 0;
         colourDNA(dna);
     }
-    else if (inc == 1000) {
+    else if (inc === 1000) {
         dnaPage = Math.floor(dna.length / basesPerPage);
         dnaPageOffset = 0;
         colourDNA(dna);
@@ -13646,7 +13182,7 @@ function setPageBasedOnMatch() {
 
 function matchPressed(inc) {
 
-    if (mfk.length == 0) {
+    if (mfk.length === 0) {
 		return;
 	}
 
@@ -13656,11 +13192,11 @@ function matchPressed(inc) {
 
 
 
-    if (inc == -100000) {
+    if (inc === -100000) {
 		dnaMatch = 0;
         setPageBasedOnMatch();
     }
-    else if (inc == 100000) {
+    else if (inc === 100000) {
 		dnaMatch = 	mfk[numKmerInd][0].length - 1;
 		setPageBasedOnMatch();
 
@@ -13694,6 +13230,17 @@ function debugSwitchClicked(e) {
 
 
 }
+
+function butDown(e) {
+   // e.target.style.backgroundColor = '#8CCFA0';
+    e.currentTarget.style.backgroundColor = '#8CCFA0';
+}
+
+function butUp(e) {
+   // e.target.style.backgroundColor = '#4CAF50';
+    e.currentTarget.style.backgroundColor = '#4CAF50';
+}
+
 
 function useAffineClicked() {
     var useAffineFlag = document.getElementById('affineAL').checked;
@@ -14136,6 +13683,9 @@ function sequencingRadClicked(id) {
 
 function transInputRadClicked(id) {
     //Motif Radio Button
+
+
+
     switch (id) {
         case 'trDNA':
 
@@ -14150,6 +13700,9 @@ function transInputRadClicked(id) {
 			document.getElementById('trTranscribe').checked = true;
 
             transRadClicked('trTranscribe');
+
+            document.getElementById('transInput').value = '';
+            transInput();
 
 
             break;
@@ -14166,6 +13719,9 @@ function transInputRadClicked(id) {
 			document.getElementById('trTranslate').checked = true;
 
             transRadClicked('trTranslate');
+
+            document.getElementById('transInput').value = '';
+            transInput();
             break;
 
 
@@ -14179,6 +13735,9 @@ function transInputRadClicked(id) {
 
             document.getElementById('trRetro').checked = true;
             transRadClicked('trRetro');
+
+            document.getElementById('transInput').value = '';
+            transInput();
 
             break;
 
@@ -14238,12 +13797,7 @@ function peptideShapeRadClicked(id) {
 
             document.getElementById('pepPeptideTypeCircular').disabled = false;
 
-            if (document.getElementById('pepPeptideTypeLinear').checked) {
-                document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
-            }
-            else {
-                document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
-            }
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = !document.getElementById('pepPeptideTypeLinear').checked;
 
 
           break;
@@ -14263,12 +13817,7 @@ function peptideShapeRadClicked(id) {
 
             document.getElementById('pepPeptideTypeCircular').disabled = false;
 
-            if (document.getElementById('pepPeptideTypeLinear').checked) {
-                document.getElementById('spectrometerPrefixSuffixPS').disabled = false;
-            }
-            else {
-                document.getElementById('spectrometerPrefixSuffixPS').disabled = true;
-            }
+            document.getElementById('spectrometerPrefixSuffixPS').disabled = !document.getElementById('pepPeptideTypeLinear').checked;
 
 
             break;
@@ -14734,13 +14283,13 @@ function tabClickDone(tabNum,prevTabNum) {
 		document.getElementById('rightTwo').style.display = 'none';
 	}
 
-	if ((tabNum == 3) && (prevTabNum < 3)) {
+	if ((tabNum === 3) && (prevTabNum < 3)) {
 		dnaMasterStrings = '';
 		dnaMaster = '';
 		dnaMasterChanged();
 
 	}
-	if ((tabNum < 3) && (prevTabNum == 3)){
+	if ((tabNum < 3) && (prevTabNum === 3)){
 		dnaMasterStrings = '';
 		dnaMaster = '';
 		dnaMasterChanged();
@@ -14751,7 +14300,7 @@ function tabClickDone(tabNum,prevTabNum) {
 
 
 
-	document.getElementById('mainAreaDiv').style.height = tabNum == 4 ?  '200px' : '500px';
+	document.getElementById('mainAreaDiv').style.height = tabNum === 4 ?  '200px' : '500px';
 
     switch (tabNum) {
         case 3: //Motif tab

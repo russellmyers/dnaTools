@@ -1004,6 +1004,11 @@ input[type=number] {
 	display: none;
 }
 
+#testApply {
+    display: inline-block;
+    vertical-align: top;
+}
+
 /*tabs stuff*/
 #tabs {border-bottom:1px solid #ccc;height:42px; width: 100%; margin:10px 0 5px;padding-top:5px; background: white; /*#5f9ca3;*/ /*background:#fff;*/}
 #tabs a {float: left;margin-left:5px;border-radius:3px 3px 0 0;border:1px solid #eee;border-bottom-color:#ccc;color:#555;height:27px;line-height:32px;padding:0 12px;text-decoration:none;background-color: #ddd; } /*color #08c*/
