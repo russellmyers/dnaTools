@@ -39,6 +39,8 @@ var startTime;
 var runImgIntervalFunc; //used for running animation
 var imgNum = 0;
 
+var stopPressed = false;
+
 /*
 //not importing from bioutilities for some reason
 
@@ -2985,7 +2987,7 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,ru
 
 
 
-    if ((curr >= dna.length - l)) {  //|| stop) {
+    if ((curr >= dna.length - l) || stopPressed) {  //|| stop) {
         mfk = [];
 
         if (useTree) {
@@ -3028,8 +3030,31 @@ function ltClump(dna,l,t,k,curr,useTree,inclRevCompl,maxMismatch,progCallback,ru
         });
         //colourDNA(dna,clumps);
 
+        var earlyFinish = null;
+        if (stopPressed && (curr < dna.length - l)) {
+            earlyFinish = curr;
+        }
+        self.postMessage({'task': 'ltClump','msgType' : 'result','indArray' : mfk, 'clumps' :clumps,'earlyFinish' : earlyFinish});
+
     }
     else {
+        ++curr;
+
+
+
+        if (curr % 100 == 0) {
+            setTimeout(function () {
+
+
+                ltClump(dna, l, t, k, curr, useTree, inclRevCompl, maxMismatch, progCallback, runCallback, countOnly);
+            }, 0);
+
+        }
+
+        else {
+            ltClump(dna, l, t, k, curr, useTree, inclRevCompl, maxMismatch, progCallback, runCallback, countOnly);
+
+        }
         /*
         setTimeout(function() {
             timeOutLoop(dna,l,k,curr+1,useTree,inclRevCompl);
@@ -3579,7 +3604,12 @@ self.addEventListener('message', function(e) {
     importScripts('russGenLibs/GenUtilities.js');
     importScripts('vendor/biginteger.js');
 
-    startTime = Date.now();
+    if (e.data.task === 'ltClumpStop') {
+
+    }
+    else {
+        startTime = Date.now();
+    }
 
 
     var dna,inclRevCompl,maxMismatch,indArray,txtArray,kmer,k,debug,res;
@@ -3678,6 +3708,7 @@ self.addEventListener('message', function(e) {
 
             break;
         case 'ltClump':
+            stopPressed = false;
             var method = e.data.useTree ? 'tree' : 'brute';
             dna = e.data.dna;
             k = e.data.k;
@@ -3700,24 +3731,28 @@ self.addEventListener('message', function(e) {
 
             startTime = Date.now();
 
-            for (var curr = 0;curr <= dna.length - ltClumpL;++curr) {
-                ltClump(dna, ltClumpL,ltClumpT, k, curr, e.data.useTree, inclRevCompl,maxMismatch,countProgltClump,runImageProg,false);
-            }
             if (method  === 'brute') {
-               console.log('worker commencing ltClump brute: ' + e.data);
+                console.log('worker commencing ltClump brute: ' + e.data);
             }
             else {
                 console.log('worker commencing ltClump tree: ' + e.data);
             }
 
-            self.postMessage({'task': 'ltClump','msgType' : 'result','indArray' : mfk, 'clumps' :clumps});
+          // for (var curr = 0;curr <= dna.length - ltClumpL;++curr) {
+                    var curr = 0;
+                    ltClump(dna, ltClumpL, ltClumpT, k, curr, e.data.useTree, inclRevCompl, maxMismatch, countProgltClump, runImageProg, false);
+
+          //  }
 
 
-
-            // self.postMessage({'task': 'ltClump','msgType' : 'result','indArray' : mfk});
-
+           // self.postMessage({'task': 'ltClump','msgType' : 'result','indArray' : mfk, 'clumps' :clumps});
 
             break;
+
+        case 'ltClumpStop':
+            stopPressed = true;
+            break;
+
         case 'motifSearch' :
             //console.log('dist: ' + dist('ACGCGGTCGAGCGCGG','GCGCGGCGCGAGCGCGG'));
 

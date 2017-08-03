@@ -399,11 +399,20 @@ function initialisePage() {
     document.getElementById('filePhylogenyInput')
         .addEventListener('change',readPhylogenyFile,false);
 
+    var runButs = document.getElementsByClassName('runBut');
+    for (var i = 0;i < runButs.length;++i) {
+        var but = runButs[i];
+        but.addEventListener('mousedown',butDown);
+        but.addEventListener('mouseup',butUp);
+    }
+
+
+
     document.getElementById('motifGreedy').checked = true;
     motifRadClicked('motifGreedy');
 
     sequencingRadClicked('seqPath');
-    sequencingInputRadClicked('seqDNA');
+    sequencingInputRadClicked('seqReads');
 
     document.getElementById('trTranscribe').checked = true;
     transRadClicked('trTranscribe');
@@ -618,6 +627,16 @@ function setUpWorkerListeners() {
                     document.getElementById('numKmers').value = 1;
                     numKmerChanged();
 
+                    document.getElementById('ltClumpStopBut').style.visibility = 'hidden';
+
+                    var earlyFinish = e.data.earlyFinish;
+                    if (earlyFinish == null) {
+
+                    }
+                    else {
+                        errMsg('Stopped after: ' + earlyFinish + ' clumps only');
+                        //document.getElementById('ltClumpEarlyFinish').innerHTML = 'Stopped after: ' + earlyFinish + ' clumps';
+                    }
 
                     var clumps = e.data.clumps;
                     tot = 0;
@@ -2207,6 +2226,8 @@ function runLTClump() {
     var maxMismatch = parseInt(document.getElementById('maxMismatchLT').value);
 
 	document.getElementById('runImg').style.visibility = 'visible';
+
+	document.getElementById('ltClumpStopBut').style.visibility = 'visible';
 
     w.postMessage(
         {'task' : 'ltClump',
@@ -9767,6 +9788,8 @@ function initialiseResults()  {
 
     document.getElementById('progress').innerHTML = '';
 
+
+
     //var hData = ['k-mers', 'Num found'];
 	var hData = ['', ''];
     var tData;
@@ -11386,6 +11409,33 @@ function dnaMasterChanged() {
 
     if ((!dnaMaster) ||(dnaMaster.length == 0)) {
         document.getElementById('rightTwo').style.display = 'none';
+        document.getElementById('mfkClear').style.visibility = 'hidden';
+        document.getElementById('motifsClear').style.visibility = 'hidden';
+        if (dnaMasterStrings.length == 0) {
+            document.getElementById('sequencingClear').style.visibility = 'hidden';
+            document.getElementById('phylogenyClear').style.visibility = 'hidden';
+        }
+        else {
+            document.getElementById('sequencingClear').style.visibility = 'visible';
+            document.getElementById('phylogenyClear').style.visibility = 'visible';
+        }
+
+        if((rnaMaster == null) || (rnaMaster == '')) {
+            document.getElementById('transClear').style.visibility = 'hidden';
+        }
+        else {
+            document.getElementById('transClear').style.visibility = 'visible';
+        }
+
+        if (((rnaMaster == null)  || (rnaMaster == ''))&& ((proteinMaster == null) || (proteinMaster == '')) && ((spectrumMaster == null) || (spectrumMaster == ''))) {
+            document.getElementById('pepClear').style.visibility = 'hidden';
+        }
+        else {
+            document.getElementById('pepClear').style.visibility = 'visible';
+        }
+
+
+
     }
     else {
 		if (myParams.tabActive < 3) {
@@ -11394,6 +11444,12 @@ function dnaMasterChanged() {
 		else {
 			document.getElementById('rightTwo').style.display = 'none';
 		}
+        document.getElementById('mfkClear').style.visibility = 'visible';
+        document.getElementById('motifsClear').style.visibility = 'visible';
+        document.getElementById('sequencingClear').style.visibility = 'visible';
+        document.getElementById('phylogenyClear').style.visibility = 'visible';
+        document.getElementById('transClear').style.visibility = 'visible';
+        document.getElementById('pepClear').style.visibility = 'visible';
     }
 
     document.getElementById('rightTwo').innerHTML = stats;
@@ -11423,12 +11479,26 @@ function alignMasterChanged() {
         colourAlign();
     }
 
+    if ((alignS == '') && (alignT == '') && (alignU == '')) {
+        document.getElementById('alignClear').style.visibility = 'hidden';
+    }
+    else {
+        document.getElementById('alignClear').style.visibility = 'visible';
+    }
+
 }
 
 function sbMasterChanged() {
 
 
     colourSBFromBackground();
+
+    if ((sbS == '') && (sbT == '')) {
+        document.getElementById('sbClear').style.visibility = 'hidden';
+    }
+    else {
+        document.getElementById('sbClear').style.visibility = 'visible';
+    }
 
 }
 
@@ -12016,11 +12086,17 @@ function cleanContents(contents,contentType) {
     return newContents;
 }
 
-function dnaInput(e) {
+function dnaInput(e,clearFlag) {
 
     if (e) {
 
     }
+
+    if (clearFlag) {
+        document.getElementById('dnaInput').value = '';
+    }
+
+
     var inDNA = document.getElementById('dnaInput');
 
 
@@ -12038,7 +12114,7 @@ function dnaInput(e) {
 
 }
 
-function motifsInput(e) {
+function motifsInput(e,clearFlag) {
 
     if (e) {
 
@@ -12048,6 +12124,10 @@ function motifsInput(e) {
 		errMsg('Please enter DNA sequences first!');
 		return;
 	}
+
+	if (clearFlag) {
+        document.getElementById('dnaStrings').value = '';
+    }
 
     var dnaStrings = document.getElementById('dnaStrings').value.split('\n');
 
@@ -12068,6 +12148,9 @@ function motifsInput(e) {
 
     document.getElementById('dnaStrings').value = dnaMaster;
 
+    document.getElementById("skewCanvas").style.display = "none";
+
+
     dnaMasterChanged();
 
 	errMsg('');
@@ -12075,7 +12158,7 @@ function motifsInput(e) {
 }
 
 
-function alignInput(e,contents,seqNum) {
+function alignInput(e,contents,seqNum,clearFlag) {
 
     if (e) {
 
@@ -12093,32 +12176,41 @@ function alignInput(e,contents,seqNum) {
         }
     }
     else {
-        var alignStrings = document.getElementById('alignStrings').value.split('\n');
+        if (clearFlag) {
 
-        alignStrings = alignStrings.filter(function (el) {
-            return el.length != 0;
-        });
-
-		alignStrings = alignStrings.map(function(el) {
-			return el.toUpperCase();
-		});
-
-		document.getElementById('alignStrings').value = alignStrings.join('\n');
-
-        /*
-         alignStrings = alignStrings.map(function(el) {
-         return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
-
-         });
-         */
-
-        alignS = alignStrings[0];
-        alignT = alignStrings[1];
-        if (alignStrings[2]) {
-            alignU = alignStrings[2];
+            alignS = '';
+            alignT = '';
+            alignU = '';
+            document.getElementById('alignStrings').value = '';
         }
         else {
-            alignU = '';
+            var alignStrings = document.getElementById('alignStrings').value.split('\n');
+
+            alignStrings = alignStrings.filter(function (el) {
+                return el.length != 0;
+            });
+
+            alignStrings = alignStrings.map(function (el) {
+                return el.toUpperCase();
+            });
+
+            document.getElementById('alignStrings').value = alignStrings.join('\n');
+
+            /*
+             alignStrings = alignStrings.map(function(el) {
+             return el.trim().toUpperCase().replace(/[^ACGTacgt\n]/gm,"");
+
+             });
+             */
+
+            alignS = alignStrings[0];
+            alignT = alignStrings[1];
+            if (alignStrings[2]) {
+                alignU = alignStrings[2];
+            }
+            else {
+                alignU = '';
+            }
         }
     }
 
@@ -12131,7 +12223,7 @@ function alignInput(e,contents,seqNum) {
 
 }
 
-function sbInput(e,contents,seqNum) {
+function sbInput(e,contents,seqNum,clearFlag) {
 
     if (e) {
 
@@ -12149,15 +12241,22 @@ function sbInput(e,contents,seqNum) {
         }
     }
     else {
-        var sbStrings = document.getElementById('sbStrings').value.split('\n');
+        if (clearFlag) {
+            sbS = '';
+            sbT = '';
+            document.getElementById('sbStrings').value = '';
+        }
+        else {
+            var sbStrings = document.getElementById('sbStrings').value.split('\n');
 
-        sbStrings = sbStrings.filter(function (el) {
-            return el.length != 0;
-        });
+            sbStrings = sbStrings.filter(function (el) {
+                return el.length != 0;
+            });
 
 
-        sbS = sbStrings[0];
-        sbT = sbStrings[1];
+            sbS = sbStrings[0];
+            sbT = sbStrings[1];
+        }
     }
 
 
@@ -12166,7 +12265,7 @@ function sbInput(e,contents,seqNum) {
 
 }
 
-function phylogenyInput(e,input) {
+function phylogenyInput(e,input,clearFlag) {
 
     if (e) {
 
@@ -12176,7 +12275,11 @@ function phylogenyInput(e,input) {
 
 
     var source;
-    if (input) {
+
+    if (clearFlag) {
+        source = '';
+    }
+    else if (input) {
         source = input;
 
     }
@@ -12281,10 +12384,14 @@ function phylogenyInput(e,input) {
 }
 
 
-function sequencingInput(e,input) {
+function sequencingInput(e,input,clearFlag) {
 
     if (e) {
 
+    }
+
+    if (clearFlag) {
+        document.getElementById('sequencingStrings').value = '';
     }
 
     document.getElementById('moreCanvas').style.visibility = 'hidden';
@@ -12300,7 +12407,10 @@ function sequencingInput(e,input) {
     }
 
     var source;
-    if (input) {
+    if (clearFlag) {
+        source = '';
+    }
+    else if (input) {
         source = input;
 
     }
@@ -12310,10 +12420,15 @@ function sequencingInput(e,input) {
     }
 
 	if (source == null || source == '') {
-		errMsg('Please enter Reads first, then "Run"!');
+        if (clearFlag) {
+            errMsg('');
+        }
+        else {
+            errMsg('Please enter Reads first, then "Run"!');
+        }
 	}
 	else {
-		errMsg('');
+ 		errMsg('');
 	}
 
     var cleaned;
@@ -12379,6 +12494,12 @@ function sequencingInput(e,input) {
             dnaMasterStrings = cleaned;
             break;
         default:
+            dnaMaster = '';
+            dnaMasterStrings = '';
+            document.getElementById('graphDnaDiv').style.display = 'none';
+            document.getElementById('graphReadsDiv').style.display = 'none';
+            dnaMasterChanged();
+
             break;
     }
 
@@ -12426,6 +12547,10 @@ function sequencingInput(e,input) {
 
 
 
+    }
+    else {
+
+            document.getElementById('graphReadsDiv').innerHTML = '';
 
 
     }
@@ -12468,14 +12593,17 @@ function downloadSeq() {
     //    + encodeURIComponent(txt.value);
 }
 
-function transInput(e,input) {
+function transInput(e,input,clearFlag) {
 
     if (e) {
 
     }
 
     var source;
-    if (input) {
+    if (clearFlag) {
+        source = '';
+    }
+    else if (input) {
         source = input;
 
     }
@@ -12538,7 +12666,7 @@ function transInput(e,input) {
     }
 }
 
-function peptideInput(e,input)  {
+function peptideInput(e,input,clearFlag)  {
 
 if (e) {
 
@@ -12558,7 +12686,10 @@ if (e) {
     var pepInp;
 
     var source;
-    if (input) {
+    if (clearFlag) {
+        source = '';
+    }
+    else if (input) {
         source = input;
 
     }
@@ -12568,7 +12699,7 @@ if (e) {
     }
 
 	if (source == null || source == '') {
-		return;
+		errMsg('');
 	}
 	else {
 		errMsg('');
@@ -12605,6 +12736,8 @@ if (e) {
 
 
     var cleaned;
+
+    document.getElementById('pepInput').value = source;
 
     cleaned = document.getElementById('pepInput').value;
 
@@ -12704,6 +12837,11 @@ function stopPressed(e) {
 
     }
     stop = true;
+
+    w.postMessage(
+        {'task' : 'ltClumpStop'
+        }); // Start the worker.
+
 
 }
 
@@ -13560,6 +13698,7 @@ function sequencingInputRadClicked(id) {
     //Motif Radio Button
     switch (id) {
         case 'seqDNA':
+            document.getElementById('sequencingStrings').placeholder = 'Enter or paste DNA sequence to split and re-assemble (single line)';
             document.getElementById('kmerLenSA').style.display = "block";
             document.getElementById('numItersSA').style.display = "none";
             document.getElementById('pairDistSA').style.display = "none";
@@ -13576,7 +13715,7 @@ function sequencingInputRadClicked(id) {
             break;
 
         case 'seqReads':
-
+            document.getElementById('sequencingStrings').placeholder = 'Enter or paste Reads\n(one per line), eg:\nACGT\nGACG';
             document.getElementById('kmerLenSA').style.display = "none";
             document.getElementById('numItersSA').style.display = "none";
             document.getElementById('pairDistSA').style.display = "none";
@@ -13593,6 +13732,8 @@ function sequencingInputRadClicked(id) {
 
 
         case 'seqPairedReads':
+
+            document.getElementById('sequencingStrings').placeholder = 'Enter or paste Paired Reads\n(one per line), eg:\nACGT|GATA\nCGTT|ATAC';
 
             document.getElementById('kmerLenSA').style.display = "none";
             document.getElementById('numItersSA').style.display = "none";
@@ -14583,6 +14724,8 @@ function tabClickDone(tabNum,prevTabNum) {
             document.getElementById('phylogenyViewer').style.display = "none";
 
 			document.getElementById('dnaMessageDiv').style.display = "none";
+
+            document.getElementById('ltClumpStopBut').style.visibility = 'hidden';
 
 
             expDebugState = false;

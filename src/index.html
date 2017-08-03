@@ -25,7 +25,7 @@
             <div id = "leftBannerDiv">
                 <h2>
                     <img style="margin-left: 20px" src = 'img/logo_cropped.png'>
-                    Genetics and Evolution - DNA Workbench</h2>
+                    Genetics and Evolution - DNA Workbench<span id="versInfo"> v0.1b002</span></h2>
 
             </div>
             <div id = "rightBannerDiv">
@@ -74,10 +74,10 @@
             <div id="mfkEnterPaste">
                 <label for="dnaInput">Enter DNA:</label>
                 <input spellcheck="false" name="dnaInput" onkeypress = "return restrictToACGT(event)" onchange="dnaInput(event)" id = "dnaInput">
-                <div id="testApply">
+                <div class="applyDiv">
                      <button type = "button" onclick="dnaInput(event)">Apply</button>
                      <br>
-                     <button type = "button">Clear</button>
+                     <button type = "button" id="mfkClear" onclick="dnaInput(event,true)">Clear</button>
                 </div>
             </div>
             <div id="mfkLoad">
@@ -126,7 +126,12 @@
             <div id = "motifInputTools">
                 <div id = "motifEnterPaste">
                     <textarea name = "dnaStrings" spellcheck = "false" placeholder = "Enter/paste DNA sequences to analyse(one per line) eg&#10;ACGTT&#10;GCACGAC&#10;AAAACG" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true)" id = "dnaStrings" ></textarea>
-                    <button type = "button" id="motifsInput"  class="alTop" onclick="motifsInput(event)">Apply</button>
+                    <div class="applyDiv">
+
+                        <button type = "button" id="motifsInput"  class="alTop" onclick="motifsInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="motifsClear" onclick = "motifsInput(event,true)">Clear</button>
+                    </div>
                     <!--label for sequencesInput>Enter sequences:</label-->
                     <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
                     <button type = "button" onclick="sequencesInput(event)">Apply</button-->
@@ -150,7 +155,14 @@
             <div id = "sequencingInputTools">
                 <div id = "sequencingEnterPaste">
                     <textarea name = "sequencingStrings" spellcheck="false" placeholder = "Enter or paste Reads&#10;(one per line), eg:&#10;ACGT&#10;GACG&#10;OR &#10;DNA sequence (single line)" rows = "4" cols = "30" onkeypress="return restrictToACGT(event,true,'|')"  id = "sequencingStrings" ></textarea>
-                    <button type = "button" id="sequencingInput" class="alTop" onclick="sequencingInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+
+                        <button type = "button" id="sequencingInput" class="alTop" onclick="sequencingInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="sequencingClear" onclick="sequencingInput(event,null,true)">Clear</button>
+                    </div>
+
                 </div>
                 <div id = "sequencingLoad">
                     <label for="fileSequencingInput" class="alTop">Load Input :</label>
@@ -169,7 +181,13 @@
             <div id = "phylogenyInputTools">
                 <div class="inputEnterPaste">
                     <textarea name = "phylogenyStrings" spellcheck="false" placeholder = "Enter/paste DNA alignments in FASTA format eg:&#10;>Frog&#10;ACGTGCA&#10;>Dog&#10;CGTACTC etc&#10; OR dist matrix / adj list (one per line)" rows = "4" cols = "30"   id = "phylogenyStrings" ></textarea>
-                    <button type = "button" id="phylogenyInput" class="alTop" onclick="phylogenyInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+                        <button type = "button" id="phylogenyInput" class="alTop" onclick="phylogenyInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="phylogenyClear" onclick="phylogenyInput(event,null,true)">Clear</button>
+                    </div>
+
                 </div>
                 <div class = "inputLoad">
                     <label for="filePhylogenyInput" class="alTop">&nbsp;&nbsp;Load Input :</label>
@@ -189,7 +207,12 @@
                 <div id = "transEnterPaste">
                     <label for = "transInput">Enter DNA/RNA/Protein:</label>
                     <input  name="transInput" spellcheck="false" onkeypress = "return restrictToACGT(event,false,'Uu')" onchange="transInput(event)" id = "transInput">
-                    <button type = "button" onclick="transInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+                        <button type = "button" onclick="transInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="transClear" onclick="transInput(event,null,true)">Clear</button>
+                    </div>
                 </div>
                 <div id = "transLoad">
                     <label for="fileTransInput">Load DNA/RNA/Protein :</label>
@@ -214,7 +237,12 @@
                 <div class="inputEnterPaste">
                     <label for = "pepInput">Enter Peptide/Spectrum:</label>
                     <input  name="pepInput" spellcheck="false" onkeypress = "return restrictToACGT(event,false,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwzyz0123456789 ')" onchange="peptideInput(event)" id = "pepInput">
-                    <button type = "button" id="peptideInput" onclick="peptideInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+                        <button type = "button" id="peptideInput" onclick="peptideInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="pepClear" onclick="peptideInput(event,null,true)">Clear</button>
+                    </div>
                     <br>
                     Type:
                     <label for="lin">Linear</label>
@@ -247,7 +275,12 @@
             <div id = "alignInputTools">
                 <div id = "alignInputManual">
                 <textarea name = "alignStrings" spellcheck="false" placeholder = "Enter DNA or Amino sequences to align (1 per line),eg:&#10;PFEMPWTFSHMNDQMYQGLCDY&#10;GDDVNHTEDSGTRGCNYAR" rows = "4" cols = "30"  id = "alignStrings" ></textarea>
-                <button type = "button" id="alignInput" class="alTop" onclick="alignInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+                        <button type = "button" id="alignInput" class="alTop" onclick="alignInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="alignClear" onclick="alignInput(event,null,null,true)">Clear</button>
+                    </div>
                 </div>
                 <!--label for sequencesInput>Enter sequences:</label-->
                 <!--input type = "text" name="sequencesInput" onkeypress = "return restrictToACGT(event)" onchange="sequencesInput(event)" id = "sequencesInput">
@@ -277,7 +310,12 @@
             <div id = "sbInputTools">
                 <div id = "sbInputManual">
                 <textarea name = "sbStrings" spellcheck="false" placeholder = "Enter or paste DNA sequences to compare (one per line)" rows = "4" cols = "30"  id = "sbStrings" ></textarea>
-                <button type = "button" id="sbInput"  class="alTop" onclick="sbInput(event)">Apply</button>
+
+                    <div class="applyDiv">
+                        <button type = "button" id="sbInput"  class="alTop" onclick="sbInput(event)">Apply</button>
+                        <br>
+                        <button type = "button" id="sbClear" onclick="sbInput(event,null,null,true)">Clear</button>
+                    </div>
                 </div>
                 <div id = "sbInputFileArea" class="alTop">
                   <label for="fileSBInput">Load Sequence 1:</label>
@@ -435,7 +473,10 @@
                     <div id = "rightClump" class="rightClump">
                         <button class="alignBut runBut" type = "button" onclick="runLTClump()">Search</button>
                         <br>
-                        <button class = "alignBut" type = "button" onclick="stopPressed(event)">Stop</button>
+
+                        <button class = "alignBut runBut" id="ltClumpStopBut" type = "button" onclick="stopPressed(event)">Stop</button>
+
+
 
 
                     </div>
@@ -701,7 +742,7 @@
                     <button type = "button" onclick="motifsInput(event)">Apply</button-->
 
                     <label for ="kmerLenSA"  id = kmerLenLabSA class="alignLab">Read Len</label>
-                    <input type = "number" class="alignEl"  name = "kmerLenSA" onchange="kMerLenChanged(event)" id = "kmerLenSA" value = 3 min = 1 max = 100>
+                    <input type = "number" class="alignEl"  name = "kmerLenSA" onchange="kMerLenChanged(event)" id = "kmerLenSA" value = 4 min = 1 max = 100>
                     <label for ="pairDistSA" id="pairDistLabSA" class="alignLab">Pair Gap:</label>
                     <input type = "number" class = "sensibleNum alignEl" name = "pairDistSA"   id = "pairDistSA" value = 1 min = 1>
                     <label for ="numItersSA" id="numItersLabSA" class="alignLab">Num Iterations:</label>

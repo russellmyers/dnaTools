@@ -145,6 +145,11 @@ body {
 
 }
 
+#versInfo {
+
+    font-size: xx-small;
+}
+
 
 #errorMsgDiv {
 	color: red;
@@ -926,6 +931,7 @@ input[type=number] {
 .runBut {
     /* background-color: lightgreen;
 	 color: white;*/
+    margin-top: 5px;
 	background-color: #4CAF50; /* Green */
     border: none;
     color: white;
@@ -934,6 +940,10 @@ input[type=number] {
     text-decoration: none;
     /*display: inline-block;*/
     /*font-size: 16px;*/
+}
+
+#ltClumpStopBut {
+    visibility: hidden;
 }
 
 
@@ -1004,9 +1014,10 @@ input[type=number] {
 	display: none;
 }
 
-#testApply {
+.applyDiv {
     display: inline-block;
     vertical-align: top;
+
 }
 
 /*tabs stuff*/
